@@ -1,6 +1,5 @@
-Thanks for downloading this template!
 
-Template Name: Clinic
-Template URL: https://bootstrapmade.com/clinic-bootstrap-template/
+
+Template Name: Garda Sensus Ekonomi
 Author: BootstrapMade.com
 License: https://bootstrapmade.com/license/
