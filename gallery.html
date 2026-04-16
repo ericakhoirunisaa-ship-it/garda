@@ -56,10 +56,16 @@
         <nav id="navmenu" class="navmenu">
           <ul>
             <li><a href="index.html" class="active">Beranda</a></li>
-            <li><a href="about.html">Penjelasan Umum</a></li>
+            <li class="dropdown"><a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
+              <li><a href="tim.html">Tim Pelaksana</a></li>
+              <li><a href="kbli.html">KBLI</a></li>
+            </ul>
+            </li>
             <li><a href="administrasi.html">Teknis Administrasi</a></li>
             <li><a href="laporan.html">Laporan Kegiatan</a></li>
-            <li><a href="publikasi.html">Publikasi</a></li>
+            <li><a href="publikasi.html">Output</a></li>
         </nav>
 
       </div>
@@ -193,7 +199,7 @@
 
   </main>
 
-  <footer id="footer" class="footer-16 footer position-relative">
+<footer id="footer" class="footer-16 footer position-relative" style="background-color: var(--accent-color); color: #ffffff; padding-top: 60px;">
 
   <div class="container">
     <div class="footer-main" data-aos="fade-up" data-aos-delay="100">
@@ -201,17 +207,17 @@
 
         <div class="col-lg-4">
           <div class="brand-section">
-            <a href="index.html" class="logo d-flex align-items-center mb-4">
-              <span class="sitename">BPS Kabupaten Tolitoli</span>
+            <a href="index.html" class="logo d-flex align-items-center mb-4" style="text-decoration: none;">
+              <span class="sitename" style="color: #ffffff; font-weight: 700; font-size: 1.5rem;">BPS Kabupaten Tolitoli</span>
             </a>
-            <p class="brand-description">
+            <p class="brand-description" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
               Penyedia data statistik berkualitas untuk Indonesia Maju. Melayani dengan profesionalisme, integritas, dan amanah.
             </p>
 
             <div class="contact-info mt-4">
               <div class="contact-item mb-2">
                 <i class="bi bi-geo-alt-fill me-2"></i>
-                <span>Jl. Magamu No. 54, Panasakan, Kec. Baolan, Kabupaten Tolitoli, Sulawesi Tengah 94514</span>
+                <span style="font-size: 0.9rem;">Jl. Magamu No. 54, Panasakan, Kec. Baolan, Kabupaten Tolitoli, Sulawesi Tengah 94514</span>
               </div>
               <div class="contact-item mb-2">
                 <i class="bi bi-telephone-fill me-2"></i>
@@ -224,46 +230,46 @@
             </div>
 
             <div class="social-links mt-4">
-              <a href="https://facebook.com/bpstolitoli" class="me-3 text-reset"><i class="bi bi-facebook fs-4"></i></a>
-              <a href="https://instagram.com/bps_tolitoli" class="me-3 text-reset"><i class="bi bi-instagram fs-4"></i></a>
-              <a href="https://youtube.com/@bpstolitoli" class="me-3 text-reset"><i class="bi bi-youtube fs-4"></i></a>
-              <a href="https://tolitoli-kab.bps.go.id" class="text-reset"><i class="bi bi-globe fs-4"></i></a>
+              <a href="" class="me-3 text-white"><i class="bi bi-facebook fs-4"></i></a>
+              <a href="" class="me-3 text-white"><i class="bi bi-instagram fs-4"></i></a>
+              <a href="" class="me-3 text-white"><i class="bi bi-youtube fs-4"></i></a>
+              <a href="" class="text-white"><i class="bi bi-globe fs-4"></i></a>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="col-lg-4 mt-5 mt-lg-0">
           <div class="row">
             <div class="col-6">
               <div class="nav-column">
-                <h6>Navigasi</h6>
-                <nav class="footer-nav">
-                  <a href="#!">Beranda</a>
-                  <a href="#!">Penjelasan Umum</a>
-                  <a href="#!">Teknis Administrasi</a>
-                  <a href="#!">Rapat / Pelatihan</a>
-                  <a href="#!">Publikasi</a>
+                <h6 style="color: #ffffff; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 20px;">Navigasi</h6>
+                <nav class="footer-nav d-flex flex-column gap-2">
+                 <a href="index.html" style="color: rgba(255, 255, 255, 0.85); text-decoration: none; transition: 0.3s;">Beranda</a>
+                  <a href="penjelasan.html" style="color: rgba(255, 255, 255, 0.85); text-decoration: none; transition: 0.3s;">Penjelasan Umum</a>
+                  <a href="administrasi.html" style="color: rgba(255, 255, 255, 0.85); text-decoration: none; transition: 0.3s;">Teknis Administrasi</a>
+                  <a href="laporan.html" style="color: rgba(255, 255, 255, 0.85); text-decoration: none; transition: 0.3s;">Laporan</a>
+                  <a href="publikasi.html" style="color: rgba(255, 255, 255, 0.85); text-decoration: none; transition: 0.3s;">Output</a>
                 </nav>
               </div>
             </div>
             <div class="col-6">
               <div class="nav-column">
-                <h6>Jam Layanan</h6>
-                <p class="small mb-1">Senin - Kamis:</p>
-                <p class="fw-bold small">08.00 - 15.30 WITA</p>
-                <p class="small mb-1">Jumat:</p>
-                <p class="fw-bold small">08.00 - 16.00 WITA</p>
-                <p class="text-muted small">*Sabtu, Minggu & Hari Libur Nasional Tutup</p>
+                <h6 style="color: #ffffff; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 20px;">Jam Layanan</h6>
+                <p class="small mb-1" style="opacity: 0.8;">Senin - Kamis:</p>
+                <p class="fw-bold small mb-2">07.30 - 16.00 WITA</p>
+                <p class="small mb-1" style="opacity: 0.8;">Jumat:</p>
+                <p class="fw-bold small mb-3">07.30 - 16.30 WITA</p>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem; font-style: italic;">*Sabtu, Minggu & Hari Libur Nasional Tutup</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-4 mt-4 mt-lg-0">
-          <h6>Lokasi Kami</h6>
-          <div class="map-container" style="width: 100%; height: 200px; border-radius: 8px; overflow: hidden;">
+        <div class="col-lg-4 mt-5 mt-lg-0">
+          <h6 style="color: #ffffff; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 20px;">Lokasi Kami</h6>
+          <div class="map-container" style="width: 100%; height: 200px; border-radius: 15px; overflow: hidden; border: 3px solid rgba(255, 255, 255, 0.2);">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.155827361405!2d120.8173468742299!3d1.0431359624545084!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32cc6b8493f35081%3A0xc47e38318f77340b!2sBPS%20Kabupaten%20Tolitoli!5e0!3m2!1sid!2sid!4v1712800000000!5m2!1sid!2sid" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.1551286282065!2d120.8198227747264!3d1.0446880624812578!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32712b4be7b628b7%3A0x602e57994bfb76da!2sBadan%20Pusat%20Statistik%20Kabupaten%20Tolitoli!5e0!3m2!1sen!2sid!4v1776297625755!5m2!1sen!2sid" 
               width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
             </iframe>
           </div>
@@ -273,15 +279,15 @@
     </div>
   </div>
 
-  <div class="footer-bottom mt-5">
-    <div class="container border-top pt-4">
+  <div class="footer-bottom mt-5" style="background-color: rgba(0, 0, 0, 0.1); padding: 25px 0;">
+    <div class="container">
       <div class="row align-items-center">
         <div class="col-md-6 text-center text-md-start">
-          <p class="mb-0">© 2026 <strong>BPS Kabupaten Tolitoli</strong>. All Rights Reserved.</p>
+          <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9;">© 2026 <strong>BPS Kabupaten Tolitoli</strong></p>
         </div>
         <div class="col-md-6 text-center text-md-end">
-          <div class="credits">
-             <a href="https://bootstrapmade.com/"></a>
+          <div class="credits" style="font-size: 0.8rem; opacity: 0.7;">
+              Penyedia Data Statistik Terpercaya
           </div>
         </div>
       </div>

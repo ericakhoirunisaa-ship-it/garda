@@ -3575,6 +3575,36 @@ section,
   }
 }
 
+.agenda-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.agenda-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.agenda-card h4 {
+  color: #2c3e50;
+  font-size: 1.25rem;
+}
+
+.agenda-meta i {
+  color: #f79039;
+}
+
+#agenda .swiper-pagination-bullet {
+  background: #ffffff !important;
+  opacity: 0.5;
+}
+#agenda .swiper-pagination-bullet-active {
+  background: #ffffff !important;
+  opacity: 1;
+}
+#agenda .agenda-card h4 {
+  font-size: 1.1rem;
+}
+
 /*--------------------------------------------------------------
 # administrasi Details Section
 --------------------------------------------------------------*/
