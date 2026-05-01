@@ -42,35 +42,37 @@
 <body class="index-page">
 
   <header id="header" class="header fixed-top">
-  <div class="branding d-flex align-items-center"> <!-- Perbaikan typo 'cente' jadi 'center' -->
-    <div class="container position-relative d-flex align-items-center justify-content-between">
-      
-      <a href="index.html" class="logo d-flex align-items-center">
-        <h1 class="sitename">Garda</h1>
-      </a>
 
-      <nav id="navmenu" class="navmenu">
+
+    <div class="branding d-flex align-items-cente">
+
+     <div class="container position-relative d-flex align-items-center justify-content-between">
+  <a href="index.html" class="logo d-flex align-items-center">
+    <h1 class="sitename">SEMANIS 2026</h1>
+  </a>
+
+  <nav id="navmenu" class="navmenu">
+    <ul>
+      <li><a href="index.html" class="active">Beranda</a></li>
+      <li class="dropdown"><a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
         <ul>
-          <li><a href="index.html" class="active">Beranda</a></li>
-          <li class="dropdown">
-            <a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
-              <li><a href="tim.html">Tim Pelaksana</a></li>
-              <li><a href="kbli.html">KBLI</a></li>
-            </ul>
-          </li>
-          <li><a href="administrasi.html">Teknis Administrasi</a></li>
-          <li><a href="laporan.html">Laporan Kegiatan</a></li>
-          <li><a href="publikasi.html">Output</a></li>
+          <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
+          <li><a href="tim.html">Tim Pelaksana</a></li>
+          <li><a href="kbli.html">KBLI</a></li>
         </ul>
-        <!-- Tombol hamburger harus berada di dalam <nav> atau sejajar di dalam container branding -->
-        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
+      </li>
+      <li><a href="administrasi.html">Teknis Administrasi</a></li>
+      <li><a href="laporan.html">Laporan Kegiatan</a></li>
+<!-- <li><a href="publikasi.html">Output</a></li> -->
+    </ul>
+    
+    <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+  </nav>
+</div>
 
     </div>
-  </div>
-</header>
+
+  </header>
   <main class="main">
 
   <section id="hero" class="hero section" style="padding-top: 120px; padding-bottom: 60px;">
@@ -666,22 +668,14 @@
 
 </footer>
 
-  <!-- Scroll Top -->
+ <!-- Scroll Top -->
   <a href="#!" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Preloader -->
   <div id="preloader"></div>
 
-  <!-- Scroll Top -->
-  <a href="#!" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
-    <i class="bi bi-arrow-up-short"></i>
-  </a>
-
-  <!-- Preloader -->
-  <div id="preloader"></div>
-
-  <!-- Vendor JS Files -->
+ <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
@@ -692,36 +686,10 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
-  <!-- Script Custom (Hamburger & Countdown) -->
+  <!-- Script Custom (Hanya Countdown) -->
   <script>
     (function() {
       "use strict";
-
-      /**
-       * Mobile nav toggle
-       * Note: Jika di main.js sudah ada script serupa, blok ini bisa dihapus 
-       * agar tidak terjadi double-toggle (buka-tutup instan).
-       */
-      const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
-      if (mobileNavToggleBtn) {
-        mobileNavToggleBtn.addEventListener('click', function(e) {
-          document.querySelector('body').classList.toggle('mobile-nav-active');
-          this.classList.toggle('bi-list');
-          this.classList.toggle('bi-x');
-        });
-      }
-
-      /**
-       * Toggle mobile nav dropdowns
-       */
-      document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
-        navmenu.addEventListener('click', function(e) {
-          e.preventDefault();
-          this.parentNode.classList.toggle('active');
-          this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
-          e.stopImmediatePropagation();
-        });
-      });
 
       /**
        * Countdown Timer Sensus Ekonomi 2026
@@ -731,7 +699,6 @@
         const now = new Date().getTime();
         const gap = countDate - now;
 
-        // Cek apakah elemen ada di halaman ini sebelum diisi
         const d = document.getElementById("days");
         const h = document.getElementById("hours");
         const m = document.getElementById("minutes");
@@ -759,7 +726,6 @@
 
       setInterval(countdown, 1000);
       countdown();
-
     })();
   </script>
 
