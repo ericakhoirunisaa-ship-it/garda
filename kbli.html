@@ -43,32 +43,32 @@
 
   <header id="header" class="header fixed-top">
 
+
     <div class="branding d-flex align-items-cente">
 
-      <div class="container position-relative d-flex align-items-center justify-content-between">
-        <a href="index.html" class="logo d-flex align-items-center">
-          <!-- Uncomment the line below if you also wish to use an image logo -->
-          <!-- <img src="assets/img/logo.webp" alt=""> -->
-          <h1 class="sitename">KBLI</h1>
-        </a>
+     <div class="container position-relative d-flex align-items-center justify-content-between">
+  <a href="index.html" class="logo d-flex align-items-center">
+    <h1 class="sitename">SEMANIS 2026</h1>
+  </a>
 
-        <nav id="navmenu" class="navmenu">
-          <ul>
-             <li><a href="index.html" class="active">Beranda</a></li>
-            <li class="dropdown"><a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
-              <li><a href="tim.html">Tim Pelaksana</a></li>
-              <li><a href="kbli.html">KBLI</a></li>
-            </ul>
-            </li>
-            <li><a href="administrasi.html">Teknis Administrasi</a></li>
-            <li><a href="laporan.html">Laporan Kegiatan</a></li>
-            <li><a href="publikasi.html">Output</a></li>
-          </ul>
-        </nav>
-
-      </div>
+  <nav id="navmenu" class="navmenu">
+    <ul>
+      <li><a href="index.html" class="active">Beranda</a></li>
+      <li class="dropdown"><a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+        <ul>
+          <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
+          <li><a href="tim.html">Tim Pelaksana</a></li>
+          <li><a href="kbli.html">KBLI</a></li>
+        </ul>
+      </li>
+      <li><a href="administrasi.html">Teknis Administrasi</a></li>
+      <li><a href="laporan.html">Laporan Kegiatan</a></li>
+      <li><a href="publikasi.html">Output</a></li>
+    </ul>
+    
+    <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+  </nav>
+</div>
 
     </div>
 
@@ -507,6 +507,7 @@
     </div>
   </div>
 </section>
+
 <style>
   .kbli-wrapper {
     background-color: #f79039;
@@ -620,24 +621,689 @@
           </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">01</span>
-          <div><h6 class="mb-1">Pertanian Tanaman, Peternakan, Perburuan, dan Kegiatan Jasa Terkait</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">02</span>
-          <div><h6 class="mb-1">Pengelolaan Kehutanan dan Pemanenan Kayu</h6></div>
-        </div>
-        <div class="d-flex gap-3">
-          <span class="kode-box">03</span>
-          <div><h6 class="mb-1">Perikanan</h6></div>
+      <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 01 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">01</span>
+  <div>
+    <h6 class="mb-1">Pertanian Tanaman, Peternakan, Perburuan, dan Kegiatan Jasa Terkait</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/01" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 02 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">02</span>
+  <div>
+    <h6 class="mb-1">Pengelolaan Kehutanan dan Pemanenan Kayu</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/02" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 03 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">03</span>
+  <div>
+    <h6 class="mb-1">Perikanan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/03" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<div class="modal fade" id="modalB" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header px-4">
+        <h5 class="modal-title">Rincian Kategori B</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-4">
+          <h6><strong>Ruang Lingkup:</strong></h6>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori pertambangan dan penggalian mencakup pengambilan/ekstraksi mineral yang terbentuk secara alami dalam bentuk padat (batu bara dan bijih logam), cair (minyak bumi), atau gas (gas alam), dari pertambangan, dasar laut, dan ekstraksi garam dari air laut, air garam, dan air asin (saline water) lainnya.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Ekstraksi dapat dilakukan dengan metode yang berbeda seperti pertambangan di permukaan tanah atau di bawah tanah, pengoperasian sumur pertambangan, penambangan di dasar laut, dan lain-lain. Kategori ini mencakup kegiatan tambahan untuk penyiapan barang tambang dan galian mentah untuk dipasarkan seperti pemecahan, pengasahan, pembersihan, pengeringan, sortasi, benefisiasi dan konsentrasi bijih logam, pencairan gas alam
+          </p>
+
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Aktivitas pertambangan diklasifikasikan ke dalam golongan pokok, golongan, dan subgolongan berdasarkan mineral utama yang dihasilkan.
+            </p>
+
+            <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Beberapa pengoperasian teknis pada kategori ini, terutama yang berkaitan dengan ekstraksi hidrokarbon, juga dapat dilakukan untuk pihak ketiga oleh unit khusus sebagai jasa industri, yang tercermin pada golongan pokok 09.
+            </p>'
+            
+            <div class="alert alert-warning py-2 mb-4" style="font-size: 0.85rem; border-radius: 10px;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Pengecualian:</strong> proses pengolahan lebih lanjut material yang telah diekstraksi, lihat kategori C (industri); penggunaan material yang telah diekstraksi tanpa adanya perubahan bentuk untuk tujuan konstruksi, lihat kategori F (konstruksi); pengemasan air dalam botol (air alami dari mata air dan air mineral dari sumber mata air dan sumur, lihat 1105); remediasi lokasi pertambangan, lihat subgolongan 3900; pengupasan lapisan tanah penutup dan pembentukan kontur lahan di lokasi pertambangan, lihat subgolongan 4312.
+          </div>
+        </div>
+
+      <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 05 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">05</span>
+  <div>
+    <h6 class="mb-1">Pertambangan Batu Bara dan Lignit</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/05" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 06 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">06</span>
+  <div>
+    <h6 class="mb-1">Pertambangan Minyak Bumi dan Gas Alam</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/06" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 07 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">07</span>
+  <div>
+    <h6 class="mb-1">Pertambangan Bijih Logam</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/07" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 08 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">08</span>
+  <div>
+    <h6 class="mb-1">Pertambangan dan Penggalian Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/08" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 09 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">09</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Jasa Penunjang Pertambangan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/09" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+        </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalC" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header px-4">
+        <h5 class="modal-title">Rincian Kategori C</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-4">
+          <h6><strong>Ruang Lingkup:</strong></h6>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori ini meliputi kegiatan perubahan secara kimia, fisik, biologis dari bahan, unsur, atau komponen menjadi produk baru, walaupun hal ini tidak bisa dijadikan sebagai satu-satunya kriteria untuk mendefinisikan kegiatan industri. Bahan baku, substansi, atau komponen yang diolah merupakan bahan mentah atau produk yang berasal dari pertanian, kehutanan, perikanan, pertambangan, atau penggalian, termasuk juga produk dari kegiatan industri lainnya. Perubahan, pembaharuan, atau rekonstruksi yang pokok dari barang secara umum diperlakukan sebagai kegiatan industri.
+            </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Hasil dari suatu proses pengolahan dapat berupa hasil akhir yang siap untuk digunakan atau dikonsumsi, atau hasil setengah jadi yang akan menjadi input untuk pengolahan lebih lanjut. Sebagai contoh, hasil pemurnian alumina merupakan bahan baku yang digunakan untuk produksi aluminium primer; aluminium primer merupakan bahan baku dari penarikan kawat aluminium; dan kawat aluminium merupakan bahan baku untuk pembuatan produk kawat pabrikasi.
+            </p>
+            <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori ini mencakup juga kegiatan produsen barang tanpa pabrik atau factoryless goods producers (FGP) yang sepenuhnya mengalihdayakan proses transformasi, tetapi tetap mengendalikan proses produksi dan menyediakan input kekayaan intelektual kritikal, terlepas dari apakah prinsipal atau FGP bertindak sebagai penyedia bahan baku atau tidak. FGP diklasifikasikan dalam kelompok yang sama seperti jika mereka melakukan proses industri tersebut secara langsung. Namun, kategori ini tidak mencakup unit yang sepenuhnya mengalihdayakan proses transformasi tetapi tidak mengendalikan proses produksi, tidak menyediakan input kekayaan intelektual kritikal, dan juga tidak sebagai penyedia bahan baku. Unit-unit ini pada dasarnya membeli barang jadi dari produsen dengan tujuan untuk dijual kembali. Kegiatan semacam ini diklasifikasikan dalam kategori G (perdagangan besar dan eceran) menurut jenis penjualan dan jenis barang yang dijual
+            </p>
+            <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Pembuatan komponen, suku cadang, aksesori, kelengkapan khusus untuk mesin dan perlengkapan, secara umum diklasifikasikan dalam kelompok yang sama dengan pembuatan mesin dan peralatan yang menggunakan suku cadang dan aksesori tersebut. Pembuatan komponen dan suku cadang umum untuk mesin dan peralatan, misalnya mesin, piston, penggerak listrik, rakitan listrik, katup, roda gigi, dan bantalan rol, diklasifikasikan dalam kelompok yang sesuai, tanpa mempertimbangkan jenis mesin atau peralatan tempat komponen tersebut digunakan.
+            </p>
+            <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Pembuatan komponen dan aksesori khusus melalui proses pencetakan atau ekstrusi bahan plastik biasanya termasuk dalam golongan 222. 
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Perakitan komponen dari produk industri dianggap sebagai kegiatan industri. Ini mencakup perakitan produk industri dari komponen yang diproduksi sendiri maupun yang dibeli. 
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Pemulihan limbah, yaitu pengolahan limbah menjadi bahan baku sekunder, diklasifikasikan dalam golongan 383 (pemulihan bahan dan limbah lainnya). Meskipun kegiatan tersebut dapat melibatkan transformasi fisik, kimia, atau biologis, tidak dianggap sebagai bagian dari proses industri. Tujuan utama kegiatan ini dianggap sebagai pengelolaan atau pemrosesan limbah, sehingga diklasifikasikan dalam kategori E (penyediaan air; pengelolaan air limbah, penanganan limbah, dan remediasi). Namun, pembuatan produk baru dari bahan baku sekunder tetap diklasifikasikan sebagai kegiatan industri, meskipun proses tersebut menggunakan limbah sebagai input. Sebagai contoh, produksi perak dari limbah film dianggap sebagai proses industri.  
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+             Secara umum, pemeliharaan dan reparasi khusus dari mesin dan peralatan industri, komersial, dan sejenisnya, diklasifikasikan dalam golongan pokok 33 (reparasi, pemeliharaan, dan pemasangan mesin dan peralatan). Walaupun demikian, reparasi dan pemeliharaan komputer, barang keperluan pribadi dan barang rumah tangga, serta kendaraan bermotor dan sepeda motor diklasifikasikan dalam golongan pokok 95 (reparasi dan pemeliharaan komputer, barang keperluan pribadi dan perlengkapan rumah tangga, serta kendaraan bermotor dan sepeda motor). Pemasangan mesin dan peralatan industri, jika dilakukan sebagai aktivitas khusus, diklasifikasikan dalam subgolongan 3320.Pemeliharaan, reparasi, dan pemasangan peralatan yang merupakan bagian dari bangunan atau struktur sejenis, misalnya pemeliharaan, reparasi, dan pemasangan eskalator atau sistem pengondisi udara, diklasifikasikan dalam kategori F (konstruksi), jika dilakukan pada situs konstruksi.
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+             Secara umum, aktivitas dalam kategori ini mencakup transformasi material menjadi produk baru, serta reparasi dan pemasangan mesin dan peralatan. Keluaran dari kategori ini dapat berupa produk baru atau produk yang telah melalui pembangunan kembali atau remanufaktur. Sebagai klarifikasi, aktivitas-aktivitas berikut dianggap sebagai kegiatan pengolahan dalam KBLI: pengolahan ikan segar (pengupasan tiram, pemotongan ikan) yang tidak dilakukan di kapal perikanan (lihat golongan 102); pasteurisasi dan pembotolan susu (lihat subgolongan 1050);konversi kulit (lihat subgolongan 1511); pengawetan kayu (lihat subgolongan 1629);pencetakan dan aktivitas terkait (lihat golongan 181); vulkanisasi ban (lihat subgolongan 2211); pembuatan beton siap pakai (lihat subgolongan 2395); pelapisan listrik/electroplating, pelapisan, dan perlakuan panas pada logam (lihat subgolongan 2592); pembangunan atau remanufaktur mesin (misalnya mesin automobil, lihat subgolongan 2910); pengisian kembali alat pemadam kebakaran;
+             </p>
+             <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+             pembuatan dan pengiriman struktur dan bangunan prafabrikasi dengan pekerjaan konstruksi yang minimum di lokasi.  Sebaliknya, terdapat beberapa aktivitas yang terkadang melibatkan proses transformasi, tetapi diklasifikasikan dalam kategori lain dalam KBLI. Dengan kata lain, kegiatan tersebut tidak dianggap sebagai kegiatan. Beberapa kegiatan tersebut antara lain
+             </p>
+             <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+             pemanenan kayu, diklasifikasikan dalam kategori A (pertanian, kehutanan, dan perikanan);pemanfaatan hasil pertanian, diklasifikasikan dalam kategori A (pertanian, kehutanan, dan perikanan); penyiapan makanan untuk dikonsumsi segera di tempat usaha diklasifikasikan dalam golongan pokok 56 (aktivitas penyediaan makanan dan minuman); pemanfaatan bijih dan mineral lainnya, diklasifikasikan dalam kategori B (pertambangan dan penggalian); produksi bahan bakar gas untuk suplai energi melalui jaringan permanen, diklasifikasikan dalam kategori D (penyediaan listrik, gas, uap/air panas, dan udara dingin); produksi kompos dari sampah organik, lihat subgolongan 3821; konstruksi struktur, perakitan bangunan prafabrikasi pada situs konstruksi, diklasifikasikan dalam kategori F (konstruksi); perakitan yang disediakan sebagai bagian dari pengiriman atau oleh penjual. Akan tetapi, jika perakitan merupakan aktivitas utama yang disediakan oleh kontraktor, kegiatan ini diklasifikasikan dalam kategori C; aktivitas pemecahan barang dalam jumlah besar dan pendistribusian ulang dalam jumlah yang lebih kecil, termasuk pengepakan, pengepakan kembali, atau pembotolan produk, seperti minuman keras atau bahan kimia; penyortiran barang bekas; pencampuran cat berdasarkan pesanan pelanggan; pemotongan logam berdasarkan pesanan pelanggan; dan perlakuan yang tidak menghasilkan produk yang berbeda, diklasifikasikan dalam kategori G (perdagangan besar dan eceran); penerbitan dan kombinasi gabungan kegiatan penerbitan dan pencetakan diklasifikasikan dalam kategori J (aktivitas penerbitan, penyiaran, produksi, dan distribusi konten)
+            </p>
+        </div>
+
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 10 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">10</span>
+  <div>
+    <h6 class="mb-1">Industri Makanan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/10" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 11 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">11</span>
+  <div>
+    <h6 class="mb-1">Industri Minuman</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/11" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 12 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">12</span>
+  <div>
+    <h6 class="mb-1">Industri Produk Tembakau</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/12" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 13 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">13</span>
+  <div>
+    <h6 class="mb-1">Industri Tekstil</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/13" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 14 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">14</span>
+  <div>
+    <h6 class="mb-1">Industri Pakaian Jadi dan Perlengkapannya (Apparel)</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/14" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 15 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">15</span>
+  <div>
+    <h6 class="mb-1">Industri Kulit dan Produk Sejenis</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/15" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 16 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">16</span>
+  <div>
+    <h6 class="mb-1">Industri Kayu, Barang dari Kayu dan Gabus</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/16" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 17 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">17</span>
+  <div>
+    <h6 class="mb-1">Industri Kertas dan Barang dari Kertas</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/17" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 18 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">18</span>
+  <div>
+    <h6 class="mb-1">Percetakan dan Reproduksi Media Rekaman</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/18" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 19 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">19</span>
+  <div>
+    <h6 class="mb-1">Industri Produksi dari Batu Bara dan Pengilangan Minyak Bumi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/19" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 20 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">20</span>
+  <div>
+    <h6 class="mb-1">Industri Bahan Kimia dan Barang dari Bahan Kimia</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/20" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 21 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">21</span>
+  <div>
+    <h6 class="mb-1">Industri Sediaan Farmasi, Obat Kimia, dan Obat Tradisional</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/21" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 22 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">22</span>
+  <div>
+    <h6 class="mb-1">Industri Barang dari Karet dan Plastik</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/22" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 23 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">23</span>
+  <div>
+    <h6 class="mb-1">Industri Produk Mineral Nonlogam</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/23" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 24 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">24</span>
+  <div>
+    <h6 class="mb-1">Industri Logam Dasar</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/24" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 25 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">25</span>
+  <div>
+    <h6 class="mb-1">Industri Produk Logam Pabrikasi Bukan Mesin dan Peralatannya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/25" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 26 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">26</span>
+  <div>
+    <h6 class="mb-1">Industri Produk Komputer, Elektronik dan Optik</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/26" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 27 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">27</span>
+  <div>
+    <h6 class="mb-1">Industri Peralatan Listrik</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/27" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 28 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">28</span>
+  <div>
+    <h6 class="mb-1">Industri Mesin dan Perlengkapan YTDL</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/28" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 29 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">29</span>
+  <div>
+    <h6 class="mb-1">Industri Kendaraan Bermotor, Trailer, dan Semitrailer</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/29" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 30 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">30</span>
+  <div>
+    <h6 class="mb-1">Industri Alat Angkutan Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/30" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 31 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">31</span>
+  <div>
+    <h6 class="mb-1">Industri Furnitur</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/31" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 32 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">32</span>
+  <div>
+    <h6 class="mb-1">Industri Produk Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/32" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+
+<!-- Golongan 33 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">33</span>
+  <div>
+    <h6 class="mb-1">Reparasi, Pemeliharaan dan Pemasangan Mesin dan Peralatan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/33" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut klik berikut</a>
+  </div>
+</div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalD" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header px-4">
+        <h5 class="modal-title">Rincian Kategori D</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-4">
+        <!-- Bagian Ruang Lingkup -->
+        <div class="mb-4">
+          <h6><strong>Ruang Lingkup:</strong></h6>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori ini mencakup pembangkitan, penyimpanan, pengendalian, distribusi, perdagangan, dan keagenan tenaga listrik atau bahan bakar gas untuk penyediaan energi melalui jaringan, saluran, atau pipa permanen, termasuk penyediaan energi untuk lokasi pabrik atau bangunan tempat tinggal. Kategori ini juga mencakup pengoperasian mesin pembangkit listrik dan gas, pemanasan dan pendinginan, seperti pengadaan uap panas dan udara dingin/sistem tata udara melalui jaringan permanen, termasuk kegiatan produksi es, baik untuk kebutuhan konsumsi maupun kebutuhan lainnya. 
+          </p>
+          <div class="alert alert-warning py-2">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Pengecualian:</strong> Kategori Ini Tidak Mencakup ekstraksi gas alam mentah (0620); jasa penyediaan sarana air bersih dan pembuangan limbah (36 & 37); pengangkutan gas melalui saluran pipa (4930). 
+          </div>
+        </div>
+
+        <h6><strong>Golongan Pokok:</strong></h6>
+
+        <!-- Golongan 35 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+          <span class="kode-box">35</span>
+          <div>
+            <h6 class="mb-1">Penyediaan Listrik, Gas, Uap/Air Panas, dan Udara Dingin</h6>
+            <!-- Bagian Link BPS di dalam Modal -->
+<a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/35" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm mt-2">
+  Informasi lebih lanjut klik berikut
+</a>
+          </div>
+        </div>
+      </div> <!-- Penutup modal-body -->
+
+    </div> <!-- Penutup modal-content -->
+  </div> <!-- Penutup modal-dialog -->
+</div> <!-- Penutup modal fade id="modalD" -->
+
+<div class="modal fade" id="modalE" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header px-4">
+        <h5 class="modal-title">Rincian Kategori E</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-4">
+          <h6><strong>Ruang Lingkup:</strong></h6>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori ini mencakup kegiatan yang berhubungan dengan penanganan, seperti pengumpulan, prapenanganan, pemulihan, dan pembuangan berbagai bentuk limbah dan sampah, seperti limbah dan sampah padat atau selain padat yang berasal dari rumah tangga dan industri, serta pengelolaannya. Hasil dari proses pengolahan limbah dan sampah dapat dibuang atau menjadi input dalam proses produksi lainnya. 
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Bahan baku sekunder adalah bahan dan produk yang dapat digunakan sebagai bahan baku melalui penggunaan kembali secara sederhana atau melalui daur ulang dan pemulihan material. 
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Kegiatan penyediaan air termasuk dalam kategori ini karena kegiatan tersebut sering dilakukan atau terkait dengan unit yang terlibat dalam treatment limbah.
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Kegiatan ini mencakup remediasi dari kontaminasi bangunan dan lokasi, tanah, air permukaan, dan air tanah (contohnya laut, hutan bakau), dan lain-lain.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Unit-unit yang biasanya mengambil alih prosedur penanganan limbah klien mereka dan menjadi pelanggan pengangkut limbah, kemudian menagih klien mereka atas layanan penanganan limbah, harus diklasifikasikan dalam golongan pokok 38, karena meskipun unit-unit tersebut tidak memberikan layanan yang bersangkutan secara langsung, mereka bertanggung jawab atas pemenuhannya. Kegiatan ini harus dianggap sebagai alih daya penuh dari layanan tersebut.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Kategori ini juga mencakup penangkapan dan penyimpanan karbon (CCS);
+          </p>
+        
+          <div class="alert alert-warning py-2 mb-4" style="font-size: 0.85rem; border-radius: 10px;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Pengecualian:</strong> Tidak mencakup perdagangan limbah sebagai agen, lihat subgolongan 4610; perdagangan limbah sebagai pedagang besar, lihat subgolongan 4679
+          </div>
+        </div>
+
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 36 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">36</span>
+  <div>
+    <h6 class="mb-1">Penampungan, Pengambilan, Pengolahan dan Penyediaan Air</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/36" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 37 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">37</span>
+  <div>
+    <h6 class="mb-1">Pengelolaan Air Limbah</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/37" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 38 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">38</span>
+  <div>
+    <h6 class="mb-1">Pengumpulan, Pengolahan dan Pembuangan Limbah Atau Sampah; serta Aktivitas Pemulihan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/38" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 39 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">39</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Remediasi dan Pengelolaan Limbah atau Sampah Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/39" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modalF" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header px-4">
+        <h5 class="modal-title">Rincian Kategori F</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-4">
+          <h6><strong>Ruang Lingkup:</strong></h6>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori ini mencakup kegiatan di bidang konstruksi, yaitu kegiatan konstruksi umum dan konstruksi khusus pekerjaan bangunan gedung dan bangunan sipil. Kegiatan konstruksi mencakup pekerjaan baru, perbaikan, penambahan dan perubahan, pendirian bangunan atau struktur prapabrikasi di lokasi proyek, dan juga konstruksi yang bersifat sementara. 
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Kegiatan konstruksi umum adalah pembangunan keseluruhan bangunan seperti konstruksi bangunan hunian, bangunan kantor, pertokoan, dan bangunan lainnya. Kategori ini juga mencakup konstruksi bangunan sipil seperti jalan kendaraan bermotor, jalan raya, jembatan, terowongan, jalan rel, lapangan udara, pelabuhan dan bangunan air lainnya, sistem irigasi, sistem air limbah, fasilitas industri, jaringan pipa dan jaringan listrik, fasilitas olahraga, dan lain-lain. 
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Kegiatan konstruksi khusus, seperti penyiapan lahan, instalasi gedung, dan penyelesaian gedung.
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Pekerjaan konstruksi dapat dilakukan atas nama sendiri atau atas dasar balas jasa/kontrak, dan mencakup jasa intermediasi yang terkait dengan konstruksi. Sebagian pekerjaan dan atau bahkan keseluruhan pekerjaan konstruksi dapat disubkontrakan. Kontraktor utama yang memegang tanggung jawab keseluruhan untuk kegiatan konstruksi diklasifikasikan di sini.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Kategori ini mencakup juga kegiatan perbaikan bangunan gedung dan bangunan sipil. 
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Pemeliharaan, perbaikan, dan instalasi peralatan yang menjadi bagian integral dari bangunan, seperti eskalator atau sistem pendingin udara, diklasifikasikan sebagai konstruksi di kategori F, jika dilakukan di lokasi konstruksi.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Kategori ini dibedakan menjadi konstruksi lengkap bangunan gedung (golongan pokok 41), konstruksi lengkap bangunan sipil (golongan pokok 42), dan juga kegiatan konstruksi khusus, jika hanya melakukan sebagian proses konstruksi (golongan pokok 43).
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Penyewaan peralatan konstruksi dengan operatornya diklasifikasikan sebagai kegiatan konstruksi khusus (golongan pokok 43).  
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Kategori ini juga mencakup; renovasi dan restorasi situs dan bangunan bersejarah yang merupakan bagian dari warisan budaya.  
+           </p>
+           
+          <div class="alert alert-warning py-2 mb-4" style="font-size: 0.85rem; border-radius: 10px;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Pengecualian:</strong> Tidak mencakup konservasi kuratif situs dan bangunan bersejarah, lihat subgolongan 9130; ekskavasi arkeologi, lihat golongan 722;  
+          </div>
+        </div>
+
+        <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 41 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">41</span>
+  <div>
+    <h6 class="mb-1">Konstruksi Gedung Hunian dan Gedung Nonhunian</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/41" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 42 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">42</span>
+  <div>
+    <h6 class="mb-1">Konstruksi Bangunan Sipil</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/42" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 43 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">43</span>
+  <div>
+    <h6 class="mb-1">Konstruksi Khusus</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/43" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalG" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header px-4">
+        <h5 class="modal-title">Rincian Kategori G</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-4">
+          <h6><strong>Ruang Lingkup:</strong></h6>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+            Kategori ini meliputi kegiatan perdagangan besar dan eceran (yaitu penjualan tanpa perubahan teknis) dari berbagai jenis barang berwujud, serta pemberian layanan yang terkait dengan penjualan barang dagangan. Barang adalah objek fisik yang diproduksi, dibutuhkan pasar, di mana hak kepemilikan dapat ditetapkan, dan kepemilikannya dapat berpindah tangan ke unit lain melalui transaksi pada pasar. 
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Perdagangan besar dan eceran merupakan tahap akhir dalam pendistribusian barang dagangan. 
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Dalam rangka tujuan penjualan, kegiatan penunjang dapat dilakukan dengan mencakup sejumlah proses umum yang terkait dengan perdagangan tanpa disertai perubahan barang. Proses ini seperti penyortiran, pengelompokan berdasar kualitas, perakitan barang, pencampuran, pembotolan, pengemasan, pemecahan dari ukuran besar dan pengemasan ulang untuk distribusi dalam jumlah lebih kecil, penyimpanan, baik dengan pendingin maupun tidak, pembersihan dan pengeringan hasil pertanian, pemotongan lembaran kayu atau logam. Jika tidak dilakukan sebagai proses umum pada perdagangan, kegiatan tersebut dapat dilakukan sebagai kegiatan utama, sekunder, atau penunjang pada kategori KBLI lainnya.
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Perdagangan besar adalah penjualan kembali baik barang baru maupun barang bekas kepada pengecer, bisnis-ke-bisnis, seperti industri, komersial, institusi atau pengguna profesional, atau penjualan kembali kepada pedagang besar lainnya, atau yang bertindak sebagai agen atau broker dalam pembelian atau penjualan barang dagangan, baik perorangan maupun perusahaan. Bentuk utama kegiatan ini mencakup pedagang atau saudagar perdagangan besar yang memiliki hak atas barang yang mereka jua, seperti pedagang grosir, jobber, distributor, eksportir, importir, kelompok pembelian bersama, kantor penjualan dan kantor cabang penjualan (tetapi bukan toko pengecer) yang dikelola oleh unit-unit perusahaan industri maupun pertambangan, terpisah dari lokasi industri atau penambangan dengan tujuan untuk memasarkan produk, selama mereka tidak hanya menerima pesanan untuk pengiriman langsung dari pabrik atau tambang. Termasuk juga jasa intermediasi, seperti kegiatan broker barang dagangan dan komoditas, pedagang komisi dan agen serta pedagang pengumpul, pembeli dan asosiasi yang utamanya memasarkan hasil pertanian. Jika pedagang besar tidak memiliki hak atas barang yang diperdagangkannya, mereka harus diklasifikasikan dalam golongan 461. Jika pedagang besar memiliki hak atas barang, bahkan jika bertindak atas nama pihak ketiga, mereka harus diklasifikasikan dalam golongan 462-469.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Pedagang besar seringkali secara fisik mengumpulkan, menyortir dan mengelompokkan berdasar kualitas barang dalam jumlah besar, membongkar dari ukuran besar, mengemas ulang menjadi ukuran yang lebih kecil, misalnya produk farmasi; menyimpan, mendinginkan,  mengantarkan dan memasang barang, melakukan promosi penjualan untuk pelanggannya dan merancang label.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Perdagangan eceran adalah penjualan kembali, baik barang baru maupun bekas, kepada masyarakat umum untuk konsumsi atau penggunaan pribadi maupun rumah tangga, melalui toko, toko serba ada, kios, perusahaan pemesanan via pos, penjual dari pintu ke pintu, pedagang keliling, koperasi konsumen, rumah pelelangan, dan lain-lain. Perdagangan eceran juga mencakup penjualan barang melalui showroom (tempat barang yang dipajang dapat dibeli), titik penjualan sementara (misalnya pop-up store), serta toko ritel otomatis.
+          </p>
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+           Pada umumnya pedagang pengecer memperoleh hak atas barang-barang yang dijualnya, tetapi beberapa pedagang pengecer bertindak sebagai agen, dan menjual atas dasar konsinyasi atau komisi.  
+          <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+         Perdagangan eceran melalui pemesanan via pos atau internet diklasifikasikan berdasarkan jenis barang yang dijual.   
+           </p>
+           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Perbedaan antara perdagangan besar dan perdagangan eceran tidak didasarkan pada jumlah barang yang dijual, karena perdagangan besar dapat dilakukan secara satuan, sebagaimana perdagangan eceran dapat dilakukan dalam jumlah besar. Namun, perbedaan utama antara perdagangan besar dan perdagangan eceran adalah jenis pelanggan. Perdagangan besar biasanya melayani entitas usaha sebagai pelanggan, sedangkan perdagangan eceran biasanya melayani konsumen individu atau rumah tangga. Jika seorang pedagang menjual kepada entitas usaha dan rumah tangga, dan secara praktis tidak memungkinkan untuk menentukan jenis pelanggan yang dominan, maka disarankan untuk mengklasifikasikan pedagang tersebut sebagai pengecer.  
+           </p>
+
+            <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
+          Kategori ini juga mencakup: perdagangan transit, yaitu kegiatan membeli komoditas, memindahkannya dari satu wilayah pabean ke wilayah pabean lain atau dari satu titik ke titik lain dalam wilayah pabean yang sama, lalu menjualnya; perdagangan transit mengacu pada transaksi segitiga dimana pedagang transit melakukan ekspor dan impor antara dua atau lebih negara yang berbeda, tanpa melibatkan wilayah ekonominya sendiri; pedagang transit memiliki hak atas komoditas selama pengangkutan, berbeda dengan intermediator yang hanya mengatur transaksi tanpa memiliki hak atas komoditas; jasa intermediasi khusus dan tidak khusus untuk perdagangan eceran; perdagangan makanan dan/atau minuman melalui mesin penjual otomatis atau titik penjualan otomatis. 
+           </p>
+           
+          <div class="alert alert-warning py-2 mb-4" style="font-size: 0.85rem; border-radius: 10px;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Pengecualian:</strong> Tidak mencakup Perdagangan listrik, lihat subgolongan 3513; perdagangan bahan bakar gas untuk pasokan energi melalui jaringan, lihat subgolongan 3520; Distribusi produk digital, termasuk layanan pengunduhan dan pengaliran media seperti buku elektronik (bukel), audio, dll, lihat kategori J; kegiatan pengecer kartu telepon prabayar dan layanan telekomunikasi, lihat subgolongan 6120; reparasi mobil dan sepeda motor, lihat golongan pokok 95. 
+          </div>
+        </div>
+
+        <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 46 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">46</span>
+  <div>
+    <h6 class="mb-1">Perdagangan Besar</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/46" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 47 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">47</span>
+  <div>
+    <h6 class="mb-1">Perdagangan Eceran</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/47" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal fade" id="modalH" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -661,27 +1327,62 @@
           </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">49</span>
-          <div><h6 class="mb-1">Transportasi Jalan, Transportasi Kereta Api, dan Transportasi melalui Saluran Pila</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">50</span>
-          <div><h6 class="mb-1">Transportasi Perairan</h6></div>
-        </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">51</span>
-          <div><h6 class="mb-1">Transportasi Udara</h6></div>
-        </div>
-                 <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">52</span>
-          <div><h6 class="mb-1">Pergudangan dan Aktivitas Penunjang Transportasi</h6></div>
-        </div>
-                 <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">53</span>
-          <div><h6 class="mb-1">Aktivitas Pos dan Kurir</h6></div>
-        </div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 49 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">49</span>
+  <div>
+    <h6 class="mb-1">Transportasi Jalan, Transportasi Kereta Api, dan Transportasi melalui Saluran Pipa</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/49" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 50 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">50</span>
+  <div>
+    <h6 class="mb-1">Transportasi Perairan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/50" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 51 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">51</span>
+  <div>
+    <h6 class="mb-1">Transportasi Udara</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/51" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 52 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">52</span>
+  <div>
+    <h6 class="mb-1">Pergudangan dan Aktivitas Penunjang Transportasi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/52" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 53 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">53</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Pos dan Kurir</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/53" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
     </div>
   </div>
@@ -706,15 +1407,29 @@
           </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">55</span>
-          <div><h6 class="mb-1">Penyediaan Akomodasi</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">56</span>
-          <div><h6 class="mb-1">Aktivitas Penyediaan Makanan dan Minuman</h6></div>
-        </div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 55 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">55</span>
+  <div>
+    <h6 class="mb-1">Penyediaan Akomodasi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/55" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 56 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">56</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Penyediaan Makanan dan Minuman</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/56" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
     </div>
   </div>
@@ -742,19 +1457,40 @@
                     </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">58</span>
-          <div><h6 class="mb-1">Aktivitas Penerbitan</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">59</span>
-          <div><h6 class="mb-1">Aktivitas Produksi Film, Video, dan Program Penerbitan Mussik</h6></div>
-        </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">60</span>
-          <div><h6 class="mb-1">Aktivitas Pemrograman, Penyiaran, Kantor Berita, dan Distribusi Konten Lainnya</h6></div>
-        </div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 58 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">58</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Penerbitan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/58" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 59 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">59</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Produksi Film, Video, dan Program Penerbitan Musik</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/59" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 60 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">60</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Pemrograman, Penyiaran, Kantor Berita, dan Distribusi Konten Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/60" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
     </div>
   </div>
@@ -779,19 +1515,40 @@
           </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">61</span>
-          <div><h6 class="mb-1">Telekomunikasi</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">62</span>
-          <div><h6 class="mb-1">Aktivitas Pemrograman, Konsultasi Komputer, dan Aktivitas terkait.</h6></div>
-        </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">66</span>
-          <div><h6 class="mb-1">Aktivitas Jasa Infrastruktur Komputasi, Pengolahan Data, Hosting, dan Infromasi Lainnya</h6></div>
-        </div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 61 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">61</span>
+  <div>
+    <h6 class="mb-1">Telekomunikasi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/61" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 62 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">62</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Pemrograman, Konsultasi Komputer, dan Aktivitas terkait.</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/62" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 66 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">63</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Jasa Infrastruktur Komputasi, Pengolahan Data, Hosting, dan Informasi Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/63" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
     </div>
   </div>
@@ -819,19 +1576,40 @@
           </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">64</span>
-          <div><h6 class="mb-1">Aktivitas Jasa Keuangan, Kecuali Asuransi dan Dana Pensiun</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">65</span>
-          <div><h6 class="mb-1">Asuransi, Penjaminan, Reasuransi, dan Dana Pensiun, Kecuali Jaminan Sosial Wajib</h6></div>
-        </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">66</span>
-          <div><h6 class="mb-1">Aktivitas Penunjang Jasa Keuangan, Asuransi, Penjaminan, dan Dana Pensiun</h6></div>
-        </div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 64 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">64</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Jasa Keuangan, Kecuali Asuransi dan Dana Pensiun</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/64" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 65 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">65</span>
+  <div>
+    <h6 class="mb-1">Asuransi, Penjaminan, Reasuransi, dan Dana Pensiun, Kecuali Jaminan Sosial Wajib</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/65" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 66 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">66</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Penunjang Jasa Keuangan, Asuransi, Penjaminan, dan Dana Pensiun</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/66" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
     </div>
   </div>
@@ -860,16 +1638,26 @@
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">68</span>
-          <div><h6 class="mb-1">Aktivitas Real Estate</h6></div>
-        </div>
+
+<!-- Golongan 68 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">68</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Real Estate</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/68" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
         </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="modalN" tabindex="-1" aria-hidden="true">
+
+
+<!-- === MODAL KATEGORI N === -->
+<div class="modal fade" id="modalN" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header px-4">
@@ -880,48 +1668,73 @@
         <div class="mb-4">
           <h6><strong>Ruang Lingkup:</strong></h6>
           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
-          Kategori ini mencakup kegiatan profesional khusus, ilmu pengetahuan, dan teknik. Kegiatan ini membutuhkan suatu tingkat pelatihan yang tinggi dan menghasilkan ilmu pengetahuan dan ketrampilan khusus yang tersedia untuk pengguna. 
+            Kategori ini mencakup kegiatan profesional khusus, ilmu pengetahuan, dan teknik. Kegiatan ini membutuhkan suatu tingkat pelatihan yang tinggi dan menghasilkan ilmu pengetahuan dan ketrampilan khusus yang tersedia untuk pengguna. 
           </p>
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
+
         <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
           <span class="kode-box">69</span>
-          <div><h6 class="mb-1">Aktivitas Hukum dan Asuransi</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Hukum dan Akuntansi</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/69" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
+
         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">70</span>
-          <div><h6 class="mb-1">Aktivitas Kantor Pusat dan Konsultasi Manajemen</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Kantor Pusat dan Konsultasi Manajemen</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/70" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
-      
-       <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">71</span>
-          <div><h6 class="mb-1">Aktivitas Arsitektural dan Enjinering; Pengujian dan Analisis Teknis</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Arsitektural dan Enjinering; Pengujian dan Analisis Teknis</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/71" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
-      
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">72</span>
-          <div><h6 class="mb-1">Penelitian dan Pengembangan Ilmiah</h6></div>
+          <div>
+            <h6 class="mb-1">Penelitian dan Pengembangan Ilmiah</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/72" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
 
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">73</span>
-          <div><h6 class="mb-1">Aktivitas Periklanan, Penelitian Pusat, dan Kehumasan</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Periklanan dan Penelitian Pasar</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/73" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
 
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">74</span>
-          <div><h6 class="mb-1">Aktivitas Profesional, Ilmiah, dan Teknis lainnya</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Profesional, Ilmiah, dan Teknis lainnya</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/74" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
 
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">75</span>
-          <div><h6 class="mb-1">Aktivitas Kesehatan Hewan</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Kesehatan Hewan</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/75" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Informasi lebih lanjut</a>
+          </div>
         </div>
-        </div>
-    </div>
-  </div>
-</div>
+      </div> <!-- Penutup modal-body -->
+    </div> <!-- Penutup modal-content -->
+  </div> <!-- Penutup modal-dialog -->
+</div> <!-- Penutup modal fade N -->
+
+
 
 <div class="modal fade" id="modalO" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -939,34 +1752,77 @@
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
+
+        <!-- Golongan 77 -->
         <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
           <span class="kode-box">77</span>
-          <div><h6 class="mb-1">Penyewaan dan Sewa Guna Usaha</h6></div>
+          <div>
+            <h6 class="mb-1">Penyewaan dan Sewa Guna Usaha</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/77" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
+
+        <!-- Golongan 78 -->
         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">78</span>
-          <div><h6 class="mb-1">Aktivitas Ketenagakerjaan</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Ketenagakerjaan</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/78" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+
+        <!-- Golongan 79 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">79</span>
-          <div><h6 class="mb-1">Aktivitas Agen Perjalanan, Penyelenggara Tur, dan Jasa Terkait</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Agen Perjalanan, Penyelenggara Tur, dan Jasa Terkait</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/79" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+
+        <!-- Golongan 80 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">80</span>
-          <div><h6 class="mb-1">Aktivitas Investigasi dan Keamanann</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Investigasi dan Keamanan</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/80" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+
+        <!-- Golongan 81 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">81</span>
-          <div><h6 class="mb-1">Aktivitas Jasa untuk Bangunan dan Lanskap</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Jasa untuk Bangunan dan Lanskap</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/81" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+
+        <!-- Golongan 82 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
           <span class="kode-box">82</span>
-          <div><h6 class="mb-1">Aktivitas Administratif, Aktivivtas Penunjang Kantor, dan Aktivitas Penunjang Usaha</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Administratif, Aktivitas Penunjang Kantor, dan Aktivitas Penunjang Usaha</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/82" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
-        </div>
-    </div>
-  </div>
-</div>
+
+      </div> <!-- Penutup modal-body -->
+    </div> <!-- Penutup modal-content -->
+  </div> <!-- Penutup modal-dialog -->
+</div> <!-- Penutup modal fade id="modalO" -->
 
 <div class="modal fade" id="modalP" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -989,12 +1845,19 @@
           </p>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">84</span>
-          <div><h6 class="mb-1">Administrasi Pemerintahan dan Pertahanan; Jaminan Sosial Wajib</h6></div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 84 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">84</span>
+  <div>
+    <h6 class="mb-1">Administrasi Pemerintahan dan Pertahanan; Jaminan Sosial Wajib</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/84" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
         </div>
-        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1024,12 +1887,19 @@
           </div>
         </div>
 
-        <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">85</span>
-          <div><h6 class="mb-1">Pendidikan</h6></div>
+       <h6><strong>Golongan Pokok:</strong></h6>
+
+<!-- Golongan 85 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">85</span>
+  <div>
+    <h6 class="mb-1">Pendidikan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/85" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
         </div>
-        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1054,19 +1924,40 @@
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">86</span>
-          <div><h6 class="mb-1">Aktivitas Kesehatan Manusia</h6></div>
+
+<!-- Golongan 86 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">86</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Kesehatan Manusia</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/86" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 87 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">87</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Perawatan Berbasis Residensial</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/87" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 88 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">88</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Sosial Tanpa Akomodasi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/88" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
         </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">87</span>
-          <div><h6 class="mb-1">Aktivitas Perawatan Berbasis Residensial</h6></div>
-        </div>
-         <div class="d-flex gap-3 mb-3 border-bottom pb-3">
-          <span class="kode-box">88</span>
-          <div><h6 class="mb-1">Aktivitas Sosial Tanpa Akomodasi</h6></div>
-        </div>
-        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1093,23 +1984,51 @@
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">90</span>
-          <div><h6 class="mb-1">Aktivitas Penciptaan Karya Seni dan Seni Pertunjukan</h6></div>
+
+<!-- Golongan 90 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">90</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Penciptaan Karya Seni dan Seni Pertunjukan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/90" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 91 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">91</span>
+  <div>
+    <h6 class="mb-1">Perpustakaan, Arsip, Museum, dan Kegiatan Kebudayaan Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/91" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 92 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">92</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Perjudian dan Pertaruhan</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/92" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 93 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">93</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Olahraga, Hiburan, dan Rekreasi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/93" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
         </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">91</span>
-          <div><h6 class="mb-1">Perpustakaan, Arsip, Museum, dan Kegiatan Kebudayaan Lainnya</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">92</span>
-          <div><h6 class="mb-1">Aktivitas Perjudian dan Pertaruhan</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">93</span>
-          <div><h6 class="mb-1">Aktivitas Olahraga, Hiburan, dan Rekreasi</h6></div>
-        </div>
-        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1130,23 +2049,45 @@
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">94</span>
-          <div><h6 class="mb-1">Aktivitas Keanggotaan Organisasi</h6></div>
+
+<!-- Golongan 94 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+  <span class="kode-box">94</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Keanggotaan Organisasi</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/94" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 95 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">95</span>
+  <div>
+    <h6 class="mb-1">Reparasi dan Pemeliharaan Komputer, Barang Keperluan Pribadi dan Perlengkapan Rumah Tangga, serta Kendaraan Bermotor dan Sepeda Motor</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/95" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+  </div>
+</div>
+
+<!-- Golongan 96 -->
+<div class="d-flex gap-3 mb-3 border-bottom pb-3">
+  <span class="kode-box">96</span>
+  <div>
+    <h6 class="mb-1">Aktivitas Jasa Perorangan Lainnya</h6>
+    <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/96" class="btn btn-outline-primary btn-sm mt-2">
+      Informasi lebih lanjut klik berikut
+    </a>
+   </div>
         </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">95</span>
-          <div><h6 class="mb-1">Reparasi dan Pemeliharaan Komputer, Barang Keperluan Pribadi dan Perlengkapan Rumah Tangga, serta Kendaraan Bermotor dan Sepeda Motor</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">96</span>
-          <div><h6 class="mb-1">Aktivitas Jasa Perorangan</h6></div>
-        </div>
-        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- MODAL KATEGORI U -->
 <div class="modal fade" id="modalU" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
@@ -1158,24 +2099,40 @@
         <div class="mb-4">
           <h6><strong>Ruang Lingkup:</strong></h6>
           <p style="text-align: justify; font-size: 0.95rem; line-height: 1.6; color: #4a5568;">
-          Kategori ini mencakup kegiatan rumah tangga sebagai pemberi kerja bagi pekerja rumah tangga dan kegiatan produksi barang dan jasa pokok yang tidak terdiferensiasi untuk keperluan sendiri rumah tangga. 
+            Kategori ini mencakup kegiatan rumah tangga sebagai pemberi kerja bagi pekerja rumah tangga dan kegiatan produksi barang dan jasa pokok yang tidak terdiferensiasi untuk keperluan sendiri rumah tangga. 
           </p>
         </div>
 
         <h6><strong>Golongan Pokok:</strong></h6>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">97</span>
-          <div><h6 class="mb-1">Aktivitas Rumah Tangga sebagai Pemberi Kerja Bagi Pekerja Rumah Tangga (PRT)</h6></div>
-        </div>
-        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
-          <span class="kode-box">97</span>
-          <div><h6 class="mb-1">Aktivitas Produksi Beragam Barang dan Jasa oleh Rumah Tangga untuk Keperluan Sendiri</h6></div>
-        </div>
-        </div>
-    </div>
-  </div>
-</div>
 
+        <!-- Golongan 97 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
+          <span class="kode-box">97</span>
+          <div>
+            <h6 class="mb-1">Aktivitas Rumah Tangga sebagai Pemberi Kerja Bagi Pekerja Rumah Tangga (PRT)</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/97" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
+        </div>
+
+        <!-- Golongan 98 -->
+        <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+          <span class="kode-box">98</span>
+          <div>
+            <h6 class="mb-1">Aktivitas Produksi Beragam Barang dan Jasa oleh Rumah Tangga untuk Keperluan Sendiri</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/98" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
+        </div>
+      </div> <!-- Penutup modal-body -->
+    </div> <!-- Penutup modal-content -->
+  </div> <!-- Penutup modal-dialog -->
+</div> <!-- Penutup modal fade U -->
+
+
+<!-- MODAL KATEGORI V -->
 <div class="modal fade" id="modalV" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
@@ -1183,17 +2140,23 @@
         <h5 class="modal-title">Rincian Kategori V</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-     
-
+      <div class="modal-body p-4">
         <h6><strong>Golongan Pokok:</strong></h6>
+
+        <!-- Golongan 99 -->
         <div class="d-flex gap-3 mb-3 border-bottom pb-3 mt-3">
           <span class="kode-box">99</span>
-          <div><h6 class="mb-1">Aktivitas Badan Internasional dan Badan Ekstra Internasional Lainnya</h6></div>
+          <div>
+            <h6 class="mb-1">Aktivitas Badan Internasional dan Badan Ekstra Internasional Lainnya</h6>
+            <a href="https://klasifikasi.web.bps.go.id/app/view/kbli2025/99" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              Informasi lebih lanjut klik berikut
+            </a>
+          </div>
         </div>
-        </div>
-    </div>
-  </div>
-</div>
+      </div> <!-- Penutup modal-body -->
+    </div> <!-- Penutup modal-content -->
+  </div> <!-- Penutup modal-dialog -->
+</div> <!-- Penutup modal fade V -->
 </section>
 
 
