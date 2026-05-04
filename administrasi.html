@@ -43,32 +43,33 @@
 
   <header id="header" class="header fixed-top">
 
+
     <div class="branding d-flex align-items-cente">
 
-       <div class="container position-relative d-flex align-items-center justify-content-between">
-        <a href="administrasi.html" class="logo d-flex align-items-center">
-          <!-- Uncomment the line below if you also wish to use an image logo -->
-          <!-- <img src="assets/img/logo.webp" alt=""> -->
-          <h1 class="sitename">SEMANIS 2026</h1>
-        </a>
+     <div class="container position-relative d-flex align-items-center justify-content-between">
+  <a href="index.html" class="logo d-flex align-items-center">
+    <h1 class="sitename">SEMANIS 2026</h1>
+  </a>
 
-        <nav id="navmenu" class="navmenu">
-          <ul>
-             <li><a href="index.html">Beranda</a></li>
-            <li class="dropdown"><a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
-              <li><a href="tim.html">Tim Pelaksana</a></li>
-              <li><a href="kbli.html">KBLI</a></li>
-            </ul>
-            </li>
-            
-             <li><a href="administrasi.html" class="active">Administrasi</a></li>
-            <li><a href="laporan.html">Laporan Kegiatan</a></li>
-           <!-- <li><a href="publikasi.html">Output</a></li> -->
-        </nav>
-
-      </div>
+  <nav id="navmenu" class="navmenu">
+    <ul>
+      <li><a href="index.html">Beranda</a></li>
+      <li class="dropdown"><a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+        <ul>
+          <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
+          <li><a href="tim.html">Tim Pelaksana</a></li>
+          <li><a href="kbli.html">KBLI</a></li>
+        </ul>
+      </li>
+      <li><a href="administrasi.html">Teknis Administrasi</a></li>
+      <li><a href="laporan.html" class="active">Laporan Kegiatan</a></li>
+<!-- <li><a href="publikasi.html">Output</a></li> -->
+ <!-- <li><a href="monitoring.html">Monitoring</a></li> -->
+    </ul>
+    
+    <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+  </nav>
+</div>
 
     </div>
 
@@ -195,7 +196,7 @@
             <i class="fas fa-video"></i>
           </div>
           <div class="administrasi-content">
-            <h3>Rekaman Zoom</h3>
+            <h3>Dokumentasi Rapat/Rekaman Zoom</h3>
             <p>Dokumentasi audiovisual hasil pertemuan daring untuk ditinjau kembali sewaktu-waktu.</p>
             <div class="admin-actions mt-3">
               <a href="https://drive.google.com/open?id=1wtiLKe7yTajeYJcv5vy4sDm6y9-7ROGB&usp=drive_fs" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Lihat</a>
@@ -340,7 +341,7 @@
 </footer>
 
 
-  <!-- Scroll Top -->
+ <!-- Scroll Top -->
   <a href="#!" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
 
@@ -353,45 +354,52 @@
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Script Custom (Hanya Countdown) -->
   <script>
     (function() {
       "use strict";
 
       /**
-       * Mobile nav toggle - Logika klik tombol garis tiga
+       * Countdown Timer Sensus Ekonomi 2026
        */
-      const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
+      const countdown = () => {
+        const countDate = new Date("May 1, 2026 00:00:00").getTime();
+        const now = new Date().getTime();
+        const gap = countDate - now;
 
-      if (mobileNavToggleBtn) {
-        mobileNavToggleBtn.addEventListener('click', function(e) {
-          document.querySelector('body').classList.toggle('mobile-nav-active');
-          this.classList.toggle('bi-list');
-          this.classList.toggle('bi-x');
-        });
-      }
+        const d = document.getElementById("days");
+        const h = document.getElementById("hours");
+        const m = document.getElementById("minutes");
+        const s = document.getElementById("seconds");
 
-      /**
-       * Toggle mobile nav dropdowns - Logika klik panah bawah di menu HP
-       */
-      document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
-        navmenu.addEventListener('click', function(e) {
-          e.preventDefault();
-          this.parentNode.classList.toggle('active');
-          this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
-          e.stopImmediatePropagation();
-        });
-      });
+        if (d && h && m && s) {
+          if (gap > 0) {
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            const day = hour * 24;
 
+            d.innerText = Math.floor(gap / day);
+            h.innerText = Math.floor((gap % day) / hour);
+            m.innerText = Math.floor((gap % hour) / minute);
+            s.innerText = Math.floor((gap % minute) / second);
+          } else {
+            d.innerText = "00";
+            h.innerText = "00";
+            m.innerText = "00";
+            s.innerText = "00";
+          }
+        }
+      };
+
+      setInterval(countdown, 1000);
+      countdown();
     })();
   </script>
-
-  <!-- Main JS File -->
-  <script src="assets/js/main.js"></script>
 
 </body>
 
