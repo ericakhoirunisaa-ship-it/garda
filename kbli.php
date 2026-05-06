@@ -1,3 +1,36 @@
+<?php
+require_once 'config.php';
+
+// 1. Ambil kata kunci pencarian dari URL (jika ada)
+$cari = isset($_GET['cari']) ? mysqli_real_escape_string($conn, $_GET['cari']) : '';
+
+// 2. Pengaturan Pagination
+$limit = 10; 
+$page = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
+$start = ($page > 1) ? ($page * $limit) - $limit : 0;
+
+// 3. Hitung total data berdasarkan pencarian (PENTING: ini untuk keseluruhan data)
+$where_clause = "";
+if (!empty($cari)) {
+    $where_clause = "WHERE deskripsi LIKE '%$cari%' OR kode LIKE '%$cari%' OR kegiatan_utama LIKE '%$cari%'";
+}
+
+$query_count = mysqli_query($conn, "SELECT COUNT(id) AS total FROM kbli $where_clause");
+$row_count = mysqli_fetch_assoc($query_count);
+$total_data = $row_count['total'] ?? 0;
+$total_pages = ceil($total_data / $limit);
+
+// 4. Ambil data dengan LIMIT dan Filter Pencarian
+$sql = "SELECT * FROM kbli $where_clause ORDER BY kode ASC LIMIT $start, $limit";
+$result = mysqli_query($conn, $sql);
+
+$data_kbli = [];
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data_kbli[] = $row;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -2159,7 +2192,151 @@
 </div> <!-- Penutup modal fade V -->
 </section>
 
+<!-- SECTION KBLI KHUSUS TOLI-TOLI -->
+<section class="kbli-toli-section py-5" style="background-color: #fffbee;">
+    <div class="container">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-7">
+                <h3 class="fw-bold" style="color: #112344; border-left: 5px solid #f79039; padding-left: 15px;">
+                    KBLI Khusus Kabupaten Toli-Toli
+                </h3>
+                <p class="text-muted">Klasifikasi aktivitas ekonomi lokal unggulan daerah untuk pemantauan data ekonomi wilayah.</p>
+            </div>
+            <div class="col-md-5">
+                <!-- Search Bar Tanpa Form Submit -->
+                <div class="input-group custom-search shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                    <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="inputCariToli" class="form-control border-0" 
+                           placeholder="Ketik untuk mencari di semua data..." autocomplete="off">
+                </div>
+                <div id="statusCari" class="mt-2 small text-muted" style="display:none;"></div>
+            </div>
+        </div>
 
+        <!-- Tabel Card -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background-color: #112344; color: #fffbee;">
+                        <tr>
+                            <th class="px-4 py-3" width="10%">Kode</th>
+                            <th class="py-3" width="25%">Deskripsi</th>
+                            <th class="py-3" width="25%">Kegiatan Utama</th>
+                            <th class="px-4 py-3" width="40%">Penjelasan</th>
+                        </tr>
+                    </thead>
+                    <!-- Body Tabel yang akan diupdate via AJAX -->
+                    <tbody id="isiTabelKbli" class="bg-white">
+                        <!-- Data awal akan dimuat oleh JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Container Pagination yang akan diupdate via AJAX -->
+        <div id="containerPagination"></div>
+    </div>
+</section>
+
+<!-- Pastikan JQuery terpasang (Taruh di footer jika belum ada) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    // Fungsi utama untuk load data
+    function loadData(page = 1, query = '') {
+        $.ajax({
+            url: "proses_cari.php",
+            method: "POST",
+            data: { halaman: page, cari: query },
+            dataType: "json",
+            success: function(data) {
+                $('#isiTabelKbli').html(data.tabel);
+                $('#containerPagination').html(data.pagination);
+                
+                if(query != '') {
+                    $('#statusCari').show().html('Menampilkan hasil untuk: <strong>"' + query + '"</strong>');
+                } else {
+                    $('#statusCari').hide();
+                }
+            }
+        });
+    }
+
+    // Load data pertama kali
+    loadData();
+
+    // Event saat mengetik di search bar
+    $('#inputCariToli').on('keyup', function(){
+        let query = $(this).val();
+        loadData(1, query); // Selalu kembali ke halaman 1 saat mencari
+    });
+
+    // Event saat klik nomor halaman (pagination)
+    $(document).on('click', '.page-link-ajax', function(e){
+        e.preventDefault();
+        let page = $(this).data('halaman');
+        let query = $('#inputCariToli').val();
+        loadData(page, query);
+        
+        // Scroll halus ke atas tabel
+        $('html, body').animate({
+            scrollTop: $(".kbli-toli-section").offset().top - 50
+        }, 100);
+    });
+});
+</script>
+
+<style>
+    .custom-search input:focus { box-shadow: none; border: 1px solid #f79039; }
+    .page-link-ajax { cursor: pointer; color: #112344; border-radius: 8px; margin: 0 5px; padding: 8px 16px; border: 1px solid #dee2e6; text-decoration: none; display: inline-block; }
+    .page-link-ajax.active { background-color: #f79039 !important; color: white !important; border: none; }
+    .page-link-ajax:hover:not(.active) { background-color: #112344; color: white; }
+    .page-item.disabled .page-link-ajax { color: #ccc; pointer-events: none; background-color: #f8f9fa; }
+</style>
+<!-- SCRIPT PENCARIAN KHUSUS -->
+<script>
+function filterTabelToli() {
+    // Ambil input dan tabel
+    let input = document.getElementById("inputCariToli");
+    let filter = input.value.toLowerCase();
+    let table = document.getElementById("tabelKbliToli");
+    let tr = table.getElementsByTagName("tr");
+
+    // Loop semua baris kecuali header
+    for (let i = 1; i < tr.length; i++) {
+        // Ambil kolom Deskripsi (indeks 1)
+        let td = tr[i].getElementsByClassName("cell-deskripsi")[0];
+        if (td) {
+            let txtValue = td.textContent || td.innerText;
+            // Jika cocok, tampilkan. Jika tidak, sembunyikan.
+            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+
+<style>
+/* Styling tambahan agar matching dengan UI Anda */
+.custom-search input:focus {
+    border-color: #f79039;
+    box-shadow: none;
+}
+.kbli-toli-section {
+    background-color: #fffbee; /* Warna cream khas portal Anda */
+}
+#tabelKbliToli thead th {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+.cell-deskripsi {
+    color: #112344 !important;
+}
+</style>
 
 <audio id="bgMusic" loop>
   <source src="assets/video/lagu.mp3" type="audio/mpeg">
