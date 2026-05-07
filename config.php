@@ -1,9 +1,9 @@
 <?php
-$host = "localhost";
+$host = "43.128.105.129";
 $user = "root";
-$pass = "";
+$pass = "Djt04k91On5HRE8ZyNVxha7JUF6m3bW2";
 $db   = "db_semanis";
-$port = 3307; // Tambahkan variabel port
+$port = 30444; // Tambahkan variabel port
 
 // Update baris koneksi dengan menambahkan parameter port di akhir
 $conn = mysqli_connect($host, $user, $pass, $db, $port); 
