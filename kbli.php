@@ -193,19 +193,20 @@ if ($result && mysqli_num_rows($result) > 0) {
   /* Ikon Dekoratif di Sudut */
   .kbli-visual-icon {
     position: absolute;
-    bottom: -20px;
-    right: -20px;
-    width: 150px;
-    opacity: 0.1; /* Sangat tipis sebagai background */
+    bottom: -10px;
+    right: -10px;
+    font-size: 110px;
+    line-height: 1;
+    opacity: 0.1;
+    color: #f79039;
     transition: all 0.5s ease;
-    filter: grayscale(1);
     pointer-events: none;
   }
 
   .kbli-card:hover .kbli-visual-icon {
-    opacity: 0.4;
+    opacity: 0.35;
     transform: scale(1.1) rotate(-10deg);
-    filter: grayscale(0); /* Berwarna saat di-hover */
+    color: #e07020;
   }
 
   .kbli-badge {
@@ -268,7 +269,7 @@ if ($result && mysqli_num_rows($result) > 0) {
       
       <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=123681&format=png" class="kbli-visual-icon" alt="Pertanian">
+          <i class="bi bi-tree kbli-visual-icon"></i>
           
           <div>
             <div class="kbli-badge">A</div>
@@ -283,7 +284,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
       <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=Zp8WbQkMv3Mh&format=png" class="kbli-visual-icon" alt="Tambang">
+          <i class="bi bi-gem kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">B</div>
             <h4 class="kbli-title">Pertambangan & Penggalian</h4>
@@ -296,7 +297,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
       <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114319&format=png" class="kbli-visual-icon" alt="Industri">
+          <i class="bi bi-gear-wide-connected kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">C</div>
             <h4 class="kbli-title">Industri</h4>
@@ -309,7 +310,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
       <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=59853&format=png" class="kbli-visual-icon" alt="Listrik">
+          <i class="bi bi-lightning-charge kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">D</div>
             <h4 class="kbli-title">Penyediaan Listrik, Gas, Uap/Air Panas, dan Udara Dingin</h4>
@@ -322,7 +323,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
  <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=103387&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-droplet-half kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">E</div>
             <h4 class="kbli-title">Penyediaan Air, Pengelolaan Air Limbah, Penanganan Limbah, dan Remediasi</h4>
@@ -336,7 +337,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114322&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-building-gear kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">F</div>
             <h4 class="kbli-title">Konstruksi</h4>
@@ -349,7 +350,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114323&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-shop kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">G</div>
             <h4 class="kbli-title">Perdagangan Besar dan Eceran</h4>
@@ -362,7 +363,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114324&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-truck kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">H</div>
             <h4 class="kbli-title">Transportasi dan Penyimpanan</h4>
@@ -375,7 +376,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=fXN2n9e54K4S&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-cup-hot kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">I</div>
             <h4 class="kbli-title">Aktivitas Penyediaan Akomodasi dan Makan Minum</h4>
@@ -388,7 +389,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114316&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-broadcast kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">J</div>
             <h4 class="kbli-title">Aktivitas Penerbitan, Penyiaran, serta Produksi dan Distribusi Konten</h4>
@@ -401,7 +402,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114321&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-cpu kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">K</div>
             <h4 class="kbli-title">Aktivitas Telekomunikasi, Pemrograman Komputer, Konsultasi, Infrastruktur Komputasi dan Jasa Informasi Lainnya</h4>
@@ -414,7 +415,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
        <div class="col">
         <div class="kbli-card">
-          <img src="https://img.icons8.com/?size=200&id=114321&format=png" class="kbli-visual-icon" alt="Air">
+          <i class="bi bi-bank kbli-visual-icon"></i>
           <div>
             <div class="kbli-badge">L</div>
             <h4 class="kbli-title">Aktivitas Keuangan & Asuransi</h4>
@@ -427,7 +428,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
       <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=114314&format=png" class="kbli-visual-icon" alt="Real Estate">
+    <i class="bi bi-houses kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">M</div>
       <h4 class="kbli-title">Real Estat</h4>
@@ -438,7 +439,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=114320&format=png" class="kbli-visual-icon" alt="Profesional">
+    <i class="bi bi-briefcase kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">N</div>
       <h4 class="kbli-title">Aktivitas Profesional, Ilmiah & Teknis</h4>
@@ -449,7 +450,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=114310&format=png" class="kbli-visual-icon" alt="Support">
+    <i class="bi bi-clipboard-check kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">O</div>
       <h4 class="kbli-title">Aktivitas Administrasi & Penunjang Usaha</h4>
@@ -462,7 +463,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=59837&format=png" class="kbli-visual-icon" alt="Gov">
+    <i class="bi bi-shield kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">P</div>
       <h4 class="kbli-title">Adm. Pemerintahan, Pertahanan & Jaminan Sosial Wajib</h4>
@@ -473,7 +474,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=114315&format=png" class="kbli-visual-icon" alt="Education">
+    <i class="bi bi-mortarboard kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">Q</div>
       <h4 class="kbli-title">Pendidikan</h4>
@@ -487,7 +488,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=114312&format=png" class="kbli-visual-icon" alt="Art">
+    <i class="bi bi-palette kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">S</div>
       <h4 class="kbli-title">Kesenian, Hiburan & Rekreasi</h4>
@@ -500,7 +501,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=60145&format=png" class="kbli-visual-icon" alt="Service">
+    <i class="bi bi-hand-thumbs-up kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">T</div>
       <h4 class="kbli-title">Aktivitas Jasa Lainnya</h4>
@@ -513,7 +514,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=8Hly7Q4f0Nsh&format=png" class="kbli-visual-icon" alt="House">
+    <i class="bi bi-house-heart kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">U</div>
       <h4 class="kbli-title">Aktivitas Rumah Tangga sebagai Pemberi Kerja dan Produksi Barang dan Jasa</h4>
@@ -526,7 +527,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 <div class="col">
   <div class="kbli-card">
-    <img src="https://img.icons8.com/?size=200&id=114318&format=png" class="kbli-visual-icon" alt="World">
+    <i class="bi bi-globe kbli-visual-icon"></i>
     <div>
       <div class="kbli-badge">V</div>
       <h4 class="kbli-title">Aktivitas Badan Internasional & Ekstrateritorial</h4>
