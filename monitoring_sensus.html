@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Monitoring SE2026 — BPS Kab. Toli-Toli</title>
+  <meta name="description" content="Dashboard monitoring progress pencacahan Sensus Ekonomi 2026 Kabupaten Toli-Toli">
+
+  <!-- Favicons -->
+  <link href="assets/img/logo.png" rel="icon">
+  <link href="assets/img/logo.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;600;700;800;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --background-color: #fffbee;
+      --default-color: #3c4049;
+      --heading-color: #112344;
+      --accent-color: #f79039;
+      --surface-color: #ffffff;
+    }
+
+    .monitoring-section {
+      background-color: var(--background-color);
+      padding: 60px 0 80px;
+    }
+
+    /* ── Stat Cards ─────────────────────────────────────────────── */
+    .stat-card {
+      border-radius: 20px;
+      padding: 28px 22px;
+      border: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+    }
+    .stat-card:hover { transform: translateY(-6px); box-shadow: 0 14px 28px rgba(0,0,0,0.11); }
+
+    .bg-total { background-color: #112344; color: #fff; }
+    .bg-open  { background-color: #f79039; color: #fff; }
+    .bg-draft { background-color: #3b82f6; color: #fff; }
+    .bg-sub   { background-color: #10b981; color: #fff; }
+    .bg-rej   { background-color: #ef4444; color: #fff; }
+
+    .stat-card span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      opacity: 0.85;
+      letter-spacing: 1.2px;
+    }
+    .stat-card h2 {
+      color: #fff !important;
+      font-weight: 900;
+      font-size: 2.4rem;
+      margin-top: 8px;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+    .stat-card i {
+      position: absolute;
+      right: -12px;
+      bottom: -12px;
+      font-size: 5rem;
+      opacity: 0.15;
+      transform: rotate(-10deg);
+    }
+
+    /* ── Info Strip ──────────────────────────────────────────────── */
+    .info-strip {
+      background: var(--surface-color);
+      border-radius: 14px;
+      padding: 14px 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+      border: 1px solid #f1f1f1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+    }
+    .info-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--heading-color);
+    }
+    .info-pill-icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Filter ──────────────────────────────────────────────────── */
+    .filter-select {
+      max-width: 420px;
+      width: 100%;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 2px solid #e2e8f0;
+      padding: 12px 20px;
+      background-color: #ffffff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--heading-color);
+      appearance: auto;
+    }
+    .filter-select:focus, .filter-select:hover {
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 14px rgba(247,144,57,0.15);
+      outline: none;
+    }
+
+    .last-update {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .last-update i { color: var(--accent-color); }
+
+    /* ── Glass Card ──────────────────────────────────────────────── */
+    .glass-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      border: 1px solid #f1f1f1;
+      margin-bottom: 24px;
+    }
+    .glass-card h6 {
+      font-family: var(--heading-font);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--heading-color);
+      margin-bottom: 20px;
+    }
+
+    /* ── Table ───────────────────────────────────────────────────── */
+    .dashboard-table thead th {
+      background: #f8fafc;
+      color: var(--heading-color);
+      border: none;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 14px;
+    }
+    .dashboard-table tbody td {
+      font-size: 0.875rem;
+      padding: 10px 14px;
+      vertical-align: middle;
+      border-color: #f1f5f9;
+    }
+    .dashboard-table tbody tr:hover { background-color: #fff8f0; }
+
+    /* ── Progress ────────────────────────────────────────────────── */
+    .progress { height: 10px; border-radius: 10px; background: #f1f5f9; }
+    .progress-bar { background-color: var(--accent-color) !important; border-radius: 10px; }
+
+    /* ── Export Btn ──────────────────────────────────────────────── */
+    .btn-export {
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border: 2px solid var(--accent-color);
+      color: var(--accent-color);
+      background: transparent;
+      transition: 0.2s;
+    }
+    .btn-export:hover { background: var(--accent-color); color: #fff; }
+
+    /* ── Badges in table ─────────────────────────────────────────── */
+    .badge-open  { background:#dbeafe; color:#1d4ed8; font-size:.8rem; }
+    .badge-draft { background:#fef9c3; color:#92400e; font-size:.8rem; }
+    .badge-sub   { background:#dcfce7; color:#166534; font-size:.8rem; }
+    .badge-rej   { background:#fee2e2; color:#991b1b; font-size:.8rem; }
+
+    /* ── Loading skeleton ────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+      color: transparent !important;
+      user-select: none;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Responsive tweaks ───────────────────────────────────────── */
+    @media (max-width:576px) {
+      .stat-card { padding: 20px 16px; }
+      .stat-card h2 { font-size: 1.9rem; }
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header fixed-top">
+    <div class="branding d-flex align-items-center">
+      <div class="container position-relative d-flex align-items-center justify-content-between">
+        <a href="index.html" class="logo d-flex align-items-center">
+          <h1 class="sitename">SEMANIS 2026</h1>
+        </a>
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="index.html">Beranda</a></li>
+            <li class="dropdown">
+              <a href="penjelasan.html"><span>Penjelasan Umum</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+              <ul>
+                <li><a href="penjelasan.html">Sensus Ekonomi</a></li>
+                <li><a href="tim.html">Tim Pelaksana</a></li>
+                <li><a href="kbli.php">KBLI</a></li>
+              </ul>
+            </li>
+            <li><a href="administrasi.html">Teknis Administrasi</a></li>
+            <li><a href="laporan.html">Laporan Kegiatan</a></li>
+            <li><a href="monitoring_sensus.html" class="active">Monitoring SE</a></li>
+            <li><a href="admin/login.php"><i class="bi bi-shield-lock-fill"></i> Admin</a></li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              <h1 class="heading-title">Monitoring Progress Sensus Ekonomi 2026</h1>
+              <p class="mb-0">Data real-time progress pencacahan lapangan per petugas dan per wilayah</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="index.html">Beranda</a></li>
+            <li class="current">Monitoring SE2026</li>
+          </ol>
+        </div>
+      </nav>
+    </div>
+
+    <section class="monitoring-section">
+      <div class="container">
+
+        <!-- ── Filter + Last Update ─────────────────────────────── -->
+        <div class="text-center mb-5" data-aos="fade-up">
+          <p class="text-muted mb-3" style="font-weight:600;">Filter Berdasarkan Kecamatan:</p>
+          <div class="d-flex flex-column align-items-center gap-3">
+            <select id="filterKecamatan" class="filter-select shadow-sm">
+              <option value="all">📍 Seluruh Wilayah Kabupaten Tolitoli</option>
+              <option value="010">Kecamatan Dampal Selatan</option>
+              <option value="020">Kecamatan Dampal Utara</option>
+              <option value="030">Kecamatan Dondo</option>
+              <option value="031">Kecamatan Ogodeide</option>
+              <option value="032">Kecamatan Basidondo</option>
+              <option value="040">Kecamatan Baolan</option>
+              <option value="041">Kecamatan Lampasio</option>
+              <option value="050">Kecamatan Galang</option>
+              <option value="060">Kecamatan Tolitoli Utara</option>
+              <option value="061">Kecamatan Dako Pemean</option>
+            </select>
+            <div class="last-update">
+              <i class="bi bi-arrow-clockwise"></i>
+              <span>Data diperbarui: <strong id="lastUpdateText">Memuat…</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Stat Cards ──────────────────────────────────────── -->
+        <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="col-6 col-lg-4 col-xl">
+            <div class="stat-card bg-total">
+              <span>Open</span>
+              <h2 id="v-open" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+              <i class="bi bi-folder2-open"></i>
+            </div>
+          </div>
+          <div class="col-6 col-lg-4 col-xl">
+            <div class="stat-card bg-draft">
+              <span>Draft</span>
+              <h2 id="v-draft" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+              <i class="bi bi-pencil-square"></i>
+            </div>
+          </div>
+          <div class="col-6 col-lg-4 col-xl">
+            <div class="stat-card bg-sub">
+              <span>Submitted</span>
+              <h2 id="v-sub" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+              <i class="bi bi-check2-all"></i>
+            </div>
+          </div>
+          <div class="col-6 col-lg-4 col-xl">
+            <div class="stat-card bg-rej">
+              <span>Rejected</span>
+              <h2 id="v-rej" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+              <i class="bi bi-x-circle-fill"></i>
+            </div>
+          </div>
+          <div class="col-6 col-lg-4 col-xl">
+            <div class="stat-card bg-open">
+              <span>% Submitted</span>
+              <h2 id="v-pct" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Info Strip (SLS + Petugas) ─────────────────────── -->
+        <div class="info-strip mb-5" data-aos="fade-up" data-aos-delay="150">
+          <div class="info-pill">
+            <div class="info-pill-icon" style="background:#fff3e0; color:#f79039"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+              <div style="font-size:.7rem; opacity:.6; text-transform:uppercase; letter-spacing:.5px;">Total SLS</div>
+              <span id="v-sls">—</span>
+            </div>
+          </div>
+          <div class="info-pill">
+            <div class="info-pill-icon" style="background:#e0f2fe; color:#0284c7"><i class="bi bi-person-badge-fill"></i></div>
+            <div>
+              <div style="font-size:.7rem; opacity:.6; text-transform:uppercase; letter-spacing:.5px;">Petugas Aktif</div>
+              <span id="v-petugas">—</span>
+            </div>
+          </div>
+          <div class="ms-auto last-update d-none d-md-flex">
+            <i class="bi bi-clock-history"></i>
+            <span>Terakhir diperbarui: <strong id="lastUpdateText2">—</strong></span>
+          </div>
+        </div>
+
+        <!-- ── Charts ─────────────────────────────────────────── -->
+        <div class="row g-4 mb-2" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-lg-7">
+            <div class="glass-card h-100">
+              <h6><i class="bi bi-bar-chart-fill me-2" style="color:var(--accent-color)"></i>Capaian Submitted per Kecamatan (%)</h6>
+              <div style="height:280px; position:relative;"><canvas id="barChart"></canvas></div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="glass-card h-100">
+              <h6><i class="bi bi-pie-chart-fill me-2" style="color:var(--accent-color)"></i>Distribusi Status Dokumen</h6>
+              <div style="height:280px; position:relative;"><canvas id="pieChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Stacked Bar per Kecamatan ──────────────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="220">
+          <h6><i class="bi bi-layers-fill me-2" style="color:var(--accent-color)"></i>Volume Dokumen per Kecamatan</h6>
+          <div style="height:240px; position:relative;"><canvas id="stackedChart"></canvas></div>
+        </div>
+
+        <!-- ── Tabel Per Kecamatan ─────────────────────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="250">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="m-0"><i class="bi bi-map-fill me-2" style="color:var(--accent-color)"></i>Ringkasan per Kecamatan</h6>
+            <button onclick="exportExcel('tableKec')" class="btn btn-sm btn-export">
+              <i class="bi bi-file-earmark-excel me-1"></i>Unduh Excel
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table id="tableKec" class="table dashboard-table">
+              <thead>
+                <tr>
+                  <th>Kecamatan</th>
+                  <th class="text-center">SLS</th>
+                  <th class="text-center">Open</th>
+                  <th class="text-center">Draft</th>
+                  <th class="text-center">Submitted</th>
+                  <th class="text-center">Rejected</th>
+                  <th style="min-width:140px">Progress</th>
+                </tr>
+              </thead>
+              <tbody id="bodyKec">
+                <tr><td colspan="7" class="text-center text-muted py-4">Memuat data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── Tabel Per Petugas ───────────────────────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="280">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h6 class="m-0"><i class="bi bi-person-lines-fill me-2" style="color:var(--accent-color)"></i>Detail per Petugas</h6>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+              <div class="input-group" style="max-width:260px;">
+                <span class="input-group-text bg-white" style="border-radius:10px 0 0 10px; border:2px solid #e2e8f0; border-right:none;">
+                  <i class="bi bi-search" style="color:#94a3b8"></i>
+                </span>
+                <input type="text" id="searchPetugas" class="form-control"
+                       placeholder="Cari petugas…"
+                       oninput="filterPetugas()"
+                       style="border:2px solid #e2e8f0; border-left:none; border-radius:0 10px 10px 0; font-size:.88rem;">
+              </div>
+              <button onclick="exportExcel('tablePetugas')" class="btn btn-sm btn-export" style="border-color:#10b981; color:#10b981;">
+                <i class="bi bi-file-earmark-excel me-1"></i>Ekspor
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive" style="max-height:420px; overflow-y:auto;">
+            <table id="tablePetugas" class="table dashboard-table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Petugas</th>
+                  <th class="text-center">SLS</th>
+                  <th class="text-center">Open</th>
+                  <th class="text-center">Draft</th>
+                  <th class="text-center">Submitted</th>
+                  <th class="text-center">Rejected</th>
+                  <th class="text-center">Total</th>
+                </tr>
+              </thead>
+              <tbody id="bodyPetugas">
+                <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-muted small mt-2" id="countPetugas"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer-16 footer position-relative" style="background-color: var(--accent-color); color: #ffffff; padding-top: 60px;">
+    <div class="container">
+      <div class="footer-main" data-aos="fade-up" data-aos-delay="100">
+        <div class="row align-items-start">
+          <div class="col-lg-4">
+            <div class="brand-section">
+              <a href="index.html" class="logo d-flex align-items-center mb-4" style="text-decoration: none;">
+                <span class="sitename" style="color: #ffffff; font-weight: 700; font-size: 1.5rem;">BPS Kabupaten Toli-Toli</span>
+              </a>
+              <div class="contact-info mt-4">
+                <div class="contact-item mb-2">
+                  <i class="bi bi-geo-alt-fill me-2"></i>
+                  <span style="font-size: 0.9rem;">Jl. Magamu No.111, Tuweley, Kec. Baolan, Kabupaten Toli-Toli, Sulawesi Tengah 94515</span>
+                </div>
+                <div class="contact-item mb-2">
+                  <i class="bi bi-telephone-fill me-2"></i><span>085183287206</span>
+                </div>
+                <div class="contact-item mb-2">
+                  <i class="bi bi-envelope-fill me-2"></i><span>bps7206@bps.go.id</span>
+                </div>
+              </div>
+              <div class="social-links mt-4">
+                <a href="https://www.facebook.com/profile.php?id=61589155730437" class="me-3 text-white"><i class="bi bi-facebook fs-4"></i></a>
+                <a href="https://www.instagram.com/bpstolitoli/" class="me-3 text-white"><i class="bi bi-instagram fs-4"></i></a>
+                <a href="https://youtube.com/@bpskabupatentolitoli4010?si=hPO81wq7eE5WNBgk" class="me-3 text-white"><i class="bi bi-youtube fs-4"></i></a>
+                <a href="https://tolitolikab.bps.go.id/" class="text-white"><i class="bi bi-globe fs-4"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 mt-5 mt-lg-0">
+            <div class="row">
+              <div class="col-6">
+                <h6 style="color:#fff; font-weight:700; text-transform:uppercase; font-size:.85rem; letter-spacing:1px; margin-bottom:20px;">Navigasi</h6>
+                <nav class="footer-nav d-flex flex-column gap-2">
+                  <a href="index.html" style="color:rgba(255,255,255,.85); text-decoration:none;">Beranda</a>
+                  <a href="penjelasan.html" style="color:rgba(255,255,255,.85); text-decoration:none;">Penjelasan Umum</a>
+                  <a href="administrasi.html" style="color:rgba(255,255,255,.85); text-decoration:none;">Teknis Administrasi</a>
+                  <a href="laporan.html" style="color:rgba(255,255,255,.85); text-decoration:none;">Laporan</a>
+                  <a href="monitoring_sensus.html" style="color:rgba(255,255,255,.85); text-decoration:none;">Monitoring SE</a>
+                </nav>
+              </div>
+              <div class="col-6">
+                <h6 style="color:#fff; font-weight:700; text-transform:uppercase; font-size:.85rem; letter-spacing:1px; margin-bottom:20px;">Jam Layanan</h6>
+                <p class="small mb-1" style="opacity:.8;">Senin - Kamis:</p>
+                <p class="fw-bold small mb-2">07.30 - 16.00 WITA</p>
+                <p class="small mb-1" style="opacity:.8;">Jumat:</p>
+                <p class="fw-bold small mb-3">07.30 - 16.30 WITA</p>
+                <p style="color:rgba(255,255,255,.7); font-size:.75rem; font-style:italic;">*Sabtu, Minggu & Hari Libur Tutup</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 mt-5 mt-lg-0">
+            <h6 style="color:#fff; font-weight:700; text-transform:uppercase; font-size:.85rem; letter-spacing:1px; margin-bottom:20px;">Lokasi Kami</h6>
+            <div style="width:100%; height:200px; border-radius:15px; overflow:hidden; border:3px solid rgba(255,255,255,.2);">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.1551286282065!2d120.8198227747264!3d1.0446880624812578!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32712b4be7b628b7%3A0x602e57994bfb76da!2sBadan%20Pusat%20Statistik%20Kabupaten%20Tolitoli!5e0!3m2!1sen!2sid!4v1776297625755!5m2!1sen!2sid"
+                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom mt-5" style="background-color:rgba(0,0,0,.1); padding:25px 0;">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6 text-center text-md-start">
+            <p class="mb-0" style="font-size:.9rem; opacity:.9;">© 2026 <strong>BPS Kabupaten Toli-Toli</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#!" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="assets/js/main.js"></script>
+
+  <script>
+    Chart.defaults.font.family = "'Roboto', system-ui, sans-serif";
+    Chart.defaults.color = '#64748b';
+
+    let barChart, pieChart, stackedChart;
+    let allPetugas = [];
+
+    async function fetchData() {
+      const kdkec = document.getElementById('filterKecamatan').value;
+      let data;
+      try {
+        const res = await fetch(`fetch_sensus_ekonomi.php?kdkec=${kdkec}`);
+        data = await res.json();
+      } catch(e) {
+        showError();
+        return;
+      }
+
+      const s = data.stats;
+      const total = s.open + s.draft + s.submitted + s.rejected;
+      const pct   = total > 0 ? Math.round(s.submitted / total * 100) : 0;
+
+      // Update stat cards
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        el.textContent = val.toLocaleString('id-ID');
+        el.classList.remove('skeleton');
+      };
+      setVal('v-open',    s.open);
+      setVal('v-draft',   s.draft);
+      setVal('v-sub',     s.submitted);
+      setVal('v-rej',     s.rejected);
+      document.getElementById('v-pct').textContent = pct + '%';
+      document.getElementById('v-pct').classList.remove('skeleton');
+
+      // Info strip
+      document.getElementById('v-sls').textContent     = s.sls.toLocaleString('id-ID') + ' SLS';
+      document.getElementById('v-petugas').textContent = s.petugas + ' Orang';
+
+      // Last update
+      const lu = data.last_update || '—';
+      document.getElementById('lastUpdateText').textContent  = lu;
+      document.getElementById('lastUpdateText2').textContent = lu;
+
+      // Tables
+      renderKec(data.tabel_kec);
+
+      allPetugas = data.tabel_petugas || [];
+      renderPetugas(allPetugas);
+
+      // Charts
+      renderCharts(data);
+    }
+
+    function renderKec(list) {
+      if (!list.length) {
+        document.getElementById('bodyKec').innerHTML =
+          '<tr><td colspan="7" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        return;
+      }
+      document.getElementById('bodyKec').innerHTML = list.map(k => `
+        <tr>
+          <td class="fw-semibold">${k.nama}</td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${k.sls}</span></td>
+          <td class="text-center"><span class="badge badge-open">${k.open.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-draft">${k.draft.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-sub">${k.submitted.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${k.rejected.toLocaleString('id-ID')}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1">
+                <div class="progress-bar" style="width:${k.prog}%"></div>
+              </div>
+              <span class="small fw-bold" style="min-width:36px; color:#f79039">${k.prog}%</span>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderPetugas(list) {
+      if (!list.length) {
+        document.getElementById('bodyPetugas').innerHTML =
+          '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        document.getElementById('countPetugas').textContent = '';
+        return;
+      }
+      document.getElementById('bodyPetugas').innerHTML = list.map((p, i) => `
+        <tr>
+          <td class="text-muted small">${i + 1}</td>
+          <td class="fw-semibold">${p.nama}</td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${p.sls}</span></td>
+          <td class="text-center"><span class="badge badge-open">${p.open.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-draft">${p.draft.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-sub">${p.submitted.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${p.rejected.toLocaleString('id-ID')}</span></td>
+          <td class="text-center fw-bold text-muted">${p.total.toLocaleString('id-ID')}</td>
+        </tr>
+      `).join('');
+      document.getElementById('countPetugas').textContent =
+        `Menampilkan ${list.length} dari ${allPetugas.length} petugas`;
+    }
+
+    function filterPetugas() {
+      const q = document.getElementById('searchPetugas').value.trim().toLowerCase();
+      if (!q) { renderPetugas(allPetugas); return; }
+      renderPetugas(allPetugas.filter(p => p.nama.toLowerCase().includes(q)));
+    }
+
+    function renderCharts(data) {
+      const kecLabels = data.tabel_kec.map(k => k.nama);
+      const ORANGE = '#f79039', BLUE = '#3b82f6', GREEN = '#10b981', RED = '#ef4444';
+
+      // Bar chart: capaian % per kecamatan
+      if (barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: kecLabels,
+          datasets: [{
+            label: 'Submitted (%)',
+            data: data.tabel_kec.map(k => k.prog),
+            backgroundColor: data.tabel_kec.map(k => k.prog >= 70 ? GREEN : k.prog >= 40 ? ORANGE : '#94a3b8'),
+            borderRadius: 8,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+            y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' },
+                 ticks: { callback: v => v + '%' } },
+          },
+          plugins: { legend: { display: false } },
+        }
+      });
+
+      // Doughnut: distribusi status
+      const s = data.stats;
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Open','Draft','Submitted','Rejected'],
+          datasets: [{
+            data: [s.open, s.draft, s.submitted, s.rejected],
+            backgroundColor: [ORANGE, BLUE, GREEN, RED],
+            borderWidth: 2, borderColor: '#fff',
+          }]
+        },
+        options: {
+          cutout: '62%',
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 13, padding: 12 } } },
+        }
+      });
+
+      // Stacked bar: volume per kecamatan
+      if (stackedChart) stackedChart.destroy();
+      stackedChart = new Chart(document.getElementById('stackedChart'), {
+        type: 'bar',
+        data: {
+          labels: kecLabels,
+          datasets: [
+            { label: 'Open',      data: data.tabel_kec.map(k => k.open),      backgroundColor: ORANGE,  stack: 's' },
+            { label: 'Draft',     data: data.tabel_kec.map(k => k.draft),     backgroundColor: BLUE,    stack: 's' },
+            { label: 'Submitted', data: data.tabel_kec.map(k => k.submitted), backgroundColor: GREEN,   stack: 's' },
+            { label: 'Rejected',  data: data.tabel_kec.map(k => k.rejected),  backgroundColor: RED,     stack: 's' },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+            y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' } },
+          },
+          plugins: { legend: { position: 'top', labels: { boxWidth: 13 } } },
+        }
+      });
+    }
+
+    function showError() {
+      ['v-open','v-draft','v-sub','v-rej','v-pct'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(id).classList.remove('skeleton');
+      });
+    }
+
+    function exportExcel(tableId) {
+      const wb = XLSX.utils.table_to_book(document.getElementById(tableId));
+      XLSX.writeFile(wb, `Monitoring_SE2026_${tableId}.xlsx`);
+    }
+
+    document.getElementById('filterKecamatan').addEventListener('change', fetchData);
+    window.addEventListener('load', fetchData);
+  </script>
+
+</body>
+</html>
