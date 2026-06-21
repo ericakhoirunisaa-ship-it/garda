@@ -84,11 +84,13 @@ $chartOpen      = json_encode(array_map('intval', array_column($perPetugas, 'tot
 $chartDraft     = json_encode(array_map('intval', array_column($perPetugas, 'total_draft')));
 $chartSubmitted = json_encode(array_map('intval', array_column($perPetugas, 'total_submitted')));
 $chartRejected  = json_encode(array_map('intval', array_column($perPetugas, 'total_rejected')));
+$chartApproved  = json_encode(array_map('intval', array_column($perPetugas, 'total_approved')));
 $doughnutData   = json_encode([
     (int)$stats['total_open'],
     (int)$stats['total_draft'],
     (int)$stats['total_submitted'],
     (int)$stats['total_rejected'],
+    (int)$stats['total_approved'],
 ]);
 $barWidth = max(600, count($perPetugas) * 60);
 ?>
@@ -112,6 +114,7 @@ $barWidth = max(600, count($perPetugas) * 60);
         .badge-draft  { background:#fef9c3; color:#92400e; }
         .badge-sub    { background:#dcfce7; color:#166534; }
         .badge-rej    { background:#fee2e2; color:#991b1b; }
+        .badge-app    { background:#ede9fe; color:#5b21b6; }
     </style>
 </head>
 <body>
@@ -197,6 +200,17 @@ $barWidth = max(600, count($perPetugas) * 60);
                 <div class="col-6 col-sm-4 col-xl-2">
                     <div class="card stat-card p-3">
                         <div class="d-flex align-items-center gap-3">
+                            <div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><i class="bi bi-patch-check-fill"></i></div>
+                            <div>
+                                <div class="fs-2 fw-bold lh-1"><?= number_format((int)$stats['total_approved']) ?></div>
+                                <div class="text-muted small">Approved</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-xl-2">
+                    <div class="card stat-card p-3">
+                        <div class="d-flex align-items-center gap-3">
                             <div class="stat-icon" style="background:rgba(247,144,57,.12);color:#f79039"><i class="bi bi-person-badge-fill"></i></div>
                             <div>
                                 <div class="fs-2 fw-bold lh-1"><?= (int)$stats['total_petugas'] ?></div>
@@ -258,6 +272,7 @@ $barWidth = max(600, count($perPetugas) * 60);
                             <span class="badge badge-draft px-3 py-2">Draft: <?= number_format((int)$stats['total_draft']) ?></span>
                             <span class="badge badge-sub px-3 py-2">Submitted: <?= number_format((int)$stats['total_submitted']) ?></span>
                             <span class="badge badge-rej px-3 py-2">Rejected: <?= number_format((int)$stats['total_rejected']) ?></span>
+                            <span class="badge badge-app px-3 py-2">Approved: <?= number_format((int)$stats['total_approved']) ?></span>
                         </div>
                     </div>
                 </div>
@@ -310,17 +325,19 @@ $barWidth = max(600, count($perPetugas) * 60);
                                         <th class="text-center">Submitted<br><small style="font-weight:400;font-size:.72rem;">Pencacah</small></th>
                                         <th class="text-center">Submitted<br><small style="font-weight:400;font-size:.72rem;">Respondent</small></th>
                                         <th class="text-center">Rejected</th>
+                                        <th class="text-center">Approved</th>
                                         <th class="text-center">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php if (empty($perPetugas)): ?>
-                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data. <a href="data_sensus_ekonomi.php">Import data?</a></td></tr>
+                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada data. <a href="data_sensus_ekonomi.php">Import data?</a></td></tr>
                                 <?php else: ?>
                                 <?php foreach ($perPetugas as $i => $p): ?>
                                     <?php
                                     $total = (int)$p['total_open'] + (int)$p['total_draft']
-                                           + (int)$p['total_submitted'] + (int)$p['total_rejected'];
+                                           + (int)$p['total_submitted'] + (int)$p['total_rejected']
+                                           + (int)$p['total_approved'];
                                     ?>
                                     <tr>
                                         <td class="ps-4 text-muted small"><?= $i + 1 ?></td>
@@ -331,6 +348,7 @@ $barWidth = max(600, count($perPetugas) * 60);
                                         <td class="text-center"><span class="badge badge-sub fw-semibold"><?= number_format((int)$p['submitted_pencacah']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-sub fw-semibold"><?= number_format((int)$p['submitted_resp']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-rej fw-semibold"><?= number_format((int)$p['total_rejected']) ?></span></td>
+                                        <td class="text-center"><span class="badge badge-app fw-semibold"><?= number_format((int)$p['total_approved']) ?></span></td>
                                         <td class="text-center fw-bold text-muted"><?= number_format($total) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -354,12 +372,13 @@ $barWidth = max(600, count($perPetugas) * 60);
                                         <th class="text-center">Draft</th>
                                         <th class="text-center">Submitted</th>
                                         <th class="text-center">Rejected</th>
+                                        <th class="text-center">Approved</th>
                                         <th class="text-center">Progress</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php if (empty($perKec)): ?>
-                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>
+                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada data.</td></tr>
                                 <?php else: ?>
                                 <?php foreach ($perKec as $kec): ?>
                                     <?php
@@ -386,6 +405,7 @@ $barWidth = max(600, count($perPetugas) * 60);
                                         <td class="text-center"><span class="badge badge-draft"><?= number_format((int)$kec['total_draft']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-sub"><?= number_format((int)$kec['total_submitted']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-rej"><?= number_format((int)$kec['total_rejected']) ?></span></td>
+                                        <td class="text-center"><span class="badge badge-app"><?= number_format((int)$kec['total_approved']) ?></span></td>
                                         <td style="min-width:120px;">
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="progress flex-grow-1" style="height:6px">
@@ -510,10 +530,10 @@ Chart.defaults.font.size   = 12;
 new Chart(document.getElementById('doughnutChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Open','Draft','Submitted','Rejected'],
+        labels: ['Open','Draft','Submitted','Rejected','Approved'],
         datasets: [{
             data: <?= $doughnutData ?>,
-            backgroundColor: ['#3b82f6','#f59e0b','#22c55e','#ef4444'],
+            backgroundColor: ['#3b82f6','#f59e0b','#22c55e','#ef4444','#8b5cf6'],
             borderWidth: 2, borderColor: '#fff',
         }]
     },
@@ -530,6 +550,7 @@ const barOpen   = <?= $chartOpen ?>;
 const barDraft  = <?= $chartDraft ?>;
 const barSub    = <?= $chartSubmitted ?>;
 const barRej    = <?= $chartRejected ?>;
+const barApp    = <?= $chartApproved ?>;
 
 new Chart(document.getElementById('barChart'), {
     type: 'bar',
@@ -540,6 +561,7 @@ new Chart(document.getElementById('barChart'), {
             { label:'Draft',     data:barDraft, backgroundColor:'#fcd34d', stack:'s' },
             { label:'Submitted', data:barSub,   backgroundColor:'#4ade80', stack:'s' },
             { label:'Rejected',  data:barRej,   backgroundColor:'#f87171', stack:'s' },
+            { label:'Approved',  data:barApp,   backgroundColor:'#c4b5fd', stack:'s' },
         ]
     },
     options: {
