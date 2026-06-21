@@ -38,9 +38,19 @@ $stats = $conn->query("SELECT
     COALESCE(SUM(draft), 0)                                        AS total_draft,
     COALESCE(SUM(submitted_by_pencacah + submitted_respondent), 0) AS total_submitted,
     COALESCE(SUM(rejected), 0)                                     AS total_rejected,
+    COALESCE(SUM(approved), 0)                                     AS total_approved,
     COUNT(DISTINCT email)                                          AS total_petugas,
     COUNT(DISTINCT sls_code)                                       AS total_sls
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
+
+$globalDenominator = (int)$stats['total_open'] + (int)$stats['total_draft']
+                   + (int)$stats['total_submitted'] + (int)$stats['total_rejected']
+                   + (int)$stats['total_approved'];
+$globalNumerator   = (int)$stats['total_submitted'] + (int)$stats['total_rejected']
+                   + (int)$stats['total_approved'];
+$globalPct = $globalDenominator > 0
+    ? number_format($globalNumerator / $globalDenominator * 100, 2)
+    : '0.00';
 
 $perPetugas = $conn->query("SELECT
     email,
@@ -62,6 +72,7 @@ $perKec = $conn->query("SELECT
     COALESCE(SUM(draft), 0)                                        AS total_draft,
     COALESCE(SUM(submitted_by_pencacah + submitted_respondent), 0) AS total_submitted,
     COALESCE(SUM(rejected), 0)                                     AS total_rejected,
+    COALESCE(SUM(approved), 0)                                     AS total_approved,
     COUNT(DISTINCT email)                                          AS total_petugas,
     COUNT(DISTINCT sls_code)                                       AS total_sls
 FROM sensus_ekonomi
@@ -207,6 +218,28 @@ $barWidth = max(600, count($perPetugas) * 60);
                 </div>
             </div>
 
+            <!-- ── Progress Bar Global ───────────────────────── -->
+            <div class="card stat-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-semibold">
+                        Progress Pencacahan
+                        <?php if ($kecFilter !== 'all'): ?>
+                            — <span style="color:#f79039"><?= htmlspecialchars($kecNama[$kecFilter]) ?></span>
+                        <?php else: ?>
+                            Keseluruhan
+                        <?php endif; ?>
+                    </span>
+                    <span class="fw-bold fs-5" style="color:#f79039"><?= $globalPct ?>%</span>
+                </div>
+                <div class="progress" style="height:8px; border-radius:6px; background:#e9ecef;">
+                    <div class="progress-bar progress-accent" style="width:<?= $globalPct ?>%; border-radius:6px;"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <small class="text-muted"><?= number_format($globalNumerator) ?> dari <?= number_format($globalDenominator) ?> dokumen sudah diproses (submit + reject + approve)</small>
+                    <small class="text-muted"><?= number_format((int)$stats['total_open'] + (int)$stats['total_draft']) ?> dokumen tersisa</small>
+                </div>
+            </div>
+
             <!-- ── Charts ─────────────────────────────────────── -->
             <div class="row g-4 mb-4">
                 <!-- Doughnut -->
@@ -330,10 +363,15 @@ $barWidth = max(600, count($perPetugas) * 60);
                                 <?php else: ?>
                                 <?php foreach ($perKec as $kec): ?>
                                     <?php
-                                    $total = (int)$kec['total_open'] + (int)$kec['total_draft']
-                                           + (int)$kec['total_submitted'] + (int)$kec['total_rejected'];
-                                    $pct   = $total > 0 ? round($kec['total_submitted'] / $total * 100) : 0;
-                                    $nama  = $kecNama[$kec['kec_code']] ?? 'Kec. ' . $kec['kec_code'];
+                                    $kDenominator = (int)$kec['total_open'] + (int)$kec['total_draft']
+                                                  + (int)$kec['total_submitted'] + (int)$kec['total_rejected']
+                                                  + (int)$kec['total_approved'];
+                                    $kNumerator   = (int)$kec['total_submitted'] + (int)$kec['total_rejected']
+                                                  + (int)$kec['total_approved'];
+                                    $pct = $kDenominator > 0
+                                        ? number_format($kNumerator / $kDenominator * 100, 2)
+                                        : '0.00';
+                                    $nama = $kecNama[$kec['kec_code']] ?? 'Kec. ' . $kec['kec_code'];
                                     ?>
                                     <tr>
                                         <td class="ps-4">
