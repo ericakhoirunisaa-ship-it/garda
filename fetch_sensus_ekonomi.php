@@ -37,6 +37,7 @@ $s = $conn->query("SELECT
     COALESCE(SUM(draft),0)                                        AS total_draft,
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS total_submitted,
     COALESCE(SUM(rejected),0)                                     AS total_rejected,
+    COALESCE(SUM(approved),0)                                     AS total_approved,
     COUNT(DISTINCT sls_code)                                      AS total_sls,
     COUNT(DISTINCT email)                                         AS total_petugas
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
@@ -48,6 +49,7 @@ $kecRows = $conn->query("SELECT
     COALESCE(SUM(draft),0)                                        AS draft,
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS submitted,
     COALESCE(SUM(rejected),0)                                     AS rejected,
+    COALESCE(SUM(approved),0)                                     AS approved,
     COUNT(DISTINCT sls_code)                                      AS sls
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code,5,3)
@@ -55,8 +57,9 @@ ORDER BY kec_code")->fetch_all(MYSQLI_ASSOC);
 
 $tabel_kec = [];
 foreach ($kecRows as $k) {
-    $tot  = (int)$k['open'] + (int)$k['draft'] + (int)$k['submitted'] + (int)$k['rejected'];
-    $prog = $tot > 0 ? round($k['submitted'] / $tot * 100) : 0;
+    $tot  = (int)$k['open'] + (int)$k['draft'] + (int)$k['submitted'] + (int)$k['rejected'] + (int)$k['approved'];
+    $num  = (int)$k['submitted'] + (int)$k['rejected'] + (int)$k['approved'];
+    $prog = $tot > 0 ? round($num / $tot * 100, 2) : 0;
     $tabel_kec[] = [
         'kec_code'  => $k['kec_code'],
         'nama'      => $kecNama[$k['kec_code']] ?? 'Kec. ' . $k['kec_code'],
@@ -64,6 +67,7 @@ foreach ($kecRows as $k) {
         'draft'     => (int)$k['draft'],
         'submitted' => (int)$k['submitted'],
         'rejected'  => (int)$k['rejected'],
+        'approved'  => (int)$k['approved'],
         'total'     => $tot,
         'sls'       => (int)$k['sls'],
         'prog'      => $prog,
@@ -77,6 +81,7 @@ $petRows = $conn->query("SELECT
     COALESCE(SUM(draft),0)                                        AS draft,
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS submitted,
     COALESCE(SUM(rejected),0)                                     AS rejected,
+    COALESCE(SUM(approved),0)                                     AS approved,
     COUNT(DISTINCT sls_code)                                      AS sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email
@@ -84,13 +89,14 @@ ORDER BY submitted DESC, open DESC")->fetch_all(MYSQLI_ASSOC);
 
 $tabel_petugas = [];
 foreach ($petRows as $p) {
-    $tot = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted'] + (int)$p['rejected'];
+    $tot = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted'] + (int)$p['rejected'] + (int)$p['approved'];
     $tabel_petugas[] = [
         'nama'      => explode('@', $p['email'])[0],
         'open'      => (int)$p['open'],
         'draft'     => (int)$p['draft'],
         'submitted' => (int)$p['submitted'],
         'rejected'  => (int)$p['rejected'],
+        'approved'  => (int)$p['approved'],
         'total'     => $tot,
         'sls'       => (int)$p['sls'],
     ];
@@ -106,6 +112,7 @@ echo json_encode([
         'draft'     => (int)$s['total_draft'],
         'submitted' => (int)$s['total_submitted'],
         'rejected'  => (int)$s['total_rejected'],
+        'approved'  => (int)$s['total_approved'],
         'sls'       => (int)$s['total_sls'],
         'petugas'   => (int)$s['total_petugas'],
     ],
