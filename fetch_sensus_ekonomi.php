@@ -350,6 +350,7 @@ foreach ($kecRows as $k) {
 // Per petugas (filtered)
 $petRows = $conn->query("SELECT
     email,
+    GROUP_CONCAT(DISTINCT SUBSTRING(sls_code,5,3) ORDER BY SUBSTRING(sls_code,5,3)) AS kec_codes,
     COALESCE(SUM(open_count),0)                                   AS open,
     COALESCE(SUM(draft),0)                                        AS draft,
     COALESCE(SUM(submitted_by_pencacah),0)                        AS submitted,
@@ -365,8 +366,13 @@ $tabel_petugas = [];
 foreach ($petRows as $p) {
     $tot = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted']
          + (int)$p['rejected'] + (int)$p['approved'] + (int)$p['revoke'];
+    $kecNames = array_map(
+        fn($k) => $kecNama[trim($k)] ?? trim($k),
+        explode(',', $p['kec_codes'] ?? '')
+    );
     $tabel_petugas[] = [
         'nama'      => $getNama($p['email']),
+        'kecamatan' => implode(', ', $kecNames),
         'open'      => (int)$p['open'],
         'draft'     => (int)$p['draft'],
         'submitted' => (int)$p['submitted'],

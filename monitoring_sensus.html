@@ -222,6 +222,16 @@
     .btn-topn:hover  { background: #fff5eb; }
     .btn-topn.active { background: var(--accent-color); color: #fff; }
 
+    /* ── Sortable column headers ─────────────────────────────────── */
+    .sort-th { cursor: pointer; user-select: none; white-space: nowrap; }
+    .sort-th:hover { color: var(--accent-color); }
+    .sort-icon { margin-left:4px; font-size:.7rem; opacity:.35; }
+    .sort-th.asc  .sort-icon::after { content:'▲'; opacity:1; color:var(--accent-color); }
+    .sort-th.desc .sort-icon::after { content:'▼'; opacity:1; color:var(--accent-color); }
+    .sort-th:not(.asc):not(.desc) .sort-icon::after { content:'⇅'; }
+    /* Total row in kec table */
+    #tableKec tfoot td { font-weight:700; background:#fff8f0; border-top:2px solid var(--accent-color); }
+
     /* ── Loading skeleton ────────────────────────────────────────── */
     .skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -432,19 +442,20 @@
               <thead>
                 <tr>
                   <th>Kecamatan</th>
-                  <th class="text-center">SLS</th>
-                  <th class="text-center">Open</th>
-                  <th class="text-center">Draft</th>
-                  <th class="text-center">Submitted</th>
-                  <th class="text-center">Rejected</th>
-                  <th class="text-center">Approved</th>
-                  <th class="text-center">Revoke</th>
-                  <th style="min-width:140px">Progress</th>
+                  <th class="text-center sort-th" onclick="sortKec('sls')">SLS<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('open')">Open<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('draft')">Draft<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('submitted')">Submitted<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('rejected')">Rejected<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('approved')">Approved<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('revoke')">Revoke<span class="sort-icon"></span></th>
+                  <th class="sort-th" onclick="sortKec('prog')" style="min-width:140px">Progress<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyKec">
                 <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
+              <tfoot id="footKec"></tfoot>
             </table>
           </div>
         </div>
@@ -467,6 +478,7 @@
                 <tr>
                   <th style="width:36px">#</th>
                   <th>Petugas</th>
+                  <th>Kecamatan</th>
                   <th class="text-center">Submitted</th>
                   <th class="text-center">Rejected</th>
                   <th class="text-center">Approved</th>
@@ -476,7 +488,7 @@
                 </tr>
               </thead>
               <tbody id="bodyTopPetugas">
-                <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -507,6 +519,7 @@
                 <tr>
                   <th>#</th>
                   <th>Petugas</th>
+                  <th>Kecamatan</th>
                   <th class="text-center">SLS</th>
                   <th class="text-center">Open</th>
                   <th class="text-center">Draft</th>
@@ -518,7 +531,7 @@
                 </tr>
               </thead>
               <tbody id="bodyPetugas">
-                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="11" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -625,8 +638,9 @@
     Chart.defaults.color = '#64748b';
 
     let barChart, pieChart, stackedChart;
-    let allPetugas = [];
+    let allPetugas = [], allKec = [];
     let topN = 10;
+    let kecSort = { col: null, dir: 'desc' };
 
     async function fetchData() {
       const kdkec = document.getElementById('filterKecamatan').value;
@@ -678,7 +692,8 @@
       document.getElementById('lastUpdateText').textContent  = lu;
       document.getElementById('lastUpdateText2').textContent = lu;
 
-      renderKec(data.tabel_kec);
+      allKec = data.tabel_kec || [];
+      renderKec(allKec);
 
       allPetugas = data.tabel_petugas || [];
       renderTopPetugas(allPetugas);
@@ -713,6 +728,7 @@
         return `<tr>
           <td class="text-center fw-bold" style="color:${color}">${medal}</td>
           <td class="fw-semibold">${p.nama}</td>
+          <td class="text-muted small">${p.kecamatan || '—'}</td>
           <td class="text-center"><span class="badge badge-sub">${p.submitted.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rej">${p.rejected.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
@@ -730,13 +746,32 @@
       }).join('');
     }
 
+    function sortKec(col) {
+      if (kecSort.col === col) kecSort.dir = kecSort.dir === 'asc' ? 'desc' : 'asc';
+      else { kecSort.col = col; kecSort.dir = 'desc'; }
+      document.querySelectorAll('#tableKec .sort-th').forEach(th => {
+        th.classList.remove('asc','desc');
+        if (th.getAttribute('onclick') === `sortKec('${col}')`)
+          th.classList.add(kecSort.dir);
+      });
+      renderKec(allKec);
+    }
+
     function renderKec(list) {
       if (!list.length) {
         document.getElementById('bodyKec').innerHTML =
           '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        document.getElementById('footKec').innerHTML = '';
         return;
       }
-      document.getElementById('bodyKec').innerHTML = list.map(k => `
+      let sorted = [...list];
+      if (kecSort.col) {
+        sorted.sort((a, b) => {
+          const v = kecSort.dir === 'asc' ? 1 : -1;
+          return (a[kecSort.col] > b[kecSort.col] ? 1 : -1) * v;
+        });
+      }
+      document.getElementById('bodyKec').innerHTML = sorted.map(k => `
         <tr>
           <td class="fw-semibold">${k.nama}</td>
           <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${k.sls}</span></td>
@@ -756,12 +791,33 @@
           </td>
         </tr>
       `).join('');
+
+      // Baris TOTAL
+      const tot = list.reduce((acc, k) => ({
+        sls: acc.sls + k.sls, open: acc.open + k.open, draft: acc.draft + k.draft,
+        submitted: acc.submitted + k.submitted, rejected: acc.rejected + k.rejected,
+        approved: acc.approved + (k.approved||0), revoke: acc.revoke + (k.revoke||0)
+      }), { sls:0, open:0, draft:0, submitted:0, rejected:0, approved:0, revoke:0 });
+      const tNum = tot.submitted + tot.rejected + tot.approved + tot.revoke;
+      const tDen = tot.open + tot.draft + tot.submitted + tot.rejected + tot.approved + tot.revoke;
+      const tPct = tDen > 0 ? (tNum/tDen*100).toFixed(2) : '0.00';
+      document.getElementById('footKec').innerHTML = `<tr>
+        <td><strong>TOTAL</strong></td>
+        <td class="text-center"><strong>${tot.sls.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.open.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.draft.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.submitted.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.rejected.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.approved.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.revoke.toLocaleString('id-ID')}</strong></td>
+        <td><span class="small fw-bold" style="color:#f79039">${tPct}%</span></td>
+      </tr>`;
     }
 
     function renderPetugas(list) {
       if (!list.length) {
         document.getElementById('bodyPetugas').innerHTML =
-          '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('countPetugas').textContent = '';
         return;
       }
@@ -769,6 +825,7 @@
         <tr>
           <td class="text-muted small">${i + 1}</td>
           <td class="fw-semibold">${p.nama}</td>
+          <td class="text-muted small">${p.kecamatan || '—'}</td>
           <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${p.sls}</span></td>
           <td class="text-center"><span class="badge badge-open">${p.open.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-draft">${p.draft.toLocaleString('id-ID')}</span></td>
@@ -786,7 +843,8 @@
     function filterPetugas() {
       const q = document.getElementById('searchPetugas').value.trim().toLowerCase();
       if (!q) { renderPetugas(allPetugas); return; }
-      renderPetugas(allPetugas.filter(p => p.nama.toLowerCase().includes(q)));
+      renderPetugas(allPetugas.filter(p =>
+        p.nama.toLowerCase().includes(q) || (p.kecamatan||'').toLowerCase().includes(q)));
     }
 
     function renderCharts(data) {
