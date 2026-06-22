@@ -15,12 +15,16 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     approved INT DEFAULT 0,
     `revoke` INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_email_sls (email, sls_code)
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 $chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
 if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
+}
+// Hapus unique key lama jika masih ada
+$chkIdx = $conn->query("SHOW INDEX FROM sensus_ekonomi WHERE Key_name = 'uq_email_sls'");
+if ($chkIdx && $chkIdx->num_rows > 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi DROP INDEX uq_email_sls");
 }
 
 $kecNama = [
@@ -55,11 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $conn->query("INSERT INTO sensus_ekonomi
                 (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
-                VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr,$rev)
-                ON DUPLICATE KEY UPDATE
-                open_count=$open, draft=$draft,
-                submitted_by_pencacah=$subp, submitted_respondent=$subr,
-                rejected=$rej, approved=$appr, `revoke`=$rev");
+                VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr,$rev)");
             $redir_msg = $conn->affected_rows ? 'Data berhasil disimpan.' : ('Gagal: ' . $conn->error);
             if (!$conn->affected_rows) $redir_type = 'danger';
         }
@@ -102,8 +102,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
             $handle   = fopen($_FILES['csv_file']['tmp_name'], 'r');
             $header   = fgetcsv($handle);
-            $inserted = 0; $updated = 0; $skipped = 0;
-            $overwrite = ($_POST['overwrite'] ?? '0') === '1';
+            $inserted = 0; $skipped = 0;
+            $clearFirst = ($_POST['overwrite'] ?? '0') === '1';
+
+            if ($clearFirst) {
+                $conn->query("TRUNCATE TABLE sensus_ekonomi");
+            }
 
             while (($row = fgetcsv($handle)) !== false) {
                 $row = array_pad($row, 8, 0);
@@ -112,45 +116,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $rsls   = trim(trim($rsls), '"');
                 if (!$remail || !$rsls) { $skipped++; continue; }
 
-                $em   = $conn->real_escape_string($remail);
-                $sl   = $conn->real_escape_string($rsls);
-                $op   = (int)$ropen;
-                $dr   = (int)$rdraft;
-                $sp   = (int)$rsubp;
-                $sr   = 0;
-                $ap   = (int)$rappr;
-                $rj   = (int)$rrej;
-                $rv   = (int)$rrev;
+                $em = $conn->real_escape_string($remail);
+                $sl = $conn->real_escape_string($rsls);
+                $op = (int)$ropen;
+                $dr = (int)$rdraft;
+                $sp = (int)$rsubp;
+                $sr = 0;
+                $ap = (int)$rappr;
+                $rj = (int)$rrej;
+                $rv = (int)$rrev;
 
-                if ($overwrite) {
-                    $r = $conn->query("INSERT INTO sensus_ekonomi
-                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
-                        VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)
-                        ON DUPLICATE KEY UPDATE
-                        open_count=$op, draft=$dr,
-                        submitted_by_pencacah=$sp, submitted_respondent=$sr,
-                        rejected=$rj, approved=$ap, `revoke`=$rv");
-                    if ($r) {
-                        if ($conn->affected_rows === 1) $inserted++;
-                        elseif ($conn->affected_rows === 2) $updated++;
-                    } else { $skipped++; }
-                } else {
-                    // Skip if exists
-                    $exists = $conn->query("SELECT id FROM sensus_ekonomi WHERE email='$em' AND sls_code='$sl' LIMIT 1");
-                    if ($exists && $exists->num_rows) { $skipped++; continue; }
-                    $r = $conn->query("INSERT INTO sensus_ekonomi
-                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
-                        VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)");
-                    if ($r) $inserted++; else $skipped++;
-                }
+                $r = $conn->query("INSERT INTO sensus_ekonomi
+                    (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
+                    VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)");
+                if ($r) $inserted++; else $skipped++;
             }
             fclose($handle);
-            if ($inserted + $updated > 0) {
+            if ($inserted > 0) {
                 $conn->query("CREATE TABLE IF NOT EXISTS sensus_meta (k VARCHAR(50) PRIMARY KEY, v TEXT) ENGINE=InnoDB");
                 $now = date('Y-m-d H:i:s');
                 $conn->query("INSERT INTO sensus_meta (k,v) VALUES ('last_import','$now') ON DUPLICATE KEY UPDATE v='$now'");
             }
-            $redir_msg = "Import selesai: $inserted ditambah" . ($updated ? ", $updated diperbarui" : '') . ($skipped ? ", $skipped dilewati" : '') . '.';
+            $redir_msg = "Import selesai: $inserted data berhasil dimasukkan" . ($skipped ? ", $skipped dilewati (email/SLS kosong)" : '') . '.';
         } else {
             $redir_msg = 'Gagal membaca file CSV.'; $redir_type = 'danger';
         }
@@ -547,8 +534,8 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="overwrite" value="1" id="chkOverwrite">
                             <label class="form-check-label small" for="chkOverwrite">
-                                <strong>Timpa data yang sudah ada</strong> (berdasarkan Email + SLS Code)<br>
-                                <span class="text-muted">Jika tidak dicentang, baris duplikat akan dilewati.</span>
+                                <strong>Hapus semua data lama sebelum import</strong><br>
+                                <span class="text-muted">Jika dicentang, seluruh data yang ada akan dihapus dulu, lalu semua baris dari file dimasukkan. Jika tidak dicentang, semua baris dari file ditambahkan ke data yang sudah ada.</span>
                             </label>
                         </div>
                     </div>

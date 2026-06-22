@@ -14,12 +14,15 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     approved INT DEFAULT 0,
     `revoke` INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_email_sls (email, sls_code)
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 $chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
 if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
+}
+$chkIdx = $conn->query("SHOW INDEX FROM sensus_ekonomi WHERE Key_name = 'uq_email_sls'");
+if ($chkIdx && $chkIdx->num_rows > 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi DROP INDEX uq_email_sls");
 }
 
 $kecNama = [
