@@ -207,6 +207,21 @@
     .badge-rev   { background:#ffedd5; color:#c2410c; font-size:.8rem; }
     .bg-rev  { background-color: #ea580c; color: #fff; }
 
+    /* ── Top-N filter buttons ────────────────────────────────────── */
+    .btn-topn {
+      border: 2px solid var(--accent-color);
+      background: transparent;
+      color: var(--accent-color);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .8rem;
+      padding: 3px 11px;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .btn-topn:hover  { background: #fff5eb; }
+    .btn-topn.active { background: var(--accent-color); color: #fff; }
+
     /* ── Loading skeleton ────────────────────────────────────────── */
     .skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -434,6 +449,39 @@
           </div>
         </div>
 
+        <!-- ── Top N Capaian Petugas ──────────────────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="265">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h6 class="m-0"><i class="bi bi-trophy-fill me-2" style="color:#f59e0b"></i>Top Capaian Petugas</h6>
+            <div class="d-flex gap-1 align-items-center">
+              <span class="text-muted small me-1">Tampilkan:</span>
+              <button class="btn-topn" data-n="5"  onclick="setTopN(5)">5</button>
+              <button class="btn-topn active" data-n="10" onclick="setTopN(10)">10</button>
+              <button class="btn-topn" data-n="20" onclick="setTopN(20)">20</button>
+              <button class="btn-topn" data-n="30" onclick="setTopN(30)">30</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table dashboard-table">
+              <thead>
+                <tr>
+                  <th style="width:36px">#</th>
+                  <th>Petugas</th>
+                  <th class="text-center">Submitted</th>
+                  <th class="text-center">Rejected</th>
+                  <th class="text-center">Approved</th>
+                  <th class="text-center">Revoke</th>
+                  <th class="text-center">Total</th>
+                  <th style="min-width:150px">Progress</th>
+                </tr>
+              </thead>
+              <tbody id="bodyTopPetugas">
+                <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- ── Tabel Per Petugas ───────────────────────────────── -->
         <div class="glass-card" data-aos="fade-up" data-aos-delay="280">
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
@@ -578,6 +626,7 @@
 
     let barChart, pieChart, stackedChart;
     let allPetugas = [];
+    let topN = 10;
 
     async function fetchData() {
       const kdkec = document.getElementById('filterKecamatan').value;
@@ -632,10 +681,53 @@
       renderKec(data.tabel_kec);
 
       allPetugas = data.tabel_petugas || [];
+      renderTopPetugas(allPetugas);
       renderPetugas(allPetugas);
 
       // Charts
       renderCharts(data);
+    }
+
+    function setTopN(n) {
+      topN = n;
+      document.querySelectorAll('.btn-topn').forEach(b =>
+        b.classList.toggle('active', parseInt(b.dataset.n) === n));
+      renderTopPetugas(allPetugas);
+    }
+
+    function renderTopPetugas(list) {
+      const body = document.getElementById('bodyTopPetugas');
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        return;
+      }
+      const ranked = list.map(p => {
+        const num = p.submitted + p.rejected + (p.approved||0) + (p.revoke||0);
+        const prog = p.total > 0 ? num / p.total * 100 : 0;
+        return { ...p, prog };
+      }).sort((a, b) => b.prog - a.prog).slice(0, topN);
+
+      body.innerHTML = ranked.map((p, i) => {
+        const color = p.prog >= 70 ? '#10b981' : p.prog >= 40 ? '#f79039' : '#94a3b8';
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        return `<tr>
+          <td class="text-center fw-bold" style="color:${color}">${medal}</td>
+          <td class="fw-semibold">${p.nama}</td>
+          <td class="text-center"><span class="badge badge-sub">${p.submitted.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${p.rejected.toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center fw-bold text-muted">${p.total.toLocaleString('id-ID')}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1">
+                <div class="progress-bar" style="width:${p.prog.toFixed(1)}%; background:${color}"></div>
+              </div>
+              <span class="small fw-bold" style="min-width:46px; color:${color}">${p.prog.toFixed(2)}%</span>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
     }
 
     function renderKec(list) {
