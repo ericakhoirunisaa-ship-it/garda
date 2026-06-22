@@ -2,13 +2,14 @@
 header('Content-Type: application/json; charset=utf-8');
 ini_set('display_errors', 0);
 error_reporting(0);
+date_default_timezone_set('Asia/Makassar');
 
-require_once 'config.php';
-
+$conn = @mysqli_connect('43.128.105.129', 'root', 'Djt04k91On5HRE8ZyNVxha7JUF6m3bW2', 'db_semanis', 30444);
 if (!$conn) {
-    echo json_encode(['error' => 'Koneksi database gagal']);
+    echo json_encode(['error' => 'DB: ' . mysqli_connect_error()]);
     exit;
 }
+$conn->set_charset('utf8mb4');
 
 $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     id INT AUTO_INCREMENT PRIMARY KEY,

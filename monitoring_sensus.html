@@ -588,12 +588,17 @@
         const res = await fetch(`fetch_sensus_ekonomi.php?kdkec=${kdkec}`, { signal: ctrl.signal });
         clearTimeout(t);
         const text = await res.text();
-        data = JSON.parse(text);
+        try {
+          data = JSON.parse(text);
+        } catch(pe) {
+          showError('Parse error: ' + text.substring(0, 150));
+          return;
+        }
       } catch(e) {
-        showError();
+        showError(e.name === 'AbortError' ? 'Timeout — server tidak merespons dalam 20 detik' : 'Network error: ' + e.message);
         return;
       }
-      if (data.error) { showError(); return; }
+      if (data.error) { showError('Server: ' + data.error); return; }
 
       const s = data.stats;
       const total = s.open + s.draft + s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
@@ -769,17 +774,19 @@
       });
     }
 
-    function showError() {
+    function showError(msg) {
       ['v-open','v-draft','v-sub','v-rej','v-app','v-rev','v-pct'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.textContent = '—'; el.classList.remove('skeleton'); }
       });
+      const info = msg || 'Gagal memuat data';
       const lu = document.getElementById('lastUpdateText');
       const lu2 = document.getElementById('lastUpdateText2');
-      if (lu) lu.textContent = 'Gagal memuat data';
-      if (lu2) lu2.textContent = 'Gagal memuat data';
+      if (lu) lu.textContent = info;
+      if (lu2) lu2.textContent = info;
       const badge = document.querySelector('.update-badge');
       if (badge) badge.style.color = '#ef4444';
+      console.error('[SE] fetchData error:', info);
     }
 
     function exportExcel(tableId) {
