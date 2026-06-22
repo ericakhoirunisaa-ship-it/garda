@@ -1,6 +1,14 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
+ini_set('display_errors', 0);
+error_reporting(0);
+
 require_once 'config.php';
+
+if (!$conn) {
+    echo json_encode(['error' => 'Koneksi database gagal']);
+    exit;
+}
 
 $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     id INT AUTO_INCREMENT PRIMARY KEY,

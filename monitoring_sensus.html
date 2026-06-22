@@ -583,12 +583,17 @@
       const kdkec = document.getElementById('filterKecamatan').value;
       let data;
       try {
-        const res = await fetch(`fetch_sensus_ekonomi.php?kdkec=${kdkec}`);
-        data = await res.json();
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 20000);
+        const res = await fetch(`fetch_sensus_ekonomi.php?kdkec=${kdkec}`, { signal: ctrl.signal });
+        clearTimeout(t);
+        const text = await res.text();
+        data = JSON.parse(text);
       } catch(e) {
         showError();
         return;
       }
+      if (data.error) { showError(); return; }
 
       const s = data.stats;
       const total = s.open + s.draft + s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
@@ -765,10 +770,16 @@
     }
 
     function showError() {
-      ['v-open','v-draft','v-sub','v-rej','v-pct'].forEach(id => {
-        document.getElementById(id).textContent = '—';
-        document.getElementById(id).classList.remove('skeleton');
+      ['v-open','v-draft','v-sub','v-rej','v-app','v-rev','v-pct'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = '—'; el.classList.remove('skeleton'); }
       });
+      const lu = document.getElementById('lastUpdateText');
+      const lu2 = document.getElementById('lastUpdateText2');
+      if (lu) lu.textContent = 'Gagal memuat data';
+      if (lu2) lu2.textContent = 'Gagal memuat data';
+      const badge = document.querySelector('.update-badge');
+      if (badge) badge.style.color = '#ef4444';
     }
 
     function exportExcel(tableId) {
