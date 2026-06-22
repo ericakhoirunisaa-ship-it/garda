@@ -12,12 +12,12 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     submitted_respondent INT DEFAULT 0,
     rejected INT DEFAULT 0,
     approved INT DEFAULT 0,
-    revoke INT DEFAULT 0,
+    `revoke` INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_email_sls (email, sls_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS revoke INT DEFAULT 0 AFTER approved");
+$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS `revoke` INT DEFAULT 0 AFTER approved");
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -286,7 +286,7 @@ $stats = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah + submitted_respondent), 0) AS total_submitted,
     COALESCE(SUM(rejected), 0)                                     AS total_rejected,
     COALESCE(SUM(approved), 0)                                     AS total_approved,
-    COALESCE(SUM(revoke), 0)                                       AS total_revoke,
+    COALESCE(SUM(`revoke`), 0)                                     AS total_revoke,
     COUNT(DISTINCT email)                                          AS total_petugas,
     COUNT(DISTINCT sls_code)                                       AS total_sls
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
@@ -314,7 +314,7 @@ $perPetugas = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah + submitted_respondent), 0) AS total_submitted,
     COALESCE(SUM(rejected), 0)                                     AS total_rejected,
     COALESCE(SUM(approved), 0)                                     AS total_approved,
-    COALESCE(SUM(revoke), 0)                                       AS total_revoke,
+    COALESCE(SUM(`revoke`), 0)                                     AS total_revoke,
     COUNT(DISTINCT sls_code)                                       AS total_sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email
@@ -327,7 +327,7 @@ $perKec = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah + submitted_respondent), 0) AS total_submitted,
     COALESCE(SUM(rejected), 0)                                     AS total_rejected,
     COALESCE(SUM(approved), 0)                                     AS total_approved,
-    COALESCE(SUM(revoke), 0)                                       AS total_revoke,
+    COALESCE(SUM(`revoke`), 0)                                     AS total_revoke,
     COUNT(DISTINCT email)                                          AS total_petugas,
     COUNT(DISTINCT sls_code)                                       AS total_sls
 FROM sensus_ekonomi
@@ -752,7 +752,7 @@ $barWidth = max(600, count($perPetugas) * 60);
                                 $offset = ($page - 1) * $perPage;
                                 $slsRows = $conn->query("SELECT id, email, sls_code,
                                     SUBSTRING(sls_code,5,3) AS kec_code,
-                                    open_count, draft, submitted_by_pencacah, submitted_respondent, rejected, approved, revoke
+                                    open_count, draft, submitted_by_pencacah, submitted_respondent, rejected, approved, `revoke`
                                 FROM sensus_ekonomi $kecWhere
                                 ORDER BY kec_code, sls_code, email
                                 LIMIT $perPage OFFSET $offset")->fetch_all(MYSQLI_ASSOC);

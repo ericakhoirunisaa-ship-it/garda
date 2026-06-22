@@ -12,12 +12,12 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     submitted_respondent INT DEFAULT 0,
     rejected INT DEFAULT 0,
     approved INT DEFAULT 0,
-    revoke INT DEFAULT 0,
+    `revoke` INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_email_sls (email, sls_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS revoke INT DEFAULT 0 AFTER approved");
+$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS `revoke` INT DEFAULT 0 AFTER approved");
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -283,7 +283,7 @@ $s = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS total_submitted,
     COALESCE(SUM(rejected),0)                                     AS total_rejected,
     COALESCE(SUM(approved),0)                                     AS total_approved,
-    COALESCE(SUM(revoke),0)                                       AS total_revoke,
+    COALESCE(SUM(`revoke`),0)                                     AS total_revoke,
     COUNT(DISTINCT sls_code)                                      AS total_sls,
     COUNT(DISTINCT email)                                         AS total_petugas
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
@@ -296,7 +296,7 @@ $kecRows = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS submitted,
     COALESCE(SUM(rejected),0)                                     AS rejected,
     COALESCE(SUM(approved),0)                                     AS approved,
-    COALESCE(SUM(revoke),0)                                       AS revoke,
+    COALESCE(SUM(`revoke`),0)                                     AS revoke,
     COUNT(DISTINCT sls_code)                                      AS sls
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code,5,3)
@@ -331,7 +331,7 @@ $petRows = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS submitted,
     COALESCE(SUM(rejected),0)                                     AS rejected,
     COALESCE(SUM(approved),0)                                     AS approved,
-    COALESCE(SUM(revoke),0)                                       AS revoke,
+    COALESCE(SUM(`revoke`),0)                                     AS revoke,
     COUNT(DISTINCT sls_code)                                      AS sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email

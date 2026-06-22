@@ -13,12 +13,12 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     submitted_respondent INT DEFAULT 0,
     rejected INT DEFAULT 0,
     approved INT DEFAULT 0,
-    revoke INT DEFAULT 0,
+    `revoke` INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_email_sls (email, sls_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS revoke INT DEFAULT 0 AFTER approved");
+$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS `revoke` INT DEFAULT 0 AFTER approved");
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -51,12 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $redir_msg = 'Email dan SLS Code wajib diisi.'; $redir_type = 'danger';
         } else {
             $conn->query("INSERT INTO sensus_ekonomi
-                (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,revoke)
+                (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
                 VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr,$rev)
                 ON DUPLICATE KEY UPDATE
                 open_count=$open, draft=$draft,
                 submitted_by_pencacah=$subp, submitted_respondent=$subr,
-                rejected=$rej, approved=$appr, revoke=$rev");
+                rejected=$rej, approved=$appr, `revoke`=$rev");
             $redir_msg = $conn->affected_rows ? 'Data berhasil disimpan.' : ('Gagal: ' . $conn->error);
             if (!$conn->affected_rows) $redir_type = 'danger';
         }
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 email='$email', sls_code='$sls',
                 open_count=$open, draft=$draft,
                 submitted_by_pencacah=$subp, submitted_respondent=$subr,
-                rejected=$rej, approved=$appr, revoke=$rev
+                rejected=$rej, approved=$appr, `revoke`=$rev
                 WHERE id=$id");
             $redir_msg = 'Data berhasil diperbarui.';
         } else {
@@ -121,12 +121,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($overwrite) {
                     $r = $conn->query("INSERT INTO sensus_ekonomi
-                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,revoke)
+                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
                         VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)
                         ON DUPLICATE KEY UPDATE
                         open_count=$op, draft=$dr,
                         submitted_by_pencacah=$sp, submitted_respondent=$sr,
-                        rejected=$rj, approved=$ap, revoke=$rv");
+                        rejected=$rj, approved=$ap, `revoke`=$rv");
                     if ($r) {
                         if ($conn->affected_rows === 1) $inserted++;
                         elseif ($conn->affected_rows === 2) $updated++;
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $exists = $conn->query("SELECT id FROM sensus_ekonomi WHERE email='$em' AND sls_code='$sl' LIMIT 1");
                     if ($exists && $exists->num_rows) { $skipped++; continue; }
                     $r = $conn->query("INSERT INTO sensus_ekonomi
-                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,revoke)
+                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
                         VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)");
                     if ($r) $inserted++; else $skipped++;
                 }
