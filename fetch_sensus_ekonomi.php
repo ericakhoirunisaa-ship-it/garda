@@ -1,11 +1,23 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 ini_set('display_errors', 0);
-error_reporting(0);
+error_reporting(E_ALL);
 date_default_timezone_set('Asia/Makassar');
+ob_start();
+
+register_shutdown_function(function() {
+    $err = error_get_last();
+    if ($err && ($err['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))) {
+        ob_end_clean();
+        echo json_encode(['error' => $err['message'] . ' (' . basename($err['file']) . ':' . $err['line'] . ')']);
+    } else {
+        ob_end_flush();
+    }
+});
 
 $conn = @mysqli_connect('43.128.105.129', 'root', 'Djt04k91On5HRE8ZyNVxha7JUF6m3bW2', 'db_semanis', 30444);
 if (!$conn) {
+    ob_end_clean();
     echo json_encode(['error' => 'DB: ' . mysqli_connect_error()]);
     exit;
 }
