@@ -13,10 +13,12 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     submitted_respondent INT DEFAULT 0,
     rejected INT DEFAULT 0,
     approved INT DEFAULT 0,
+    revoke INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_email_sls (email, sls_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS revoke INT DEFAULT 0 AFTER approved");
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -43,17 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $subr   = (int)($_POST['submitted_respondent'] ?? 0);
         $rej    = (int)($_POST['rejected'] ?? 0);
         $appr   = (int)($_POST['approved'] ?? 0);
+        $rev    = (int)($_POST['revoke'] ?? 0);
 
         if (!$email || !$sls) {
             $redir_msg = 'Email dan SLS Code wajib diisi.'; $redir_type = 'danger';
         } else {
             $conn->query("INSERT INTO sensus_ekonomi
-                (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved)
-                VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr)
+                (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,revoke)
+                VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr,$rev)
                 ON DUPLICATE KEY UPDATE
                 open_count=$open, draft=$draft,
                 submitted_by_pencacah=$subp, submitted_respondent=$subr,
-                rejected=$rej, approved=$appr");
+                rejected=$rej, approved=$appr, revoke=$rev");
             $redir_msg = $conn->affected_rows ? 'Data berhasil disimpan.' : ('Gagal: ' . $conn->error);
             if (!$conn->affected_rows) $redir_type = 'danger';
         }
@@ -68,12 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $subr  = (int)($_POST['submitted_respondent'] ?? 0);
         $rej   = (int)($_POST['rejected'] ?? 0);
         $appr  = (int)($_POST['approved'] ?? 0);
+        $rev   = (int)($_POST['revoke'] ?? 0);
         if ($id && $email && $sls) {
             $conn->query("UPDATE sensus_ekonomi SET
                 email='$email', sls_code='$sls',
                 open_count=$open, draft=$draft,
                 submitted_by_pencacah=$subp, submitted_respondent=$subr,
-                rejected=$rej, approved=$appr
+                rejected=$rej, approved=$appr, revoke=$rev
                 WHERE id=$id");
             $redir_msg = 'Data berhasil diperbarui.';
         } else {
@@ -99,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $overwrite = ($_POST['overwrite'] ?? '0') === '1';
 
             while (($row = fgetcsv($handle)) !== false) {
-                $row = array_pad($row, 8, 0);
-                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rsubr, $rrej, $rappr] = $row;
+                $row = array_pad($row, 9, 0);
+                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rsubr, $rrej, $rappr, $rrev] = $row;
                 $remail = trim(trim($remail), '"');
                 $rsls   = trim(trim($rsls), '"');
                 if (!$remail || !$rsls) { $skipped++; continue; }
@@ -113,15 +117,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sr   = (int)$rsubr;
                 $rj   = (int)$rrej;
                 $ap   = (int)$rappr;
+                $rv   = (int)$rrev;
 
                 if ($overwrite) {
                     $r = $conn->query("INSERT INTO sensus_ekonomi
-                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved)
-                        VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap)
+                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,revoke)
+                        VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)
                         ON DUPLICATE KEY UPDATE
                         open_count=$op, draft=$dr,
                         submitted_by_pencacah=$sp, submitted_respondent=$sr,
-                        rejected=$rj, approved=$ap");
+                        rejected=$rj, approved=$ap, revoke=$rv");
                     if ($r) {
                         if ($conn->affected_rows === 1) $inserted++;
                         elseif ($conn->affected_rows === 2) $updated++;
@@ -131,8 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $exists = $conn->query("SELECT id FROM sensus_ekonomi WHERE email='$em' AND sls_code='$sl' LIMIT 1");
                     if ($exists && $exists->num_rows) { $skipped++; continue; }
                     $r = $conn->query("INSERT INTO sensus_ekonomi
-                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved)
-                        VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap)");
+                        (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,revoke)
+                        VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)");
                     if ($r) $inserted++; else $skipped++;
                 }
             }
@@ -321,6 +326,7 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                                 <th class="text-center">Sub. Resp.</th>
                                 <th class="text-center">Rejected</th>
                                 <th class="text-center">Approved</th>
+                                <th class="text-center">Revoke</th>
                                 <th class="text-center pe-4" style="width:90px">Aksi</th>
                             </tr>
                         </thead>
@@ -346,6 +352,7 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                                 <td class="text-center"><span class="badge badge-sub"><?= $r['submitted_respondent'] ?></span></td>
                                 <td class="text-center"><span class="badge badge-rej"><?= $r['rejected'] ?></span></td>
                                 <td class="text-center"><span class="badge bg-secondary bg-opacity-75"><?= $r['approved'] ?></span></td>
+                                <td class="text-center"><span class="badge" style="background:#ffedd5;color:#c2410c"><?= $r['revoke'] ?></span></td>
                                 <td class="text-center pe-4">
                                     <button class="btn btn-sm btn-outline-primary act-btn me-1"
                                             onclick='openEditModal(<?= json_encode($r) ?>)'>
@@ -441,6 +448,10 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                             <label class="form-label fw-semibold">Approved</label>
                             <input type="number" name="approved" id="formAppr" class="form-control" min="0" value="0">
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Revoke</label>
+                            <input type="number" name="revoke" id="formRev" class="form-control" min="0" value="0">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -518,7 +529,7 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                 <div class="modal-body">
                     <p class="text-muted small mb-3">
                         Format CSV (sesuai <code>fasih_progress.csv</code>):<br>
-                        <code>Email, SLS_Code, Open, Draft, Submitted_By_Pencacah, Submitted_Respondent, Rejected, Approved</code>
+                        <code>Email, SLS_Code, Open, Draft, Submitted_By_Pencacah, Submitted_Respondent, Rejected, Approved, Revoke</code>
                     </p>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
@@ -575,6 +586,7 @@ function openAddModal() {
     document.getElementById('formSubR').value   = '0';
     document.getElementById('formRej').value    = '0';
     document.getElementById('formAppr').value   = '0';
+    document.getElementById('formRev').value    = '0';
     document.getElementById('kecPreview').textContent = '';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-plus-lg me-2"></i>Tambah Data';
     document.getElementById('submitBtn').innerHTML  = '<i class="bi bi-save-fill me-1"></i>Simpan';
@@ -592,6 +604,7 @@ function openEditModal(r) {
     document.getElementById('formSubR').value   = r.submitted_respondent || 0;
     document.getElementById('formRej').value    = r.rejected || 0;
     document.getElementById('formAppr').value   = r.approved || 0;
+    document.getElementById('formRev').value    = r.revoke || 0;
     updateKecPreview(r.sls_code || '');
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil-fill me-2"></i>Edit Data';
     document.getElementById('submitBtn').innerHTML  = '<i class="bi bi-save-fill me-1"></i>Perbarui';
@@ -610,9 +623,9 @@ function confirmDeleteAll() {
 
 function downloadTemplate() {
     const rows = [
-        ['Email','SLS_Code','Open','Draft','Submitted_By_Pencacah','Submitted_Respondent','Rejected','Approved'],
-        ['"contoh@gmail.com"','"7206050007000100"','50','5','10','0','0','0'],
-        ['"contoh@gmail.com"','"7206050007000200"','40','3','8','0','0','0'],
+        ['Email','SLS_Code','Open','Draft','Submitted_By_Pencacah','Submitted_Respondent','Rejected','Approved','Revoke'],
+        ['"contoh@gmail.com"','"7206050007000100"','50','5','10','0','0','0','0'],
+        ['"contoh@gmail.com"','"7206050007000200"','40','3','8','0','0','0','0'],
     ];
     const csv  = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});

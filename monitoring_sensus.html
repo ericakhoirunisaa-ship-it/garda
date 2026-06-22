@@ -204,6 +204,8 @@
     .badge-sub   { background:#dcfce7; color:#166534; font-size:.8rem; }
     .badge-rej   { background:#fee2e2; color:#991b1b; font-size:.8rem; }
     .badge-app   { background:#ede9fe; color:#5b21b6; font-size:.8rem; }
+    .badge-rev   { background:#ffedd5; color:#c2410c; font-size:.8rem; }
+    .bg-rev  { background-color: #ea580c; color: #fff; }
 
     /* ── Loading skeleton ────────────────────────────────────────── */
     .skeleton {
@@ -343,6 +345,13 @@
             </div>
           </div>
           <div class="col-6 col-lg-4 col-xl">
+            <div class="stat-card bg-rev">
+              <span>Revoke</span>
+              <h2 id="v-rev" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </div>
+          </div>
+          <div class="col-6 col-lg-4 col-xl">
             <div class="stat-card bg-open">
               <span>% Progress</span>
               <h2 id="v-pct" class="skeleton">&nbsp;&nbsp;&nbsp;&nbsp;</h2>
@@ -414,11 +423,12 @@
                   <th class="text-center">Submitted</th>
                   <th class="text-center">Rejected</th>
                   <th class="text-center">Approved</th>
+                  <th class="text-center">Revoke</th>
                   <th style="min-width:140px">Progress</th>
                 </tr>
               </thead>
               <tbody id="bodyKec">
-                <tr><td colspan="7" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -455,11 +465,12 @@
                   <th class="text-center">Submitted</th>
                   <th class="text-center">Rejected</th>
                   <th class="text-center">Approved</th>
+                  <th class="text-center">Revoke</th>
                   <th class="text-center">Total</th>
                 </tr>
               </thead>
               <tbody id="bodyPetugas">
-                <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -580,8 +591,8 @@
       }
 
       const s = data.stats;
-      const total = s.open + s.draft + s.submitted + s.rejected + (s.approved || 0);
-      const num   = s.submitted + s.rejected + (s.approved || 0);
+      const total = s.open + s.draft + s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
+      const num   = s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
       const pct   = total > 0 ? (num / total * 100).toFixed(2) : '0.00';
 
       // Update stat cards
@@ -595,6 +606,7 @@
       setVal('v-sub',     s.submitted);
       setVal('v-rej',     s.rejected);
       setVal('v-app',     s.approved || 0);
+      setVal('v-rev',     s.revoke || 0);
       document.getElementById('v-pct').textContent = pct + '%';
       document.getElementById('v-pct').classList.remove('skeleton');
 
@@ -620,7 +632,7 @@
     function renderKec(list) {
       if (!list.length) {
         document.getElementById('bodyKec').innerHTML =
-          '<tr><td colspan="7" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         return;
       }
       document.getElementById('bodyKec').innerHTML = list.map(k => `
@@ -632,6 +644,7 @@
           <td class="text-center"><span class="badge badge-sub">${k.submitted.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rej">${k.rejected.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-app">${(k.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(k.revoke||0).toLocaleString('id-ID')}</span></td>
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="progress flex-grow-1">
@@ -647,7 +660,7 @@
     function renderPetugas(list) {
       if (!list.length) {
         document.getElementById('bodyPetugas').innerHTML =
-          '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('countPetugas').textContent = '';
         return;
       }
@@ -661,6 +674,7 @@
           <td class="text-center"><span class="badge badge-sub">${p.submitted.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rej">${p.rejected.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center fw-bold text-muted">${p.total.toLocaleString('id-ID')}</td>
         </tr>
       `).join('');
@@ -705,15 +719,15 @@
 
       // Doughnut: distribusi status
       const s = data.stats;
-      const PURPLE = '#7c3aed';
+      const PURPLE = '#7c3aed', REVCOL = '#ea580c';
       if (pieChart) pieChart.destroy();
       pieChart = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: {
-          labels: ['Open','Draft','Submitted','Rejected','Approved'],
+          labels: ['Open','Draft','Submitted','Rejected','Approved','Revoke'],
           datasets: [{
-            data: [s.open, s.draft, s.submitted, s.rejected, s.approved||0],
-            backgroundColor: [ORANGE, BLUE, GREEN, RED, PURPLE],
+            data: [s.open, s.draft, s.submitted, s.rejected, s.approved||0, s.revoke||0],
+            backgroundColor: [ORANGE, BLUE, GREEN, RED, PURPLE, REVCOL],
             borderWidth: 2, borderColor: '#fff',
           }]
         },
@@ -731,11 +745,12 @@
         data: {
           labels: kecLabels,
           datasets: [
-            { label: 'Open',      data: data.tabel_kec.map(k => k.open),          backgroundColor: ORANGE,  stack: 's' },
-            { label: 'Draft',     data: data.tabel_kec.map(k => k.draft),          backgroundColor: BLUE,    stack: 's' },
-            { label: 'Submitted', data: data.tabel_kec.map(k => k.submitted),      backgroundColor: GREEN,   stack: 's' },
-            { label: 'Rejected',  data: data.tabel_kec.map(k => k.rejected),       backgroundColor: RED,     stack: 's' },
-            { label: 'Approved',  data: data.tabel_kec.map(k => k.approved||0),    backgroundColor: PURPLE,  stack: 's' },
+            { label: 'Open',      data: data.tabel_kec.map(k => k.open),          backgroundColor: ORANGE,   stack: 's' },
+            { label: 'Draft',     data: data.tabel_kec.map(k => k.draft),          backgroundColor: BLUE,     stack: 's' },
+            { label: 'Submitted', data: data.tabel_kec.map(k => k.submitted),      backgroundColor: GREEN,    stack: 's' },
+            { label: 'Rejected',  data: data.tabel_kec.map(k => k.rejected),       backgroundColor: RED,      stack: 's' },
+            { label: 'Approved',  data: data.tabel_kec.map(k => k.approved||0),    backgroundColor: PURPLE,   stack: 's' },
+            { label: 'Revoke',    data: data.tabel_kec.map(k => k.revoke||0),      backgroundColor: '#ea580c', stack: 's' },
           ]
         },
         options: {
