@@ -320,7 +320,7 @@ $kecRows = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS submitted,
     COALESCE(SUM(rejected),0)                                     AS rejected,
     COALESCE(SUM(approved),0)                                     AS approved,
-    COALESCE(SUM(`revoke`),0)                                     AS revoke,
+    COALESCE(SUM(`revoke`),0)                                     AS `revoke`,
     COUNT(DISTINCT sls_code)                                      AS sls
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code,5,3)
@@ -355,7 +355,7 @@ $petRows = $conn->query("SELECT
     COALESCE(SUM(submitted_by_pencacah+submitted_respondent),0)   AS submitted,
     COALESCE(SUM(rejected),0)                                     AS rejected,
     COALESCE(SUM(approved),0)                                     AS approved,
-    COALESCE(SUM(`revoke`),0)                                     AS revoke,
+    COALESCE(SUM(`revoke`),0)                                     AS `revoke`,
     COUNT(DISTINCT sls_code)                                      AS sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email
