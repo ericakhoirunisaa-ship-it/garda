@@ -17,7 +17,10 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_email_sls (email, sls_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-$conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN IF NOT EXISTS `revoke` INT DEFAULT 0 AFTER approved");
+$chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
+if ($chk && $chk->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
+}
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
