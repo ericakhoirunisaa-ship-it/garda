@@ -311,7 +311,7 @@ $s = $conn->query("SELECT
     COALESCE(SUM(rejected),0)                                     AS total_rejected,
     COALESCE(SUM(approved),0)                                     AS total_approved,
     COALESCE(SUM(`revoke`),0)                                     AS total_revoke,
-    COUNT(DISTINCT sls_code)                                      AS total_sls,
+    COUNT(*)                                                       AS total_sls,
     COUNT(DISTINCT email)                                         AS total_petugas
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
 
@@ -324,7 +324,7 @@ $kecRows = $conn->query("SELECT
     COALESCE(SUM(rejected),0)                                     AS rejected,
     COALESCE(SUM(approved),0)                                     AS approved,
     COALESCE(SUM(`revoke`),0)                                     AS `revoke`,
-    COUNT(DISTINCT sls_code)                                      AS sls
+    COUNT(*)                                                      AS sls
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code,5,3)
 ORDER BY kec_code")->fetch_all(MYSQLI_ASSOC);
@@ -360,7 +360,7 @@ $petRows = $conn->query("SELECT
     COALESCE(SUM(rejected),0)                                     AS rejected,
     COALESCE(SUM(approved),0)                                     AS approved,
     COALESCE(SUM(`revoke`),0)                                     AS `revoke`,
-    COUNT(DISTINCT sls_code)                                      AS sls
+    COUNT(*)                                                      AS sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email
 ORDER BY submitted DESC, open DESC")->fetch_all(MYSQLI_ASSOC);
