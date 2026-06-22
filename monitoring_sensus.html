@@ -382,55 +382,25 @@
           </div>
         </div>
 
-        <!-- ── Charts ─────────────────────────────────────────── -->
-        <div class="row g-4 mb-2" data-aos="fade-up" data-aos-delay="200">
-          <div class="col-lg-7">
+        <!-- ── Capaian per Kecamatan (hero chart) ────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="200">
+          <h6><i class="bi bi-bar-chart-fill me-2" style="color:var(--accent-color)"></i>Capaian Submitted per Kecamatan (%)</h6>
+          <div style="height:360px; position:relative;"><canvas id="barChart"></canvas></div>
+        </div>
+
+        <!-- ── Volume + Distribusi ────────────────────────────── -->
+        <div class="row g-4 mb-2" data-aos="fade-up" data-aos-delay="220">
+          <div class="col-lg-8">
             <div class="glass-card h-100">
-              <h6><i class="bi bi-bar-chart-fill me-2" style="color:var(--accent-color)"></i>Capaian Submitted per Kecamatan (%)</h6>
-              <div style="height:280px; position:relative;"><canvas id="barChart"></canvas></div>
+              <h6><i class="bi bi-layers-fill me-2" style="color:var(--accent-color)"></i>Volume Dokumen per Kecamatan</h6>
+              <div style="height:260px; position:relative;"><canvas id="stackedChart"></canvas></div>
             </div>
           </div>
-          <div class="col-lg-5">
+          <div class="col-lg-4">
             <div class="glass-card h-100">
               <h6><i class="bi bi-pie-chart-fill me-2" style="color:var(--accent-color)"></i>Distribusi Status Dokumen</h6>
-              <div style="height:280px; position:relative;"><canvas id="pieChart"></canvas></div>
+              <div style="height:260px; position:relative;"><canvas id="pieChart"></canvas></div>
             </div>
-          </div>
-        </div>
-
-        <!-- ── Stacked Bar per Kecamatan ──────────────────────── -->
-        <div class="glass-card" data-aos="fade-up" data-aos-delay="220">
-          <h6><i class="bi bi-layers-fill me-2" style="color:var(--accent-color)"></i>Volume Dokumen per Kecamatan</h6>
-          <div style="height:240px; position:relative;"><canvas id="stackedChart"></canvas></div>
-        </div>
-
-        <!-- ── Tabel Per Kecamatan ─────────────────────────────── -->
-        <div class="glass-card" data-aos="fade-up" data-aos-delay="250">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="m-0"><i class="bi bi-map-fill me-2" style="color:var(--accent-color)"></i>Ringkasan per Kecamatan</h6>
-            <button onclick="exportExcel('tableKec')" class="btn btn-sm btn-export">
-              <i class="bi bi-file-earmark-excel me-1"></i>Unduh Excel
-            </button>
-          </div>
-          <div class="table-responsive">
-            <table id="tableKec" class="table dashboard-table">
-              <thead>
-                <tr>
-                  <th>Kecamatan</th>
-                  <th class="text-center">SLS</th>
-                  <th class="text-center">Open</th>
-                  <th class="text-center">Draft</th>
-                  <th class="text-center">Submitted</th>
-                  <th class="text-center">Rejected</th>
-                  <th class="text-center">Approved</th>
-                  <th class="text-center">Revoke</th>
-                  <th style="min-width:140px">Progress</th>
-                </tr>
-              </thead>
-              <tbody id="bodyKec">
-                <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
@@ -629,42 +599,11 @@
       document.getElementById('lastUpdateText').textContent  = lu;
       document.getElementById('lastUpdateText2').textContent = lu;
 
-      // Tables
-      renderKec(data.tabel_kec);
-
       allPetugas = data.tabel_petugas || [];
       renderPetugas(allPetugas);
 
       // Charts
       renderCharts(data);
-    }
-
-    function renderKec(list) {
-      if (!list.length) {
-        document.getElementById('bodyKec').innerHTML =
-          '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data.</td></tr>';
-        return;
-      }
-      document.getElementById('bodyKec').innerHTML = list.map(k => `
-        <tr>
-          <td class="fw-semibold">${k.nama}</td>
-          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${k.sls}</span></td>
-          <td class="text-center"><span class="badge badge-open">${k.open.toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-draft">${k.draft.toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-sub">${k.submitted.toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-rej">${k.rejected.toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-app">${(k.approved||0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-rev">${(k.revoke||0).toLocaleString('id-ID')}</span></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="progress flex-grow-1">
-                <div class="progress-bar" style="width:${k.prog}%"></div>
-              </div>
-              <span class="small fw-bold" style="min-width:46px; color:#f79039">${k.prog}%</span>
-            </div>
-          </td>
-        </tr>
-      `).join('');
     }
 
     function renderPetugas(list) {
@@ -702,28 +641,36 @@
       const kecLabels = data.tabel_kec.map(k => k.nama);
       const ORANGE = '#f79039', BLUE = '#3b82f6', GREEN = '#10b981', RED = '#ef4444';
 
-      // Bar chart: capaian % per kecamatan
+      // Horizontal bar chart: capaian % per kecamatan
       if (barChart) barChart.destroy();
       barChart = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
           labels: kecLabels,
           datasets: [{
-            label: 'Submitted (%)',
+            label: 'Progress (%)',
             data: data.tabel_kec.map(k => k.prog),
-            backgroundColor: data.tabel_kec.map(k => k.prog >= 70 ? GREEN : k.prog >= 40 ? ORANGE : '#94a3b8'),
-            borderRadius: 8,
-            borderSkipped: false,
+            backgroundColor: data.tabel_kec.map(k =>
+              k.prog >= 70 ? GREEN : k.prog >= 40 ? ORANGE : '#94a3b8'),
+            borderRadius: 6,
+            barThickness: 24,
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true, maintainAspectRatio: false,
           scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-            y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' },
-                 ticks: { callback: v => v + '%' } },
+            x: {
+              beginAtZero: true, max: 100,
+              grid: { color: '#f1f5f9' },
+              ticks: { callback: v => v + '%', font: { size: 11 } }
+            },
+            y: { grid: { display: false }, ticks: { font: { size: 12 } } },
           },
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x.toFixed(2)}%` } },
+          },
         }
       });
 
