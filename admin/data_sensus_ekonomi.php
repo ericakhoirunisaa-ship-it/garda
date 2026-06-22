@@ -145,6 +145,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             fclose($handle);
+            if ($inserted + $updated > 0) {
+                $conn->query("CREATE TABLE IF NOT EXISTS sensus_meta (k VARCHAR(50) PRIMARY KEY, v TEXT) ENGINE=InnoDB");
+                $now = date('Y-m-d H:i:s');
+                $conn->query("INSERT INTO sensus_meta (k,v) VALUES ('last_import','$now') ON DUPLICATE KEY UPDATE v='$now'");
+            }
             $redir_msg = "Import selesai: $inserted ditambah" . ($updated ? ", $updated diperbarui" : '') . ($skipped ? ", $skipped dilewati" : '') . '.';
         } else {
             $redir_msg = 'Gagal membaca file CSV.'; $redir_type = 'danger';

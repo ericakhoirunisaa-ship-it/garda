@@ -378,9 +378,16 @@ foreach ($petRows as $p) {
     ];
 }
 
-// Last update
-$lu = $conn->query("SELECT DATE_FORMAT(MAX(GREATEST(created_at, COALESCE(updated_at,'2000-01-01'))),'%d %M %Y %H:%i') AS lu FROM sensus_ekonomi")->fetch_assoc();
-$lastUpdate = $lu['lu'] ? $lu['lu'] . ' WIB' : null;
+// Last update — baca dari tabel meta yang dicatat saat import CSV
+$conn->query("CREATE TABLE IF NOT EXISTS sensus_meta (k VARCHAR(50) PRIMARY KEY, v TEXT) ENGINE=InnoDB");
+$luRow = $conn->query("SELECT v FROM sensus_meta WHERE k='last_import' LIMIT 1");
+$lastUpdate = null;
+if ($luRow && ($luData = $luRow->fetch_assoc())) {
+    $dt = new DateTime($luData['v']);
+    $bulan = ['','Januari','Februari','Maret','April','Mei','Juni',
+              'Juli','Agustus','September','Oktober','November','Desember'];
+    $lastUpdate = $dt->format('d') . ' ' . $bulan[(int)$dt->format('n')] . ' ' . $dt->format('Y H:i') . ' WITA';
+}
 
 echo json_encode([
     'stats' => [
