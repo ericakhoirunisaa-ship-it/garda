@@ -106,8 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $overwrite = ($_POST['overwrite'] ?? '0') === '1';
 
             while (($row = fgetcsv($handle)) !== false) {
-                $row = array_pad($row, 9, 0);
-                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rsubr, $rrej, $rappr, $rrev] = $row;
+                $row = array_pad($row, 8, 0);
+                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rappr, $rrej, $rrev] = $row;
                 $remail = trim(trim($remail), '"');
                 $rsls   = trim(trim($rsls), '"');
                 if (!$remail || !$rsls) { $skipped++; continue; }
@@ -117,9 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $op   = (int)$ropen;
                 $dr   = (int)$rdraft;
                 $sp   = (int)$rsubp;
-                $sr   = (int)$rsubr;
-                $rj   = (int)$rrej;
+                $sr   = 0;
                 $ap   = (int)$rappr;
+                $rj   = (int)$rrej;
                 $rv   = (int)$rrev;
 
                 if ($overwrite) {
@@ -532,7 +532,7 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                 <div class="modal-body">
                     <p class="text-muted small mb-3">
                         Format CSV (sesuai <code>fasih_progress.csv</code>):<br>
-                        <code>Email, SLS_Code, Open, Draft, Submitted_By_Pencacah, Submitted_Respondent, Rejected, Approved, Revoke</code>
+                        <code>Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH, APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS</code>
                     </p>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
@@ -626,9 +626,9 @@ function confirmDeleteAll() {
 
 function downloadTemplate() {
     const rows = [
-        ['Email','SLS_Code','Open','Draft','Submitted_By_Pencacah','Submitted_Respondent','Rejected','Approved','Revoke'],
-        ['"contoh@gmail.com"','"7206050007000100"','50','5','10','0','0','0','0'],
-        ['"contoh@gmail.com"','"7206050007000200"','40','3','8','0','0','0','0'],
+        ['Email','SLS_Code','OPEN','DRAFT','SUBMITTED_BY_PENCACAH','APPROVED_BY_PENGAWAS','REJECTED_BY_PENGAWAS','REVOKED_BY_PENGAWAS'],
+        ['"contoh@gmail.com"','"7206050007000100"','50','5','10','0','0','0'],
+        ['"contoh@gmail.com"','"7206050007000200"','40','3','8','0','0','0'],
     ];
     const csv  = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
