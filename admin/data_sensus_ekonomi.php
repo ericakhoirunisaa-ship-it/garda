@@ -15,16 +15,20 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     approved INT DEFAULT 0,
     `revoke` INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_email_sls (email, sls_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 $chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
 if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
 }
-// Hapus unique key lama jika masih ada
+// Pastikan unique key ada (deduplikasi dulu jika ada duplikat lama)
 $chkIdx = $conn->query("SHOW INDEX FROM sensus_ekonomi WHERE Key_name = 'uq_email_sls'");
-if ($chkIdx && $chkIdx->num_rows > 0) {
-    $conn->query("ALTER TABLE sensus_ekonomi DROP INDEX uq_email_sls");
+if ($chkIdx && $chkIdx->num_rows === 0) {
+    $conn->query("DELETE s1 FROM sensus_ekonomi s1
+        JOIN sensus_ekonomi s2
+        ON s1.email = s2.email AND s1.sls_code = s2.sls_code AND s1.id < s2.id");
+    $conn->query("ALTER TABLE sensus_ekonomi ADD UNIQUE KEY uq_email_sls (email, sls_code)");
 }
 
 $kecNama = [
@@ -100,19 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     elseif ($action === 'import_csv') {
         if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
-            $handle   = fopen($_FILES['csv_file']['tmp_name'], 'r');
-            $header   = fgetcsv($handle);
-            $inserted = 0; $skipped = 0;
+            $handle     = fopen($_FILES['csv_file']['tmp_name'], 'r');
+            $header     = fgetcsv($handle);
+            $upserted   = 0; $skipped = 0;
             $clearFirst = ($_POST['overwrite'] ?? '0') === '1';
 
             if ($clearFirst) {
                 $conn->query("TRUNCATE TABLE sensus_ekonomi");
             }
 
+            // Format kolom: Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH,
+            //               APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS
             while (($row = fgetcsv($handle)) !== false) {
-                $row = array_pad($row, 8, 0);
+                $row    = array_pad($row, 8, 0);
                 [$remail, $rsls, $ropen, $rdraft, $rsubp, $rappr, $rrej, $rrev] = $row;
-                $remail = trim(trim($remail), '"');
+                $remail = strtolower(trim(trim($remail), '"'));
                 $rsls   = trim(trim($rsls), '"');
                 if (!$remail || !$rsls) { $skipped++; continue; }
 
@@ -121,23 +127,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $op = (int)$ropen;
                 $dr = (int)$rdraft;
                 $sp = (int)$rsubp;
-                $sr = 0;
-                $ap = (int)$rappr;
-                $rj = (int)$rrej;
-                $rv = (int)$rrev;
+                $ap = (int)$rappr;   // APPROVED_BY_PENGAWAS
+                $rj = (int)$rrej;   // REJECTED_BY_PENGAWAS
+                $rv = (int)$rrev;   // REVOKED_BY_PENGAWAS
 
                 $r = $conn->query("INSERT INTO sensus_ekonomi
                     (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
-                    VALUES ('$em','$sl',$op,$dr,$sp,$sr,$rj,$ap,$rv)");
-                if ($r) $inserted++; else $skipped++;
+                    VALUES ('$em','$sl',$op,$dr,$sp,0,$rj,$ap,$rv)
+                    ON DUPLICATE KEY UPDATE
+                    open_count=$op, draft=$dr, submitted_by_pencacah=$sp,
+                    rejected=$rj, approved=$ap, `revoke`=$rv");
+                if ($r) $upserted++; else $skipped++;
             }
             fclose($handle);
-            if ($inserted > 0) {
+            if ($upserted > 0) {
                 $conn->query("CREATE TABLE IF NOT EXISTS sensus_meta (k VARCHAR(50) PRIMARY KEY, v TEXT) ENGINE=InnoDB");
                 $now = date('Y-m-d H:i:s');
                 $conn->query("INSERT INTO sensus_meta (k,v) VALUES ('last_import','$now') ON DUPLICATE KEY UPDATE v='$now'");
             }
-            $redir_msg = "Import selesai: $inserted data berhasil dimasukkan" . ($skipped ? ", $skipped dilewati (email/SLS kosong)" : '') . '.';
+            $redir_msg = "Import selesai: $upserted baris diproses (insert/update)" . ($skipped ? ", $skipped dilewati (email/SLS kosong)" : '') . '.';
         } else {
             $redir_msg = 'Gagal membaca file CSV.'; $redir_type = 'danger';
         }
@@ -522,10 +530,10 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="text-muted small mb-3">
-                        Format CSV (sesuai <code>fasih_progress.csv</code>):<br>
+                    <div class="alert alert-info py-2 mb-3" style="font-size:.82rem;">
+                        <strong>Format kolom CSV (urut):</strong><br>
                         <code>Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH, APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS</code>
-                    </p>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
                         <input type="file" name="csv_file" class="form-control" accept=".csv,text/csv" required>
@@ -534,8 +542,8 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="overwrite" value="1" id="chkOverwrite">
                             <label class="form-check-label small" for="chkOverwrite">
-                                <strong>Hapus semua data lama sebelum import</strong><br>
-                                <span class="text-muted">Jika dicentang, seluruh data yang ada akan dihapus dulu, lalu semua baris dari file dimasukkan. Jika tidak dicentang, semua baris dari file ditambahkan ke data yang sudah ada.</span>
+                                <strong>Reset — hapus semua data lama sebelum import</strong><br>
+                                <span class="text-muted">Jika <strong>tidak</strong> dicentang (default): data existing di-update, baris baru di-insert (aman untuk update berkala). Jika dicentang: semua data dihapus dulu lalu seluruh baris dari file dimasukkan.</span>
                             </label>
                         </div>
                     </div>
