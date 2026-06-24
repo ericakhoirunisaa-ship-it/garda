@@ -643,70 +643,52 @@ foreach ($kecNama as $kc => $nm) {
             </div>
 
             <!-- ── Grafik Target vs Realisasi per Kecamatan ─────── -->
-            <div class="card stat-card p-4 mb-4">
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                    <div>
-                        <div class="section-head mb-1">
-                            <i class="bi bi-bullseye me-1"></i>Target vs Realisasi per Kecamatan
-                        </div>
-                        <div class="d-flex flex-wrap gap-3" style="font-size:.8rem; color:#64748b;">
-                            <span><i class="bi bi-calendar-check me-1" style="color:#f79039"></i>Hari ke-<strong><?= $hariKe ?></strong> (sejak 15 Jun 2026)</span>
-                            <span><i class="bi bi-calculator me-1" style="color:#f79039"></i>Target = petugas × 6 dokumen/hari</span>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2 align-items-center" style="font-size:.78rem;">
-                        <span class="d-flex align-items-center gap-1">
-                            <span style="display:inline-block;width:28px;height:3px;background:#f79039;border-radius:2px"></span>
-                            Target
-                        </span>
-                        <span class="d-flex align-items-center gap-1">
-                            <span style="display:inline-block;width:14px;height:14px;background:#4ade80;border-radius:3px"></span>
-                            Realisasi
-                        </span>
-                    </div>
+            <div class="card stat-card p-3 mb-4">
+                <div class="section-head mb-2">
+                    <i class="bi bi-bullseye me-1"></i>Target vs Realisasi per Kecamatan
+                    <span class="text-muted fw-normal ms-2" style="font-size:.75rem;">
+                        — Hari ke-<strong><?= $hariKe ?></strong> sejak 15 Jun 2026 &nbsp;·&nbsp; Target = petugas × 6 dok/hari
+                    </span>
                 </div>
-                <canvas id="kecTargetChart" style="height:200px;"></canvas>
-
-                <!-- Tabel ringkas di bawah chart -->
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm align-middle mb-0" style="font-size:.8rem;">
-                        <thead style="background:#f8fafc; color:#64748b; font-size:.7rem; text-transform:uppercase;">
+                <div class="row g-3 align-items-start">
+                    <div class="col-lg-7">
+                        <canvas id="kecTargetChart" style="height:200px;"></canvas>
+                    </div>
+                    <div class="col-lg-5">
+                        <table class="table table-sm align-middle mb-0" style="font-size:.78rem;">
+                            <thead style="background:#f8fafc; color:#64748b; font-size:.68rem; text-transform:uppercase;">
+                                <tr>
+                                    <th class="ps-1">Kecamatan</th>
+                                    <th class="text-center">Target</th>
+                                    <th class="text-center">Real.</th>
+                                    <th style="min-width:80px">Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($kecNama as $kc => $nm):
+                                $n   = $petugasPerKec[$kc] ?? 0;
+                                $tgt = $n * 6 * $hariKe;
+                                $rl  = $realisasiByKec[$kc] ?? 0;
+                                $pct = $tgt > 0 ? min(100, round($rl / $tgt * 100)) : 0;
+                                $barColor = $pct >= 100 ? '#4ade80' : ($pct >= 70 ? '#facc15' : '#f87171');
+                            ?>
                             <tr>
-                                <th class="ps-2">Kecamatan</th>
-                                <th class="text-center">Petugas</th>
-                                <th class="text-center">Target<br><small style="font-weight:400">(hari ke-<?= $hariKe ?>)</small></th>
-                                <th class="text-center">Realisasi</th>
-                                <th class="text-center">Sisa</th>
-                                <th style="min-width:110px">Progress</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($kecNama as $kc => $nm):
-                            $n   = $petugasPerKec[$kc] ?? 0;
-                            $tgt = $n * 6 * $hariKe;
-                            $rl  = $realisasiByKec[$kc] ?? 0;
-                            $pct = $tgt > 0 ? min(100, round($rl / $tgt * 100)) : 0;
-                            $sisa = max(0, $tgt - $rl);
-                            $barColor = $pct >= 100 ? '#4ade80' : ($pct >= 70 ? '#facc15' : '#f87171');
-                        ?>
-                        <tr>
-                            <td class="ps-2 fw-semibold"><?= htmlspecialchars($nm) ?></td>
-                            <td class="text-center"><?= $n ?></td>
-                            <td class="text-center fw-bold" style="color:#f79039"><?= number_format($tgt) ?></td>
-                            <td class="text-center fw-bold" style="color:#166534"><?= number_format($rl) ?></td>
-                            <td class="text-center text-muted"><?= number_format($sisa) ?></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div style="flex:1; background:#e9ecef; border-radius:4px; height:6px; overflow:hidden;">
-                                        <div style="width:<?= $pct ?>%; height:100%; background:<?= $barColor ?>; border-radius:4px;"></div>
+                                <td class="ps-1 fw-semibold" style="max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><?= htmlspecialchars($nm) ?></td>
+                                <td class="text-center" style="color:#f79039"><?= number_format($tgt) ?></td>
+                                <td class="text-center fw-bold" style="color:#166534"><?= number_format($rl) ?></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <div style="flex:1; background:#e9ecef; border-radius:4px; height:5px; overflow:hidden;">
+                                            <div style="width:<?= $pct ?>%; height:100%; background:<?= $barColor ?>; border-radius:4px;"></div>
+                                        </div>
+                                        <span style="font-size:.7rem; min-width:28px; text-align:right; color:<?= $barColor ?>"><?= $pct ?>%</span>
                                     </div>
-                                    <span style="font-size:.75rem; min-width:32px; text-align:right; color:<?= $barColor ?>"><?= $pct ?>%</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
