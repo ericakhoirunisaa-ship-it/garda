@@ -392,7 +392,39 @@ $doughnutData   = json_encode([
     (int)$stats['total_approved'],
     (int)$stats['total_revoke'],
 ]);
-$barWidth = max(600, count($perPetugas) * 60);
+
+// ── Grafik Target vs Realisasi per Kecamatan ──────────────────────────────
+$startDate  = new DateTime('2026-06-15');
+$today      = new DateTime('today');
+$hariKe     = max(1, (int)$today->diff($startDate)->days + 1);
+
+$petugasPerKec = [];
+foreach ($emailData as $email => $info) {
+    $kc = $info['kec_code'];
+    $petugasPerKec[$kc] = ($petugasPerKec[$kc] ?? 0) + 1;
+}
+
+$realisasiRows = $conn->query("SELECT
+    SUBSTRING(sls_code,5,3) AS kec_code,
+    COALESCE(SUM(submitted_by_pencacah + rejected + approved + `revoke`), 0) AS realisasi
+FROM sensus_ekonomi
+GROUP BY SUBSTRING(sls_code,5,3)")->fetch_all(MYSQLI_ASSOC);
+$realisasiByKec = [];
+foreach ($realisasiRows as $row) {
+    $realisasiByKec[$row['kec_code']] = (int)$row['realisasi'];
+}
+
+$kecChartLabels    = [];
+$kecChartTarget    = [];
+$kecChartRealisasi = [];
+$kecChartPetugas   = [];
+foreach ($kecNama as $kc => $nm) {
+    $n = $petugasPerKec[$kc] ?? 0;
+    $kecChartLabels[]    = $nm;
+    $kecChartPetugas[]   = $n;
+    $kecChartTarget[]    = $n * 6 * $hariKe;
+    $kecChartRealisasi[] = $realisasiByKec[$kc] ?? 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -607,6 +639,74 @@ $barWidth = max(600, count($perPetugas) * 60);
                             <canvas id="barChart" style="min-width:<?= $barWidth ?>px; height:260px;"></canvas>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- ── Grafik Target vs Realisasi per Kecamatan ─────── -->
+            <div class="card stat-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                        <div class="section-head mb-1">
+                            <i class="bi bi-bullseye me-1"></i>Target vs Realisasi per Kecamatan
+                        </div>
+                        <div class="d-flex flex-wrap gap-3" style="font-size:.8rem; color:#64748b;">
+                            <span><i class="bi bi-calendar-check me-1" style="color:#f79039"></i>Hari ke-<strong><?= $hariKe ?></strong> (sejak 15 Jun 2026)</span>
+                            <span><i class="bi bi-calculator me-1" style="color:#f79039"></i>Target = petugas × 6 dokumen/hari</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 align-items-center" style="font-size:.78rem;">
+                        <span class="d-flex align-items-center gap-1">
+                            <span style="display:inline-block;width:28px;height:3px;background:#f79039;border-radius:2px"></span>
+                            Target
+                        </span>
+                        <span class="d-flex align-items-center gap-1">
+                            <span style="display:inline-block;width:14px;height:14px;background:#4ade80;border-radius:3px"></span>
+                            Realisasi
+                        </span>
+                    </div>
+                </div>
+                <canvas id="kecTargetChart" style="height:300px;"></canvas>
+
+                <!-- Tabel ringkas di bawah chart -->
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm align-middle mb-0" style="font-size:.8rem;">
+                        <thead style="background:#f8fafc; color:#64748b; font-size:.7rem; text-transform:uppercase;">
+                            <tr>
+                                <th class="ps-2">Kecamatan</th>
+                                <th class="text-center">Petugas</th>
+                                <th class="text-center">Target<br><small style="font-weight:400">(hari ke-<?= $hariKe ?>)</small></th>
+                                <th class="text-center">Realisasi</th>
+                                <th class="text-center">Sisa</th>
+                                <th style="min-width:110px">Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($kecNama as $kc => $nm):
+                            $n   = $petugasPerKec[$kc] ?? 0;
+                            $tgt = $n * 6 * $hariKe;
+                            $rl  = $realisasiByKec[$kc] ?? 0;
+                            $pct = $tgt > 0 ? min(100, round($rl / $tgt * 100)) : 0;
+                            $sisa = max(0, $tgt - $rl);
+                            $barColor = $pct >= 100 ? '#4ade80' : ($pct >= 70 ? '#facc15' : '#f87171');
+                        ?>
+                        <tr>
+                            <td class="ps-2 fw-semibold"><?= htmlspecialchars($nm) ?></td>
+                            <td class="text-center"><?= $n ?></td>
+                            <td class="text-center fw-bold" style="color:#f79039"><?= number_format($tgt) ?></td>
+                            <td class="text-center fw-bold" style="color:#166534"><?= number_format($rl) ?></td>
+                            <td class="text-center text-muted"><?= number_format($sisa) ?></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="flex:1; background:#e9ecef; border-radius:4px; height:6px; overflow:hidden;">
+                                        <div style="width:<?= $pct ?>%; height:100%; background:<?= $barColor ?>; border-radius:4px;"></div>
+                                    </div>
+                                    <span style="font-size:.75rem; min-width:32px; text-align:right; color:<?= $barColor ?>"><?= $pct ?>%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -911,6 +1011,73 @@ new Chart(document.getElementById('barChart'), {
         },
         plugins: { legend:{ position:'top', labels:{ boxWidth:12 } } },
         animation: { duration:600 },
+    }
+});
+
+// ── Target vs Realisasi per Kecamatan ────────────────
+const kecLabels    = <?= json_encode($kecChartLabels) ?>;
+const kecTarget    = <?= json_encode($kecChartTarget) ?>;
+const kecRealisasi = <?= json_encode($kecChartRealisasi) ?>;
+const kecPetugas   = <?= json_encode($kecChartPetugas) ?>;
+const hariKe       = <?= $hariKe ?>;
+
+new Chart(document.getElementById('kecTargetChart'), {
+    data: {
+        labels: kecLabels,
+        datasets: [
+            {
+                type: 'bar',
+                label: 'Realisasi',
+                data: kecRealisasi,
+                backgroundColor: kecRealisasi.map((v, i) => v >= kecTarget[i] ? '#4ade80' : v >= kecTarget[i] * 0.7 ? '#86efac' : '#bbf7d0'),
+                borderColor:     kecRealisasi.map((v, i) => v >= kecTarget[i] ? '#16a34a' : '#4ade80'),
+                borderWidth: 1,
+                borderRadius: 4,
+                order: 2,
+            },
+            {
+                type: 'line',
+                label: 'Target (hari ke-' + hariKe + ')',
+                data: kecTarget,
+                borderColor: '#f79039',
+                backgroundColor: 'rgba(247,144,57,.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#f79039',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                tension: 0.3,
+                fill: false,
+                order: 1,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index' },
+        plugins: {
+            legend: { position: 'top', labels: { boxWidth: 14, padding: 14 } },
+            tooltip: {
+                callbacks: {
+                    afterBody(items) {
+                        const i = items[0].dataIndex;
+                        const pct = kecTarget[i] > 0
+                            ? Math.min(100, Math.round(kecRealisasi[i] / kecTarget[i] * 100))
+                            : 0;
+                        return ['Petugas: ' + kecPetugas[i], 'Pencapaian: ' + pct + '%'];
+                    }
+                }
+            }
+        },
+        scales: {
+            x: { ticks: { font: { size: 11 } } },
+            y: {
+                beginAtZero: true,
+                ticks: { font: { size: 11 } },
+                title: { display: true, text: 'Jumlah Dokumen', font: { size: 11 } }
+            }
+        },
+        animation: { duration: 700 },
     }
 });
 
