@@ -42,8 +42,11 @@ if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
 }
 $chkIdx = $conn->query("SHOW INDEX FROM sensus_ekonomi WHERE Key_name = 'uq_email_sls'");
-if ($chkIdx && $chkIdx->num_rows > 0) {
-    $conn->query("ALTER TABLE sensus_ekonomi DROP INDEX uq_email_sls");
+if ($chkIdx && $chkIdx->num_rows === 0) {
+    $conn->query("DELETE s1 FROM sensus_ekonomi s1
+        JOIN sensus_ekonomi s2
+        ON s1.email = s2.email AND s1.sls_code = s2.sls_code AND s1.id < s2.id");
+    $conn->query("ALTER TABLE sensus_ekonomi ADD UNIQUE KEY uq_email_sls (email, sls_code)");
 }
 
 $kecNama = [

@@ -407,6 +407,40 @@
           </div>
         </div>
 
+        <!-- ── Target vs Realisasi Kabupaten ────────────────── -->
+        <div class="glass-card" id="cardTargetKab" data-aos="fade-up" data-aos-delay="180">
+          <h6><i class="bi bi-bullseye me-2" style="color:var(--accent-color)"></i>Target vs Realisasi — Kabupaten Tolitoli</h6>
+          <div class="row g-3 align-items-center mb-3">
+            <div class="col-6 col-md-3 text-center">
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px;">Target Hari Ini</div>
+              <div id="kab-target" class="fw-black" style="font-size:2rem;color:#f79039;line-height:1;">—</div>
+              <div class="text-muted small" id="kab-formula" style="font-size:.72rem;">238 × 6 × n hari</div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px;">Realisasi</div>
+              <div id="kab-realisasi" class="fw-black" style="font-size:2rem;color:#10b981;line-height:1;">—</div>
+              <div class="text-muted small" style="font-size:.72rem;">Submitted + Rejected + Approved + Revoke</div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px;">Capaian</div>
+              <div id="kab-pct" class="fw-black" style="font-size:2rem;line-height:1;">—</div>
+              <div class="text-muted small" style="font-size:.72rem;">dari target kumulatif</div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px;">Hari Pencacahan</div>
+              <div id="kab-hari" class="fw-black" style="font-size:2rem;color:#112344;line-height:1;">—</div>
+              <div class="text-muted small" style="font-size:.72rem;">sejak 15 Juni 2026</div>
+            </div>
+          </div>
+          <div class="progress mb-2" style="height:14px;">
+            <div id="kab-bar" class="progress-bar" role="progressbar" style="width:0%; background:#10b981; border-radius:10px; transition:width .6s ease;"></div>
+          </div>
+          <div class="d-flex justify-content-between" style="font-size:.75rem; color:#94a3b8;">
+            <span>0</span>
+            <span id="kab-bar-label"></span>
+          </div>
+        </div>
+
         <!-- ── Capaian per Kecamatan (hero chart) ────────────── -->
         <div class="glass-card" data-aos="fade-up" data-aos-delay="200">
           <h6><i class="bi bi-bar-chart-fill me-2" style="color:var(--accent-color)"></i>Capaian Submitted per Kecamatan (%)</h6>
@@ -691,6 +725,28 @@
       const lu = data.last_update || '—';
       document.getElementById('lastUpdateText').textContent  = lu;
       document.getElementById('lastUpdateText2').textContent = lu;
+
+      // Target vs Realisasi Kabupaten
+      const TOTAL_PETUGAS_KAB = 238;
+      const TARGET_PER_HARI   = 6;
+      const startDate = new Date('2026-06-15T00:00:00');
+      const today     = new Date(); today.setHours(0,0,0,0);
+      const hariKe    = Math.max(1, Math.floor((today - startDate) / 86400000) + 1);
+      const targetKab = TOTAL_PETUGAS_KAB * TARGET_PER_HARI * hariKe;
+      const realisasiKab = s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
+      const pctKab    = targetKab > 0 ? Math.min(100, (realisasiKab / targetKab * 100)) : 0;
+      const pctKabStr = pctKab.toFixed(2) + '%';
+      const pctColor  = pctKab >= 100 ? '#10b981' : pctKab >= 70 ? '#f79039' : '#ef4444';
+
+      document.getElementById('kab-target').textContent     = targetKab.toLocaleString('id-ID');
+      document.getElementById('kab-realisasi').textContent  = realisasiKab.toLocaleString('id-ID');
+      document.getElementById('kab-pct').textContent        = pctKabStr;
+      document.getElementById('kab-pct').style.color        = pctColor;
+      document.getElementById('kab-hari').textContent       = 'Hari ke-' + hariKe;
+      document.getElementById('kab-formula').textContent    = `${TOTAL_PETUGAS_KAB} × ${TARGET_PER_HARI} × ${hariKe} hari`;
+      document.getElementById('kab-bar').style.width        = pctKab.toFixed(2) + '%';
+      document.getElementById('kab-bar').style.background   = pctColor;
+      document.getElementById('kab-bar-label').textContent  = `${realisasiKab.toLocaleString('id-ID')} / ${targetKab.toLocaleString('id-ID')} (${pctKabStr})`;
 
       allKec = data.tabel_kec || [];
       renderKec(allKec);

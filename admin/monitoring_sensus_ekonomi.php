@@ -383,7 +383,7 @@ $chartSubmitted = json_encode(array_map(fn($p) => $p['total_submitted'],   $perP
 $chartRejected  = json_encode(array_map(fn($p) => $p['total_rejected'],    $perPetugasChart));
 $chartApproved  = json_encode(array_map(fn($p) => $p['total_approved'],    $perPetugasChart));
 $chartRevoke    = json_encode(array_map(fn($p) => $p['total_revoke'],      $perPetugasChart));
-$barWidth = max(600, count($perPetugasChart) * 60);
+$barWidth = max(500, count($perPetugasChart) * 48);
 $doughnutData   = json_encode([
     (int)$stats['total_open'],
     (int)$stats['total_draft'],
@@ -636,7 +636,7 @@ foreach ($kecNama as $kc => $nm) {
                     <div class="card stat-card p-4 h-100">
                         <div class="section-head"><i class="bi bi-bar-chart-fill me-1"></i>Progress per Petugas</div>
                         <div class="chart-scroll">
-                            <canvas id="barChart" style="min-width:<?= $barWidth ?>px; height:260px;"></canvas>
+                            <canvas id="barChart" style="min-width:<?= $barWidth ?>px; height:200px;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -665,7 +665,7 @@ foreach ($kecNama as $kc => $nm) {
                         </span>
                     </div>
                 </div>
-                <canvas id="kecTargetChart" style="height:300px;"></canvas>
+                <canvas id="kecTargetChart" style="height:200px;"></canvas>
 
                 <!-- Tabel ringkas di bawah chart -->
                 <div class="table-responsive mt-3">
