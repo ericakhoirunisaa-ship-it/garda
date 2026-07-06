@@ -504,6 +504,7 @@
               <button class="btn-topn active" data-n="10" onclick="setTopN(10)">10</button>
               <button class="btn-topn" data-n="20" onclick="setTopN(20)">20</button>
               <button class="btn-topn" data-n="30" onclick="setTopN(30)">30</button>
+              <button class="btn-topn" data-n="50" onclick="setTopN(50)">50</button>
             </div>
           </div>
           <div class="table-responsive">
@@ -552,20 +553,21 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Petugas</th>
-                  <th>Kecamatan</th>
-                  <th class="text-center">SLS</th>
-                  <th class="text-center">Open</th>
-                  <th class="text-center">Draft</th>
-                  <th class="text-center">Submitted</th>
-                  <th class="text-center">Rejected</th>
-                  <th class="text-center">Approved</th>
-                  <th class="text-center">Revoke</th>
-                  <th class="text-center">Total</th>
+                  <th class="sort-th" onclick="sortPetugas('nama')">Petugas<span class="sort-icon"></span></th>
+                  <th class="sort-th" onclick="sortPetugas('kecamatan')">Kecamatan<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('sls')">SLS<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('open')">Open<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('draft')">Draft<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('submitted')">Submitted<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('rejected')">Rejected<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('approved')">Approved<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('revoke')">Revoke<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('total')">Total<span class="sort-icon"></span></th>
+                  <th class="sort-th" onclick="sortPetugas('prog')" style="min-width:150px">Progress<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyPetugas">
-                <tr><td colspan="11" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="12" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -675,6 +677,7 @@
     let allPetugas = [], allKec = [];
     let topN = 10;
     let kecSort = { col: null, dir: 'desc' };
+    let petugasSort = { col: null, dir: 'desc' };
 
     async function fetchData() {
       const kdkec = document.getElementById('filterKecamatan').value;
@@ -873,12 +876,24 @@
     function renderPetugas(list) {
       if (!list.length) {
         document.getElementById('bodyPetugas').innerHTML =
-          '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('countPetugas').textContent = '';
         return;
       }
-      document.getElementById('bodyPetugas').innerHTML = list.map((p, i) => `
-        <tr>
+      const withProg = list.map(p => {
+        const num = p.submitted + p.rejected + (p.approved||0) + (p.revoke||0);
+        return { ...p, prog: p.total > 0 ? num / p.total * 100 : 0 };
+      });
+      if (petugasSort.col) {
+        withProg.sort((a, b) => {
+          const v = petugasSort.dir === 'asc' ? 1 : -1;
+          const av = a[petugasSort.col] ?? 0, bv = b[petugasSort.col] ?? 0;
+          return (av > bv ? 1 : av < bv ? -1 : 0) * v;
+        });
+      }
+      document.getElementById('bodyPetugas').innerHTML = withProg.map((p, i) => {
+        const color = p.prog >= 70 ? '#10b981' : p.prog >= 40 ? '#f79039' : '#94a3b8';
+        return `<tr>
           <td class="text-muted small">${i + 1}</td>
           <td class="fw-semibold">${p.nama}</td>
           <td class="text-muted small">${p.kecamatan || '—'}</td>
@@ -890,17 +905,37 @@
           <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center fw-bold text-muted">${p.total.toLocaleString('id-ID')}</td>
-        </tr>
-      `).join('');
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1">
+                <div class="progress-bar" style="width:${p.prog.toFixed(1)}%; background:${color}"></div>
+              </div>
+              <span class="small fw-bold" style="min-width:46px; color:${color}">${p.prog.toFixed(2)}%</span>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
       document.getElementById('countPetugas').textContent =
         `Menampilkan ${list.length} dari ${allPetugas.length} petugas`;
     }
 
+    function sortPetugas(col) {
+      if (petugasSort.col === col) petugasSort.dir = petugasSort.dir === 'asc' ? 'desc' : 'asc';
+      else { petugasSort.col = col; petugasSort.dir = 'desc'; }
+      document.querySelectorAll('#tablePetugas .sort-th').forEach(th => {
+        th.classList.remove('asc', 'desc');
+        if (th.getAttribute('onclick') === `sortPetugas('${col}')`)
+          th.classList.add(petugasSort.dir);
+      });
+      filterPetugas();
+    }
+
     function filterPetugas() {
       const q = document.getElementById('searchPetugas').value.trim().toLowerCase();
-      if (!q) { renderPetugas(allPetugas); return; }
-      renderPetugas(allPetugas.filter(p =>
-        p.nama.toLowerCase().includes(q) || (p.kecamatan||'').toLowerCase().includes(q)));
+      let list = allPetugas;
+      if (q) list = list.filter(p =>
+        p.nama.toLowerCase().includes(q) || (p.kecamatan||'').toLowerCase().includes(q));
+      renderPetugas(list);
     }
 
     function renderCharts(data) {
