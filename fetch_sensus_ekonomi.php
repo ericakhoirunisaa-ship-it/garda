@@ -41,6 +41,14 @@ $chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
 if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
 }
+$chk2 = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'edited_by_pengawas'");
+if ($chk2 && $chk2->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN edited_by_pengawas INT DEFAULT 0 AFTER `revoke`");
+}
+$chk3 = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'edited_by_admin_kabupaten'");
+if ($chk3 && $chk3->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN edited_by_admin_kabupaten INT DEFAULT 0 AFTER edited_by_pengawas");
+}
 $chkIdx = $conn->query("SHOW INDEX FROM sensus_ekonomi WHERE Key_name = 'uq_email_sls'");
 if ($chkIdx && $chkIdx->num_rows === 0) {
     $conn->query("DELETE s1 FROM sensus_ekonomi s1
@@ -308,48 +316,55 @@ $kecWhere = $kecCond ? "WHERE $kecCond" : '';
 
 // Overall stats
 $s = $conn->query("SELECT
-    COALESCE(SUM(open_count),0)                                   AS total_open,
-    COALESCE(SUM(draft),0)                                        AS total_draft,
-    COALESCE(SUM(submitted_by_pencacah),0)                        AS total_submitted,
-    COALESCE(SUM(rejected),0)                                     AS total_rejected,
-    COALESCE(SUM(approved),0)                                     AS total_approved,
-    COALESCE(SUM(`revoke`),0)                                     AS total_revoke,
-    COUNT(*)                                                       AS total_sls,
-    COUNT(DISTINCT email)                                         AS total_petugas
+    COALESCE(SUM(open_count),0)                           AS total_open,
+    COALESCE(SUM(draft),0)                                AS total_draft,
+    COALESCE(SUM(submitted_by_pencacah),0)                AS total_submitted,
+    COALESCE(SUM(rejected),0)                             AS total_rejected,
+    COALESCE(SUM(approved),0)                             AS total_approved,
+    COALESCE(SUM(`revoke`),0)                             AS total_revoke,
+    COALESCE(SUM(edited_by_pengawas),0)                   AS total_edited_pengawas,
+    COALESCE(SUM(edited_by_admin_kabupaten),0)            AS total_edited_admin,
+    COUNT(*)                                              AS total_sls,
+    COUNT(DISTINCT email)                                 AS total_petugas
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
 
 // Per kecamatan (always all for the bar chart overview)
 $kecRows = $conn->query("SELECT
     SUBSTRING(sls_code,5,3) AS kec_code,
-    COALESCE(SUM(open_count),0)                                   AS open,
-    COALESCE(SUM(draft),0)                                        AS draft,
-    COALESCE(SUM(submitted_by_pencacah),0)                        AS submitted,
-    COALESCE(SUM(rejected),0)                                     AS rejected,
-    COALESCE(SUM(approved),0)                                     AS approved,
-    COALESCE(SUM(`revoke`),0)                                     AS `revoke`,
-    COUNT(*)                                                      AS sls
+    COALESCE(SUM(open_count),0)                   AS open,
+    COALESCE(SUM(draft),0)                         AS draft,
+    COALESCE(SUM(submitted_by_pencacah),0)         AS submitted,
+    COALESCE(SUM(rejected),0)                      AS rejected,
+    COALESCE(SUM(approved),0)                      AS approved,
+    COALESCE(SUM(`revoke`),0)                      AS `revoke`,
+    COALESCE(SUM(edited_by_pengawas),0)            AS edited_pengawas,
+    COALESCE(SUM(edited_by_admin_kabupaten),0)     AS edited_admin,
+    COUNT(*)                                       AS sls
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code,5,3)
 ORDER BY kec_code")->fetch_all(MYSQLI_ASSOC);
 
 $tabel_kec = [];
 foreach ($kecRows as $k) {
+    $approvedCombined = (int)$k['approved'] + (int)$k['edited_pengawas'] + (int)$k['edited_admin'];
     $tot  = (int)$k['open'] + (int)$k['draft'] + (int)$k['submitted']
-          + (int)$k['rejected'] + (int)$k['approved'] + (int)$k['revoke'];
-    $num  = (int)$k['submitted'] + (int)$k['rejected'] + (int)$k['approved'] + (int)$k['revoke'];
+          + (int)$k['rejected'] + $approvedCombined + (int)$k['revoke'];
+    $num  = (int)$k['submitted'] + (int)$k['rejected'] + $approvedCombined + (int)$k['revoke'];
     $prog = $tot > 0 ? round($num / $tot * 100, 2) : 0;
     $tabel_kec[] = [
-        'kec_code'  => $k['kec_code'],
-        'nama'      => $kecNama[$k['kec_code']] ?? 'Kec. ' . $k['kec_code'],
-        'open'      => (int)$k['open'],
-        'draft'     => (int)$k['draft'],
-        'submitted' => (int)$k['submitted'],
-        'rejected'  => (int)$k['rejected'],
-        'approved'  => (int)$k['approved'],
-        'revoke'    => (int)$k['revoke'],
-        'total'     => $tot,
-        'sls'       => (int)$k['sls'],
-        'prog'      => $prog,
+        'kec_code'        => $k['kec_code'],
+        'nama'            => $kecNama[$k['kec_code']] ?? 'Kec. ' . $k['kec_code'],
+        'open'            => (int)$k['open'],
+        'draft'           => (int)$k['draft'],
+        'submitted'       => (int)$k['submitted'],
+        'rejected'        => (int)$k['rejected'],
+        'approved'        => $approvedCombined,
+        'edited_pengawas' => (int)$k['edited_pengawas'],
+        'edited_admin'    => (int)$k['edited_admin'],
+        'revoke'          => (int)$k['revoke'],
+        'total'           => $tot,
+        'sls'             => (int)$k['sls'],
+        'prog'            => $prog,
     ];
 }
 
@@ -357,36 +372,41 @@ foreach ($kecRows as $k) {
 $petRows = $conn->query("SELECT
     email,
     GROUP_CONCAT(DISTINCT SUBSTRING(sls_code,5,3) ORDER BY SUBSTRING(sls_code,5,3)) AS kec_codes,
-    COALESCE(SUM(open_count),0)                                   AS open,
-    COALESCE(SUM(draft),0)                                        AS draft,
-    COALESCE(SUM(submitted_by_pencacah),0)                        AS submitted,
-    COALESCE(SUM(rejected),0)                                     AS rejected,
-    COALESCE(SUM(approved),0)                                     AS approved,
-    COALESCE(SUM(`revoke`),0)                                     AS `revoke`,
-    COUNT(*)                                                      AS sls
+    COALESCE(SUM(open_count),0)                   AS open,
+    COALESCE(SUM(draft),0)                         AS draft,
+    COALESCE(SUM(submitted_by_pencacah),0)         AS submitted,
+    COALESCE(SUM(rejected),0)                      AS rejected,
+    COALESCE(SUM(approved),0)                      AS approved,
+    COALESCE(SUM(`revoke`),0)                      AS `revoke`,
+    COALESCE(SUM(edited_by_pengawas),0)            AS edited_pengawas,
+    COALESCE(SUM(edited_by_admin_kabupaten),0)     AS edited_admin,
+    COUNT(*)                                       AS sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email
 ORDER BY submitted DESC, open DESC")->fetch_all(MYSQLI_ASSOC);
 
 $tabel_petugas = [];
 foreach ($petRows as $p) {
+    $approvedCombined = (int)$p['approved'] + (int)$p['edited_pengawas'] + (int)$p['edited_admin'];
     $tot = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted']
-         + (int)$p['rejected'] + (int)$p['approved'] + (int)$p['revoke'];
+         + (int)$p['rejected'] + $approvedCombined + (int)$p['revoke'];
     $kecNames = array_map(
         fn($k) => $kecNama[trim($k)] ?? trim($k),
         explode(',', $p['kec_codes'] ?? '')
     );
     $tabel_petugas[] = [
-        'nama'      => $getNama($p['email']),
-        'kecamatan' => implode(', ', $kecNames),
-        'open'      => (int)$p['open'],
-        'draft'     => (int)$p['draft'],
-        'submitted' => (int)$p['submitted'],
-        'rejected'  => (int)$p['rejected'],
-        'approved'  => (int)$p['approved'],
-        'revoke'    => (int)$p['revoke'],
-        'total'     => $tot,
-        'sls'       => (int)$p['sls'],
+        'nama'            => $getNama($p['email']),
+        'kecamatan'       => implode(', ', $kecNames),
+        'open'            => (int)$p['open'],
+        'draft'           => (int)$p['draft'],
+        'submitted'       => (int)$p['submitted'],
+        'rejected'        => (int)$p['rejected'],
+        'approved'        => $approvedCombined,
+        'edited_pengawas' => (int)$p['edited_pengawas'],
+        'edited_admin'    => (int)$p['edited_admin'],
+        'revoke'          => (int)$p['revoke'],
+        'total'           => $tot,
+        'sls'             => (int)$p['sls'],
     ];
 }
 
@@ -401,16 +421,19 @@ if ($luRow && ($luData = $luRow->fetch_assoc())) {
     $lastUpdate = $dt->format('d') . ' ' . $bulan[(int)$dt->format('n')] . ' ' . $dt->format('Y H:i') . ' WITA';
 }
 
+$approvedCombinedStats = (int)$s['total_approved'] + (int)$s['total_edited_pengawas'] + (int)$s['total_edited_admin'];
 echo json_encode([
     'stats' => [
-        'open'      => (int)$s['total_open'],
-        'draft'     => (int)$s['total_draft'],
-        'submitted' => (int)$s['total_submitted'],
-        'rejected'  => (int)$s['total_rejected'],
-        'approved'  => (int)$s['total_approved'],
-        'revoke'    => (int)$s['total_revoke'],
-        'sls'       => (int)$s['total_sls'],
-        'petugas'   => (int)$s['total_petugas'],
+        'open'            => (int)$s['total_open'],
+        'draft'           => (int)$s['total_draft'],
+        'submitted'       => (int)$s['total_submitted'],
+        'rejected'        => (int)$s['total_rejected'],
+        'approved'        => $approvedCombinedStats,
+        'edited_pengawas' => (int)$s['total_edited_pengawas'],
+        'edited_admin'    => (int)$s['total_edited_admin'],
+        'revoke'          => (int)$s['total_revoke'],
+        'sls'             => (int)$s['total_sls'],
+        'petugas'         => (int)$s['total_petugas'],
     ],
     'tabel_kec'     => $tabel_kec,
     'tabel_petugas' => $tabel_petugas,

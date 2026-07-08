@@ -14,6 +14,8 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
     rejected INT DEFAULT 0,
     approved INT DEFAULT 0,
     `revoke` INT DEFAULT 0,
+    edited_by_pengawas INT DEFAULT 0,
+    edited_by_admin_kabupaten INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_email_sls (email, sls_code)
@@ -21,6 +23,14 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_ekonomi (
 $chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
 if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
+}
+$chk2 = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'edited_by_pengawas'");
+if ($chk2 && $chk2->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN edited_by_pengawas INT DEFAULT 0 AFTER `revoke`");
+}
+$chk3 = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'edited_by_admin_kabupaten'");
+if ($chk3 && $chk3->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN edited_by_admin_kabupaten INT DEFAULT 0 AFTER edited_by_pengawas");
 }
 // Pastikan unique key ada (deduplikasi dulu jika ada duplikat lama)
 $chkIdx = $conn->query("SHOW INDEX FROM sensus_ekonomi WHERE Key_name = 'uq_email_sls'");
@@ -57,13 +67,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rej    = (int)($_POST['rejected'] ?? 0);
         $appr   = (int)($_POST['approved'] ?? 0);
         $rev    = (int)($_POST['revoke'] ?? 0);
+        $ep     = (int)($_POST['edited_by_pengawas'] ?? 0);
+        $ea     = (int)($_POST['edited_by_admin_kabupaten'] ?? 0);
 
         if (!$email || !$sls) {
             $redir_msg = 'Email dan SLS Code wajib diisi.'; $redir_type = 'danger';
         } else {
             $conn->query("INSERT INTO sensus_ekonomi
-                (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
-                VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr,$rev)");
+                (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`,edited_by_pengawas,edited_by_admin_kabupaten)
+                VALUES ('$email','$sls',$open,$draft,$subp,$subr,$rej,$appr,$rev,$ep,$ea)");
             $redir_msg = $conn->affected_rows ? 'Data berhasil disimpan.' : ('Gagal: ' . $conn->error);
             if (!$conn->affected_rows) $redir_type = 'danger';
         }
@@ -79,12 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rej   = (int)($_POST['rejected'] ?? 0);
         $appr  = (int)($_POST['approved'] ?? 0);
         $rev   = (int)($_POST['revoke'] ?? 0);
+        $ep    = (int)($_POST['edited_by_pengawas'] ?? 0);
+        $ea    = (int)($_POST['edited_by_admin_kabupaten'] ?? 0);
         if ($id && $email && $sls) {
             $conn->query("UPDATE sensus_ekonomi SET
                 email='$email', sls_code='$sls',
                 open_count=$open, draft=$draft,
                 submitted_by_pencacah=$subp, submitted_respondent=$subr,
-                rejected=$rej, approved=$appr, `revoke`=$rev
+                rejected=$rej, approved=$appr, `revoke`=$rev,
+                edited_by_pengawas=$ep, edited_by_admin_kabupaten=$ea
                 WHERE id=$id");
             $redir_msg = 'Data berhasil diperbarui.';
         } else {
@@ -114,10 +129,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Format kolom: Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH,
-            //               APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS
+            //               APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS,
+            //               EDITED_BY_PENGAWAS, EDITED_BY_ADMIN_KABUPATEN
             while (($row = fgetcsv($handle)) !== false) {
-                $row    = array_pad($row, 8, 0);
-                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rappr, $rrej, $rrev] = $row;
+                $row    = array_pad($row, 10, 0);
+                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rappr, $rrej, $rrev, $rep, $rea] = $row;
                 $remail = strtolower(trim(trim($remail), '"'));
                 $rsls   = trim(trim($rsls), '"');
                 if (!$remail || !$rsls) { $skipped++; continue; }
@@ -130,13 +146,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ap = (int)$rappr;   // APPROVED_BY_PENGAWAS
                 $rj = (int)$rrej;   // REJECTED_BY_PENGAWAS
                 $rv = (int)$rrev;   // REVOKED_BY_PENGAWAS
+                $epv = (int)$rep;   // EDITED_BY_PENGAWAS
+                $eav = (int)$rea;   // EDITED_BY_ADMIN_KABUPATEN
 
                 $r = $conn->query("INSERT INTO sensus_ekonomi
-                    (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`)
-                    VALUES ('$em','$sl',$op,$dr,$sp,0,$rj,$ap,$rv)
+                    (email,sls_code,open_count,draft,submitted_by_pencacah,submitted_respondent,rejected,approved,`revoke`,edited_by_pengawas,edited_by_admin_kabupaten)
+                    VALUES ('$em','$sl',$op,$dr,$sp,0,$rj,$ap,$rv,$epv,$eav)
                     ON DUPLICATE KEY UPDATE
                     open_count=$op, draft=$dr, submitted_by_pencacah=$sp,
-                    rejected=$rj, approved=$ap, `revoke`=$rv");
+                    rejected=$rj, approved=$ap, `revoke`=$rv,
+                    edited_by_pengawas=$epv, edited_by_admin_kabupaten=$eav");
                 if ($r) $upserted++; else $skipped++;
             }
             fclose($handle);
@@ -330,12 +349,14 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                                 <th class="text-center">Rejected</th>
                                 <th class="text-center">Approved</th>
                                 <th class="text-center">Revoke</th>
+                                <th class="text-center">Edit Pengawas</th>
+                                <th class="text-center">Edit Admin Kab</th>
                                 <th class="text-center pe-4" style="width:90px">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php if (empty($records)): ?>
-                            <tr><td colspan="11" class="text-center text-muted py-5">
+                            <tr><td colspan="13" class="text-center text-muted py-5">
                                 Belum ada data. Gunakan tombol <strong>Tambah</strong> atau <strong>Import CSV</strong>.
                             </td></tr>
                         <?php else: ?>
@@ -356,6 +377,8 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                                 <td class="text-center"><span class="badge badge-rej"><?= $r['rejected'] ?></span></td>
                                 <td class="text-center"><span class="badge bg-secondary bg-opacity-75"><?= $r['approved'] ?></span></td>
                                 <td class="text-center"><span class="badge" style="background:#ffedd5;color:#c2410c"><?= $r['revoke'] ?></span></td>
+                                <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46"><?= $r['edited_by_pengawas'] ?? 0 ?></span></td>
+                                <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3"><?= $r['edited_by_admin_kabupaten'] ?? 0 ?></span></td>
                                 <td class="text-center pe-4">
                                     <button class="btn btn-sm btn-outline-primary act-btn me-1"
                                             onclick='openEditModal(<?= json_encode($r) ?>)'>
@@ -455,6 +478,14 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                             <label class="form-label fw-semibold">Revoke</label>
                             <input type="number" name="revoke" id="formRev" class="form-control" min="0" value="0">
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Edited by Pengawas</label>
+                            <input type="number" name="edited_by_pengawas" id="formEP" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Edited by Admin Kab</label>
+                            <input type="number" name="edited_by_admin_kabupaten" id="formEA" class="form-control" min="0" value="0">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -532,7 +563,7 @@ $records    = $conn->query("SELECT * FROM sensus_ekonomi $whereSQL ORDER BY SUBS
                 <div class="modal-body">
                     <div class="alert alert-info py-2 mb-3" style="font-size:.82rem;">
                         <strong>Format kolom CSV (urut):</strong><br>
-                        <code>Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH, APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS</code>
+                        <code>Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH, APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS, EDITED_BY_PENGAWAS, EDITED_BY_ADMIN_KABUPATEN</code>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
@@ -590,6 +621,8 @@ function openAddModal() {
     document.getElementById('formRej').value    = '0';
     document.getElementById('formAppr').value   = '0';
     document.getElementById('formRev').value    = '0';
+    document.getElementById('formEP').value     = '0';
+    document.getElementById('formEA').value     = '0';
     document.getElementById('kecPreview').textContent = '';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-plus-lg me-2"></i>Tambah Data';
     document.getElementById('submitBtn').innerHTML  = '<i class="bi bi-save-fill me-1"></i>Simpan';
@@ -608,6 +641,8 @@ function openEditModal(r) {
     document.getElementById('formRej').value    = r.rejected || 0;
     document.getElementById('formAppr').value   = r.approved || 0;
     document.getElementById('formRev').value    = r.revoke || 0;
+    document.getElementById('formEP').value     = r.edited_by_pengawas || 0;
+    document.getElementById('formEA').value     = r.edited_by_admin_kabupaten || 0;
     updateKecPreview(r.sls_code || '');
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil-fill me-2"></i>Edit Data';
     document.getElementById('submitBtn').innerHTML  = '<i class="bi bi-save-fill me-1"></i>Perbarui';
@@ -626,9 +661,9 @@ function confirmDeleteAll() {
 
 function downloadTemplate() {
     const rows = [
-        ['Email','SLS_Code','OPEN','DRAFT','SUBMITTED_BY_PENCACAH','APPROVED_BY_PENGAWAS','REJECTED_BY_PENGAWAS','REVOKED_BY_PENGAWAS'],
-        ['"contoh@gmail.com"','"7206050007000100"','50','5','10','0','0','0'],
-        ['"contoh@gmail.com"','"7206050007000200"','40','3','8','0','0','0'],
+        ['Email','SLS_Code','OPEN','DRAFT','SUBMITTED_BY_PENCACAH','APPROVED_BY_PENGAWAS','REJECTED_BY_PENGAWAS','REVOKED_BY_PENGAWAS','EDITED_BY_PENGAWAS','EDITED_BY_ADMIN_KABUPATEN'],
+        ['"contoh@gmail.com"','"7206050007000100"','50','5','10','0','0','0','0','0'],
+        ['"contoh@gmail.com"','"7206050007000200"','40','3','8','0','0','0','0','0'],
     ];
     const csv  = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});

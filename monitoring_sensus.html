@@ -482,12 +482,14 @@
                   <th class="text-center sort-th" onclick="sortKec('submitted')">Submitted<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortKec('rejected')">Rejected<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortKec('approved')">Approved<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('edited_pengawas')">Edit Pengawas<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('edited_admin')">Edit Admin Kab<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortKec('revoke')">Revoke<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortKec('prog')" style="min-width:140px">Progress<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyKec">
-                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="11" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
               <tfoot id="footKec"></tfoot>
             </table>
@@ -561,13 +563,15 @@
                   <th class="text-center sort-th" onclick="sortPetugas('submitted')">Submitted<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('rejected')">Rejected<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('approved')">Approved<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('edited_pengawas')">Edit Pengawas<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('edited_admin')">Edit Admin Kab<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('revoke')">Revoke<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('total')">Total<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortPetugas('prog')" style="min-width:150px">Progress<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyPetugas">
-                <tr><td colspan="12" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="14" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -802,6 +806,7 @@
             </div>
           </td>
         </tr>`;
+      /* Note: approved already includes edited_by_pengawas + edited_by_admin_kabupaten in the API response */
       }).join('');
     }
 
@@ -839,6 +844,8 @@
           <td class="text-center"><span class="badge badge-sub">${k.submitted.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rej">${k.rejected.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-app">${(k.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(k.edited_pengawas||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(k.edited_admin||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rev">${(k.revoke||0).toLocaleString('id-ID')}</span></td>
           <td>
             <div class="d-flex align-items-center gap-2">
@@ -855,8 +862,11 @@
       const tot = list.reduce((acc, k) => ({
         sls: acc.sls + k.sls, open: acc.open + k.open, draft: acc.draft + k.draft,
         submitted: acc.submitted + k.submitted, rejected: acc.rejected + k.rejected,
-        approved: acc.approved + (k.approved||0), revoke: acc.revoke + (k.revoke||0)
-      }), { sls:0, open:0, draft:0, submitted:0, rejected:0, approved:0, revoke:0 });
+        approved: acc.approved + (k.approved||0),
+        edited_pengawas: acc.edited_pengawas + (k.edited_pengawas||0),
+        edited_admin: acc.edited_admin + (k.edited_admin||0),
+        revoke: acc.revoke + (k.revoke||0)
+      }), { sls:0, open:0, draft:0, submitted:0, rejected:0, approved:0, edited_pengawas:0, edited_admin:0, revoke:0 });
       const tNum = tot.submitted + tot.rejected + tot.approved + tot.revoke;
       const tDen = tot.open + tot.draft + tot.submitted + tot.rejected + tot.approved + tot.revoke;
       const tPct = tDen > 0 ? (tNum/tDen*100).toFixed(2) : '0.00';
@@ -868,6 +878,8 @@
         <td class="text-center"><strong>${tot.submitted.toLocaleString('id-ID')}</strong></td>
         <td class="text-center"><strong>${tot.rejected.toLocaleString('id-ID')}</strong></td>
         <td class="text-center"><strong>${tot.approved.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.edited_pengawas.toLocaleString('id-ID')}</strong></td>
+        <td class="text-center"><strong>${tot.edited_admin.toLocaleString('id-ID')}</strong></td>
         <td class="text-center"><strong>${tot.revoke.toLocaleString('id-ID')}</strong></td>
         <td><span class="small fw-bold" style="color:#f79039">${tPct}%</span></td>
       </tr>`;
@@ -903,6 +915,8 @@
           <td class="text-center"><span class="badge badge-sub">${p.submitted.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rej">${p.rejected.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited_pengawas||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(p.edited_admin||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center fw-bold text-muted">${p.total.toLocaleString('id-ID')}</td>
           <td>

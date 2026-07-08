@@ -20,6 +20,14 @@ $chk = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'revoke'");
 if ($chk && $chk->num_rows === 0) {
     $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN `revoke` INT DEFAULT 0 AFTER approved");
 }
+$chk2 = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'edited_by_pengawas'");
+if ($chk2 && $chk2->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN edited_by_pengawas INT DEFAULT 0 AFTER `revoke`");
+}
+$chk3 = $conn->query("SHOW COLUMNS FROM sensus_ekonomi LIKE 'edited_by_admin_kabupaten'");
+if ($chk3 && $chk3->num_rows === 0) {
+    $conn->query("ALTER TABLE sensus_ekonomi ADD COLUMN edited_by_admin_kabupaten INT DEFAULT 0 AFTER edited_by_pengawas");
+}
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -289,6 +297,8 @@ $stats = $conn->query("SELECT
     COALESCE(SUM(rejected), 0)                                     AS total_rejected,
     COALESCE(SUM(approved), 0)                                     AS total_approved,
     COALESCE(SUM(`revoke`), 0)                                     AS total_revoke,
+    COALESCE(SUM(edited_by_pengawas), 0)                           AS total_edited_pengawas,
+    COALESCE(SUM(edited_by_admin_kabupaten), 0)                    AS total_edited_admin,
     COUNT(DISTINCT email)                                          AS total_petugas,
     COUNT(*)                                                       AS total_sls
 FROM sensus_ekonomi $kecWhere")->fetch_assoc();
@@ -298,11 +308,12 @@ $lastUpdateRow = $conn->query("SELECT MAX(GREATEST(created_at, COALESCE(updated_
 $lastUpdate = $lastUpdateRow['last_update'];
 $lastUpdateStr = $lastUpdate ? date('d M Y H:i', strtotime($lastUpdate)) . ' WIB' : null;
 
+$totalApprovedCombined = (int)$stats['total_approved'] + (int)$stats['total_edited_pengawas'] + (int)$stats['total_edited_admin'];
 $globalDenominator = (int)$stats['total_open'] + (int)$stats['total_draft']
                    + (int)$stats['total_submitted'] + (int)$stats['total_rejected']
-                   + (int)$stats['total_approved'] + (int)$stats['total_revoke'];
+                   + $totalApprovedCombined + (int)$stats['total_revoke'];
 $globalNumerator   = (int)$stats['total_submitted'] + (int)$stats['total_rejected']
-                   + (int)$stats['total_approved'] + (int)$stats['total_revoke'];
+                   + $totalApprovedCombined + (int)$stats['total_revoke'];
 $globalPct = $globalDenominator > 0
     ? number_format($globalNumerator / $globalDenominator * 100, 2)
     : '0.00';
@@ -318,6 +329,8 @@ $dbRows = $conn->query("SELECT
     COALESCE(SUM(rejected), 0)              AS total_rejected,
     COALESCE(SUM(approved), 0)              AS total_approved,
     COALESCE(SUM(`revoke`), 0)              AS total_revoke,
+    COALESCE(SUM(edited_by_pengawas), 0)    AS total_edited_pengawas,
+    COALESCE(SUM(edited_by_admin_kabupaten), 0) AS total_edited_admin,
     COUNT(*)                                AS total_sls
 FROM sensus_ekonomi $kecWhere
 GROUP BY email")->fetch_all(MYSQLI_ASSOC);
@@ -347,11 +360,13 @@ foreach ($xlsxFiltered as $email => $info) {
         'total_draft'        => (int)($db['total_draft']       ?? 0),
         'submitted_pencacah' => (int)($db['submitted_pencacah']?? 0),
         'submitted_resp'     => (int)($db['submitted_resp']    ?? 0),
-        'total_submitted'    => (int)($db['total_submitted']   ?? 0),
-        'total_rejected'     => (int)($db['total_rejected']    ?? 0),
-        'total_approved'     => (int)($db['total_approved']    ?? 0),
-        'total_revoke'       => (int)($db['total_revoke']      ?? 0),
-        'total_sls'          => (int)($db['total_sls']         ?? 0),
+        'total_submitted'       => (int)($db['total_submitted']        ?? 0),
+        'total_rejected'        => (int)($db['total_rejected']         ?? 0),
+        'total_approved'        => (int)($db['total_approved']         ?? 0),
+        'total_revoke'          => (int)($db['total_revoke']           ?? 0),
+        'total_edited_pengawas' => (int)($db['total_edited_pengawas']  ?? 0),
+        'total_edited_admin'    => (int)($db['total_edited_admin']     ?? 0),
+        'total_sls'             => (int)($db['total_sls']              ?? 0),
     ];
 }
 usort($perPetugas, fn($a, $b) =>
@@ -361,14 +376,16 @@ usort($perPetugas, fn($a, $b) =>
 
 $perKec = $conn->query("SELECT
     SUBSTRING(sls_code, 5, 3) AS kec_code,
-    COALESCE(SUM(open_count), 0)                                   AS total_open,
-    COALESCE(SUM(draft), 0)                                        AS total_draft,
-    COALESCE(SUM(submitted_by_pencacah), 0) AS total_submitted,
-    COALESCE(SUM(rejected), 0)                                     AS total_rejected,
-    COALESCE(SUM(approved), 0)                                     AS total_approved,
-    COALESCE(SUM(`revoke`), 0)                                     AS total_revoke,
-    COUNT(DISTINCT email)                                          AS total_petugas,
-    COUNT(*)                                                       AS total_sls
+    COALESCE(SUM(open_count), 0)                        AS total_open,
+    COALESCE(SUM(draft), 0)                             AS total_draft,
+    COALESCE(SUM(submitted_by_pencacah), 0)             AS total_submitted,
+    COALESCE(SUM(rejected), 0)                          AS total_rejected,
+    COALESCE(SUM(approved), 0)                          AS total_approved,
+    COALESCE(SUM(`revoke`), 0)                          AS total_revoke,
+    COALESCE(SUM(edited_by_pengawas), 0)                AS total_edited_pengawas,
+    COALESCE(SUM(edited_by_admin_kabupaten), 0)         AS total_edited_admin,
+    COUNT(DISTINCT email)                               AS total_petugas,
+    COUNT(*)                                            AS total_sls
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code, 5, 3)
 ORDER BY kec_code")->fetch_all(MYSQLI_ASSOC);
@@ -381,7 +398,7 @@ $chartOpen      = json_encode(array_map(fn($p) => $p['total_open'],        $perP
 $chartDraft     = json_encode(array_map(fn($p) => $p['total_draft'],       $perPetugasChart));
 $chartSubmitted = json_encode(array_map(fn($p) => $p['total_submitted'],   $perPetugasChart));
 $chartRejected  = json_encode(array_map(fn($p) => $p['total_rejected'],    $perPetugasChart));
-$chartApproved  = json_encode(array_map(fn($p) => $p['total_approved'],    $perPetugasChart));
+$chartApproved  = json_encode(array_map(fn($p) => $p['total_approved'] + $p['total_edited_pengawas'] + $p['total_edited_admin'], $perPetugasChart));
 $chartRevoke    = json_encode(array_map(fn($p) => $p['total_revoke'],      $perPetugasChart));
 $barWidth = max(500, count($perPetugasChart) * 48);
 $doughnutData   = json_encode([
@@ -389,7 +406,7 @@ $doughnutData   = json_encode([
     (int)$stats['total_draft'],
     (int)$stats['total_submitted'],
     (int)$stats['total_rejected'],
-    (int)$stats['total_approved'],
+    $totalApprovedCombined,
     (int)$stats['total_revoke'],
 ]);
 
@@ -406,7 +423,7 @@ foreach ($emailData as $email => $info) {
 
 $realisasiRows = $conn->query("SELECT
     SUBSTRING(sls_code,5,3) AS kec_code,
-    COALESCE(SUM(submitted_by_pencacah + rejected + approved + `revoke`), 0) AS realisasi
+    COALESCE(SUM(submitted_by_pencacah + rejected + approved + `revoke` + edited_by_pengawas + edited_by_admin_kabupaten), 0) AS realisasi
 FROM sensus_ekonomi
 GROUP BY SUBSTRING(sls_code,5,3)")->fetch_all(MYSQLI_ASSOC);
 $realisasiByKec = [];
@@ -536,8 +553,9 @@ foreach ($kecNama as $kc => $nm) {
                         <div class="d-flex align-items-center gap-3">
                             <div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><i class="bi bi-patch-check-fill"></i></div>
                             <div>
-                                <div class="fs-2 fw-bold lh-1"><?= number_format((int)$stats['total_approved']) ?></div>
+                                <div class="fs-2 fw-bold lh-1"><?= number_format($totalApprovedCombined) ?></div>
                                 <div class="text-muted small">Approved</div>
+                                <div style="font-size:.65rem;color:#8b5cf6"><?= number_format((int)$stats['total_approved']) ?> + <?= number_format((int)$stats['total_edited_pengawas']) ?> + <?= number_format((int)$stats['total_edited_admin']) ?></div>
                             </div>
                         </div>
                     </div>
@@ -594,7 +612,7 @@ foreach ($kecNama as $kc => $nm) {
                     <div class="progress-bar progress-accent" style="width:<?= $globalPct ?>%; border-radius:6px;"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-2">
-                    <small class="text-muted"><?= number_format($globalNumerator) ?> dari <?= number_format($globalDenominator) ?> dokumen sudah diproses (submit + reject + approve + revoke)</small>
+                    <small class="text-muted"><?= number_format($globalNumerator) ?> dari <?= number_format($globalDenominator) ?> dokumen sudah diproses (submit + reject + approve + edit pengawas + edit admin kab + revoke)</small>
                     <small class="text-muted"><?= number_format((int)$stats['total_open'] + (int)$stats['total_draft']) ?> dokumen tersisa</small>
                 </div>
                 <?php if ($lastUpdateStr): ?>
@@ -734,18 +752,21 @@ foreach ($kecNama as $kc => $nm) {
                                         <th class="text-center">Rejected</th>
                                         <th class="text-center">Approved</th>
                                         <th class="text-center">Revoke</th>
+                                        <th class="text-center">Edited<br><small style="font-weight:400;font-size:.72rem;">Pengawas</small></th>
+                                        <th class="text-center">Edited<br><small style="font-weight:400;font-size:.72rem;">Admin Kab</small></th>
                                         <th class="text-center">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php if (empty($perPetugas)): ?>
-                                    <tr><td colspan="14" class="text-center text-muted py-4">Belum ada data. <a href="data_sensus_ekonomi.php">Import data?</a></td></tr>
+                                    <tr><td colspan="16" class="text-center text-muted py-4">Belum ada data. <a href="data_sensus_ekonomi.php">Import data?</a></td></tr>
                                 <?php else: ?>
                                 <?php foreach ($perPetugas as $i => $p): ?>
                                     <?php
                                     $total = $p['total_open'] + $p['total_draft']
                                            + $p['total_submitted'] + $p['total_rejected']
-                                           + $p['total_approved'] + $p['total_revoke'];
+                                           + $p['total_approved'] + $p['total_revoke']
+                                           + $p['total_edited_pengawas'] + $p['total_edited_admin'];
                                     $rowStyle = $total === 0 ? ' class="text-muted"' : '';
                                     ?>
                                     <tr<?= $rowStyle ?>>
@@ -762,6 +783,8 @@ foreach ($kecNama as $kc => $nm) {
                                         <td class="text-center"><span class="badge badge-rej fw-semibold"><?= number_format($p['total_rejected']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-app fw-semibold"><?= number_format($p['total_approved']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-rev fw-semibold"><?= number_format($p['total_revoke']) ?></span></td>
+                                        <td class="text-center"><span class="badge fw-semibold" style="background:#d1fae5;color:#065f46"><?= number_format($p['total_edited_pengawas']) ?></span></td>
+                                        <td class="text-center"><span class="badge fw-semibold" style="background:#e0e7ff;color:#3730a3"><?= number_format($p['total_edited_admin']) ?></span></td>
                                         <td class="text-center fw-bold text-muted"><?= number_format($total) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -786,20 +809,23 @@ foreach ($kecNama as $kc => $nm) {
                                         <th class="text-center">Submitted</th>
                                         <th class="text-center">Rejected</th>
                                         <th class="text-center">Approved</th>
+                                        <th class="text-center">Edit Pengawas</th>
+                                        <th class="text-center">Edit Admin Kab</th>
                                         <th class="text-center">Progress</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php if (empty($perKec)): ?>
-                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada data.</td></tr>
+                                    <tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>
                                 <?php else: ?>
                                 <?php foreach ($perKec as $kec): ?>
                                     <?php
+                                    $kApprovedCombined = (int)$kec['total_approved'] + (int)$kec['total_edited_pengawas'] + (int)$kec['total_edited_admin'];
                                     $kDenominator = (int)$kec['total_open'] + (int)$kec['total_draft']
                                                   + (int)$kec['total_submitted'] + (int)$kec['total_rejected']
-                                                  + (int)$kec['total_approved'] + (int)$kec['total_revoke'];
+                                                  + $kApprovedCombined + (int)$kec['total_revoke'];
                                     $kNumerator   = (int)$kec['total_submitted'] + (int)$kec['total_rejected']
-                                                  + (int)$kec['total_approved'] + (int)$kec['total_revoke'];
+                                                  + $kApprovedCombined + (int)$kec['total_revoke'];
                                     $pct = $kDenominator > 0
                                         ? number_format($kNumerator / $kDenominator * 100, 2)
                                         : '0.00';
@@ -818,7 +844,9 @@ foreach ($kecNama as $kc => $nm) {
                                         <td class="text-center"><span class="badge badge-draft"><?= number_format((int)$kec['total_draft']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-sub"><?= number_format((int)$kec['total_submitted']) ?></span></td>
                                         <td class="text-center"><span class="badge badge-rej"><?= number_format((int)$kec['total_rejected']) ?></span></td>
-                                        <td class="text-center"><span class="badge badge-app"><?= number_format((int)$kec['total_approved']) ?></span></td>
+                                        <td class="text-center"><span class="badge badge-app"><?= number_format($kApprovedCombined) ?></span></td>
+                                        <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46"><?= number_format((int)$kec['total_edited_pengawas']) ?></span></td>
+                                        <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3"><?= number_format((int)$kec['total_edited_admin']) ?></span></td>
                                         <td style="min-width:120px;">
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="progress flex-grow-1" style="height:6px">
@@ -860,6 +888,8 @@ foreach ($kecNama as $kc => $nm) {
                                         <th class="text-center">Rejected</th>
                                         <th class="text-center">Approved</th>
                                         <th class="text-center">Revoke</th>
+                                        <th class="text-center">Edit Pengawas</th>
+                                        <th class="text-center">Edit Admin Kab</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -871,13 +901,14 @@ foreach ($kecNama as $kc => $nm) {
                                 $offset = ($page - 1) * $perPage;
                                 $slsRows = $conn->query("SELECT id, email, sls_code,
                                     SUBSTRING(sls_code,5,3) AS kec_code,
-                                    open_count, draft, submitted_by_pencacah, submitted_respondent, rejected, approved, `revoke`
+                                    open_count, draft, submitted_by_pencacah, submitted_respondent, rejected, approved, `revoke`,
+                                    edited_by_pengawas, edited_by_admin_kabupaten
                                 FROM sensus_ekonomi $kecWhere
                                 ORDER BY kec_code, sls_code, email
                                 LIMIT $perPage OFFSET $offset")->fetch_all(MYSQLI_ASSOC);
                                 ?>
                                 <?php if (empty($slsRows)): ?>
-                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada data.</td></tr>
+                                    <tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>
                                 <?php else: ?>
                                 <?php foreach ($slsRows as $i => $r): ?>
                                     <tr>
@@ -899,6 +930,8 @@ foreach ($kecNama as $kc => $nm) {
                                         <td class="text-center"><span class="badge badge-rej"><?= $r['rejected'] ?></span></td>
                                         <td class="text-center"><span class="badge bg-secondary bg-opacity-75"><?= $r['approved'] ?></span></td>
                                         <td class="text-center"><span class="badge badge-rev"><?= $r['revoke'] ?></span></td>
+                                        <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46"><?= $r['edited_by_pengawas'] ?? 0 ?></span></td>
+                                        <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3"><?= $r['edited_by_admin_kabupaten'] ?? 0 ?></span></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <?php endif; ?>
