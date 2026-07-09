@@ -780,9 +780,7 @@
         return;
       }
       const ranked = list.map(p => {
-        const num = p.submitted + p.rejected + (p.approved||0) + (p.revoke||0);
-        const prog = p.total > 0 ? num / p.total * 100 : 0;
-        return { ...p, prog };
+        return { ...p, prog: p.prog || 0 };
       }).sort((a, b) => b.prog - a.prog).slice(0, topN);
 
       body.innerHTML = ranked.map((p, i) => {
@@ -893,8 +891,7 @@
         return;
       }
       const withProg = list.map(p => {
-        const num = p.submitted + p.rejected + (p.approved||0) + (p.revoke||0);
-        return { ...p, prog: p.total > 0 ? num / p.total * 100 : 0 };
+        return { ...p, prog: p.prog || 0 };
       });
       if (petugasSort.col) {
         withProg.sort((a, b) => {

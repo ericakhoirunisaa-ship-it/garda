@@ -388,8 +388,10 @@ ORDER BY submitted DESC, open DESC")->fetch_all(MYSQLI_ASSOC);
 $tabel_petugas = [];
 foreach ($petRows as $p) {
     $approvedCombined = (int)$p['approved'] + (int)$p['edited_pengawas'] + (int)$p['edited_admin'];
-    $tot = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted']
-         + (int)$p['rejected'] + $approvedCombined + (int)$p['revoke'];
+    $tot  = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted']
+          + (int)$p['rejected'] + $approvedCombined + (int)$p['revoke'];
+    $pNum = (int)$p['submitted'] + (int)$p['rejected'] + $approvedCombined + (int)$p['revoke'];
+    $prog = $tot > 0 ? round($pNum / $tot * 100, 2) : 0;
     $kecNames = array_map(
         fn($k) => $kecNama[trim($k)] ?? trim($k),
         explode(',', $p['kec_codes'] ?? '')
@@ -407,6 +409,7 @@ foreach ($petRows as $p) {
         'revoke'          => (int)$p['revoke'],
         'total'           => $tot,
         'sls'             => (int)$p['sls'],
+        'prog'            => $prog,
     ];
 }
 
