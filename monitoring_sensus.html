@@ -773,18 +773,28 @@
       renderTopPetugas(allPetugas);
     }
 
+    function calcProgPetugas(p) {
+      // Rumus: (submit+approve+revoke+reject+edit_pengawas+edit_admin) /
+      //        (submit+approve+revoke+reject+open+draft+edit_pengawas+edit_admin)
+      // p.approved dari API sudah = approved + edited_pengawas + edited_admin
+      const num = p.submitted + (p.approved||0) + (p.revoke||0) + p.rejected;
+      const den = num + p.open + p.draft;
+      return den > 0 ? (num / den * 100) : 0;
+    }
+
     function renderTopPetugas(list) {
       const body = document.getElementById('bodyTopPetugas');
       if (!list.length) {
-        body.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        body.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         return;
       }
       const ranked = list.map(p => {
-        return { ...p, prog: p.prog || 0 };
+        return { ...p, prog: calcProgPetugas(p) };
       }).sort((a, b) => b.prog - a.prog).slice(0, topN);
 
       body.innerHTML = ranked.map((p, i) => {
-        const color = p.prog >= 70 ? '#10b981' : p.prog >= 40 ? '#f79039' : '#94a3b8';
+        const prog  = p.prog;
+        const color = prog >= 70 ? '#10b981' : prog >= 40 ? '#f79039' : '#94a3b8';
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
         return `<tr>
           <td class="text-center fw-bold" style="color:${color}">${medal}</td>
@@ -798,13 +808,12 @@
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="progress flex-grow-1">
-                <div class="progress-bar" style="width:${p.prog.toFixed(1)}%; background:${color}"></div>
+                <div class="progress-bar" style="width:${prog.toFixed(1)}%; background:${color}"></div>
               </div>
-              <span class="small fw-bold" style="min-width:46px; color:${color}">${p.prog.toFixed(2)}%</span>
+              <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
             </div>
           </td>
         </tr>`;
-      /* Note: approved already includes edited_by_pengawas + edited_by_admin_kabupaten in the API response */
       }).join('');
     }
 
@@ -886,12 +895,12 @@
     function renderPetugas(list) {
       if (!list.length) {
         document.getElementById('bodyPetugas').innerHTML =
-          '<tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="14" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('countPetugas').textContent = '';
         return;
       }
       const withProg = list.map(p => {
-        return { ...p, prog: p.prog || 0 };
+        return { ...p, prog: calcProgPetugas(p) };
       });
       if (petugasSort.col) {
         withProg.sort((a, b) => {
@@ -901,7 +910,8 @@
         });
       }
       document.getElementById('bodyPetugas').innerHTML = withProg.map((p, i) => {
-        const color = p.prog >= 70 ? '#10b981' : p.prog >= 40 ? '#f79039' : '#94a3b8';
+        const prog  = p.prog;
+        const color = prog >= 70 ? '#10b981' : prog >= 40 ? '#f79039' : '#94a3b8';
         return `<tr>
           <td class="text-muted small">${i + 1}</td>
           <td class="fw-semibold">${p.nama}</td>
@@ -919,9 +929,9 @@
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="progress flex-grow-1">
-                <div class="progress-bar" style="width:${p.prog.toFixed(1)}%; background:${color}"></div>
+                <div class="progress-bar" style="width:${prog.toFixed(1)}%; background:${color}"></div>
               </div>
-              <span class="small fw-bold" style="min-width:46px; color:${color}">${p.prog.toFixed(2)}%</span>
+              <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
             </div>
           </td>
         </tr>`;
