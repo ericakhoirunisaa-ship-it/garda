@@ -130,10 +130,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Format kolom: Email, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH,
             //               APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS,
-            //               EDITED_BY_PENGAWAS, EDITED_BY_ADMIN_KABUPATEN
+            //               EDITED_BY_ADMIN_KABUPATEN, EDITED_BY_PENGAWAS
             while (($row = fgetcsv($handle)) !== false) {
                 $row    = array_pad($row, 10, 0);
-                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rappr, $rrej, $rrev, $rep, $rea] = $row;
+                [$remail, $rsls, $ropen, $rdraft, $rsubp, $rappr, $rrej, $rrev, $rea, $rep] = $row;
                 $remail = strtolower(trim(trim($remail), '"'));
                 $rsls   = trim(trim($rsls), '"');
                 if (!$remail || !$rsls) { $skipped++; continue; }
