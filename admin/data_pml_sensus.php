@@ -411,7 +411,7 @@ if (($_GET['action'] ?? '') === 'export') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="data_pml_' . date('Ymd_His') . '.csv"');
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['Email','Nama','Kec_Code','Open','Draft','Submitted','Approved','Rejected','Revoke','Edit_PML','Edit_Admin']);
+    fputcsv($out, ['Email','Nama','Kec_Code','OPEN','DRAFT','SUBMITTED_BY_PENCACAH','APPROVED_BY_PENGAWAS','REJECTED_BY_PENGAWAS','REVOKED_BY_PENGAWAS','EDITED_BY_ADMIN_KABUPATEN','EDITED_BY_PENGAWAS']);
     foreach ($all as $row) {
         fputcsv($out, [$row['email'], $row['nama'], $row['kec_code'],
             $row['open_count'], $row['draft'], $row['submitted'],
@@ -501,27 +501,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->query("TRUNCATE TABLE sensus_pml");
             }
 
-            // Format: Email, Nama, Kec_Code, Open, Draft, Submitted, Approved, Rejected, Revoke, Edit_PML, Edit_Admin
+            // Format: Email, Nama, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH,
+            //         APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS,
+            //         EDITED_BY_ADMIN_KABUPATEN, EDITED_BY_PENGAWAS
+            // kec_code = $emailKec lookup, fallback 3 digit pertama SLS_Code
+            // Baris di-aggregate (SUM) per email+kec_code sebelum upsert
+            $grouped = [];
             while (($row = fgetcsv($handle)) !== false) {
-                $row = array_pad($row, 11, 0);
-                [$remail, $rnama, $rkec, $ropen, $rdraft, $rsub, $rappr, $rrej, $rrev, $redit_pml, $redit_adm] = $row;
+                $row    = array_pad($row, 11, 0);
+                [$remail, $rnama, $rsls, $ropen, $rdraft, $rsub, $rappr, $rrej, $rrev, $rea, $rep] = $row;
                 $remail = strtolower(trim(trim($remail), '"'));
                 $rnama  = trim(trim($rnama), '"');
-                $rkec   = trim(trim($rkec), '"');
-                if (!$remail || !$rkec) { $skipped++; continue; }
-
-                $em  = $conn->real_escape_string($remail);
-                $nm  = $conn->real_escape_string($rnama);
-                $kc  = $conn->real_escape_string($rkec);
-                $op  = (int)$ropen;
-                $dr  = (int)$rdraft;
-                $sb  = (int)$rsub;
-                $ap  = (int)$rappr;
-                $rj  = (int)$rrej;
-                $rv  = (int)$rrev;
-                $ep  = (int)$redit_pml;
-                $ea  = (int)$redit_adm;
-
+                $rsls   = trim(trim($rsls), '"');
+                if (!$remail) { $skipped++; continue; }
+                $rkec = $emailKec[strtolower($remail)] ?? substr($rsls, 0, 3);
+                if (!$rkec) { $skipped++; continue; }
+                $key = $remail . '|' . $rkec;
+                if (!isset($grouped[$key])) {
+                    $grouped[$key] = ['email'=>$remail,'nama'=>$rnama,'kec'=>$rkec,
+                        'op'=>0,'dr'=>0,'sb'=>0,'ap'=>0,'rj'=>0,'rv'=>0,'ea'=>0,'ep'=>0];
+                }
+                $grouped[$key]['op'] += (int)$ropen;
+                $grouped[$key]['dr'] += (int)$rdraft;
+                $grouped[$key]['sb'] += (int)$rsub;
+                $grouped[$key]['ap'] += (int)$rappr;
+                $grouped[$key]['rj'] += (int)$rrej;
+                $grouped[$key]['rv'] += (int)$rrev;
+                $grouped[$key]['ea'] += (int)$rea;   // EDITED_BY_ADMIN_KABUPATEN
+                $grouped[$key]['ep'] += (int)$rep;   // EDITED_BY_PENGAWAS
+            }
+            fclose($handle);
+            foreach ($grouped as $g) {
+                $em = $conn->real_escape_string($g['email']);
+                $nm = $conn->real_escape_string($g['nama']);
+                $kc = $conn->real_escape_string($g['kec']);
+                [$op,$dr,$sb,$ap,$rj,$rv,$ep,$ea] = [$g['op'],$g['dr'],$g['sb'],$g['ap'],$g['rj'],$g['rv'],$g['ep'],$g['ea']];
                 $r = $conn->query("INSERT INTO sensus_pml
                     (email, nama, kec_code, open_count, draft, submitted, approved, rejected, `revoke`, edited_by_pengawas, edited_by_admin)
                     VALUES ('$em','$nm','$kc',$op,$dr,$sb,$ap,$rj,$rv,$ep,$ea)
@@ -531,7 +545,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     edited_by_pengawas=$ep, edited_by_admin=$ea");
                 if ($r) $upserted++; else $skipped++;
             }
-            fclose($handle);
             $redir_msg = "Import selesai: $upserted baris diproses (insert/update)" . ($skipped ? ", $skipped dilewati (email/kec kosong)" : '') . '.';
         } else {
             $redir_msg = 'Gagal membaca file CSV.'; $redir_type = 'danger';
@@ -937,7 +950,7 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                 <div class="modal-body">
                     <div class="alert alert-info py-2 mb-3" style="font-size:.82rem;">
                         <strong>Format kolom CSV (urut):</strong><br>
-                        <code>Email, Nama, Kec_Code, Open, Draft, Submitted, Approved, Rejected, Revoke, Edit_PML, Edit_Admin</code>
+                        <code>Email, Nama, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH, APPROVED_BY_PENGAWAS, REJECTED_BY_PENGAWAS, REVOKED_BY_PENGAWAS, EDITED_BY_ADMIN_KABUPATEN, EDITED_BY_PENGAWAS</code>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
@@ -1019,9 +1032,9 @@ function confirmDeleteAll() {
 
 function downloadTemplate() {
     const rows = [
-        ['Email','Nama','Kec_Code','Open','Draft','Submitted','Approved','Rejected','Revoke','Edit_PML','Edit_Admin'],
-        ['"contoh@gmail.com"','"Nama PML"','"040"','10','5','3','5','2','1','1','0'],
-        ['"contoh2@gmail.com"','"Nama PML"','"050"','8','3','2','3','1','0','0','1'],
+        ['Email','Nama','SLS_Code','OPEN','DRAFT','SUBMITTED_BY_PENCACAH','APPROVED_BY_PENGAWAS','REJECTED_BY_PENGAWAS','REVOKED_BY_PENGAWAS','EDITED_BY_ADMIN_KABUPATEN','EDITED_BY_PENGAWAS'],
+        ['"contoh@gmail.com"','"Nama PML"','"040001001"','10','5','3','5','2','1','0','1'],
+        ['"contoh@gmail.com"','"Nama PML"','"040001002"','8','3','2','3','1','0','0','0'],
     ];
     const csv  = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
