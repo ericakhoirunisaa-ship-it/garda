@@ -440,7 +440,7 @@ $pmlRows = $conn->query("SELECT
     COALESCE(SUM(pending),0)  AS pending,
     COALESCE(SUM(approved),0) AS approved,
     COALESCE(SUM(rejected),0) AS rejected,
-    COALESCE(SUM(`revoke`),0) AS revoke,
+    COALESCE(SUM(`revoke`),0) AS `revoke`,
     COALESCE(SUM(edited),0)   AS edited
 FROM sensus_pml $kecWherePML
 GROUP BY email, nama
