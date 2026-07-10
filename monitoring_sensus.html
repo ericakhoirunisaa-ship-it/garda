@@ -519,13 +519,15 @@
                   <th class="text-center">Submitted</th>
                   <th class="text-center">Rejected</th>
                   <th class="text-center">Approved</th>
+                  <th class="text-center">Edit Pengawas</th>
+                  <th class="text-center">Edit Admin Kab</th>
                   <th class="text-center">Revoke</th>
                   <th class="text-center">Total</th>
                   <th style="min-width:150px">Progress</th>
                 </tr>
               </thead>
               <tbody id="bodyTopPetugas">
-                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="11" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -787,7 +789,7 @@
     function renderTopPetugas(list) {
       const body = document.getElementById('bodyTopPetugas');
       if (!list.length) {
-        body.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        body.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         return;
       }
       const ranked = list.map(p => {
@@ -805,6 +807,8 @@
           <td class="text-center"><span class="badge badge-sub">${p.submitted.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rej">${p.rejected.toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited_pengawas||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(p.edited_admin||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center fw-bold text-muted">${p.total.toLocaleString('id-ID')}</td>
           <td>
