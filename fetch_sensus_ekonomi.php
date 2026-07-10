@@ -420,7 +420,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(150) NOT NULL,
     nama VARCHAR(200) NOT NULL DEFAULT '',
-    kec_code VARCHAR(5) NOT NULL DEFAULT '',
+    kec_code VARCHAR(20) NOT NULL DEFAULT '',
     pending INT DEFAULT 0,
     approved INT DEFAULT 0,
     rejected INT DEFAULT 0,
@@ -430,6 +430,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_pml_email_kec (email, kec_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+$conn->query("ALTER TABLE sensus_pml MODIFY COLUMN kec_code VARCHAR(20) NOT NULL DEFAULT ''");
 
 $kecWherePML = ($kdkec !== 'all') ? "WHERE kec_code='" . $conn->real_escape_string($kdkec) . "'" : '';
 
