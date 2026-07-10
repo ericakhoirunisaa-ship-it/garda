@@ -304,6 +304,7 @@ $emailNama = [
     'menni010429@gmail.com'           => 'Sumarni',
     'sridevilula991115@gmail.com'     => 'Sri devi',
     'mohtaufanalfareza@gmail.com'     => 'Muh. Taufan Al Fareza',
+    'stuntingsalumpaga@gmail.com'     => 'RAMNI',
 ];
 
 $getNama = fn($email) => $emailNama[strtolower($email)] ?? $email;
@@ -574,6 +575,7 @@ $emailKec = [
     'idjafar095@gmail.com' => '060', 'djumaopall@gmail.com' => '040',
     'nafilatulyulmaz@gmail.com' => '060', 'menni010429@gmail.com' => '050',
     'sridevilula991115@gmail.com' => '041', 'mohtaufanalfareza@gmail.com' => '040',
+    'stuntingsalumpaga@gmail.com' => '060',
 ];
 
 $tabel_pml = [];
