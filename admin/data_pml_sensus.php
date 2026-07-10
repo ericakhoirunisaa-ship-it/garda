@@ -8,16 +8,24 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
     email VARCHAR(150) NOT NULL,
     nama VARCHAR(200) NOT NULL DEFAULT '',
     kec_code VARCHAR(20) NOT NULL DEFAULT '',
-    pending INT DEFAULT 0,
+    open_count INT DEFAULT 0,
+    draft INT DEFAULT 0,
+    submitted INT DEFAULT 0,
     approved INT DEFAULT 0,
     rejected INT DEFAULT 0,
     `revoke` INT DEFAULT 0,
-    edited INT DEFAULT 0,
+    edited_by_pengawas INT DEFAULT 0,
+    edited_by_admin INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_pml_email_kec (email, kec_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 $conn->query("ALTER TABLE sensus_pml MODIFY COLUMN kec_code VARCHAR(20) NOT NULL DEFAULT ''");
+foreach (['open_count','draft','submitted','edited_by_pengawas','edited_by_admin'] as $_col) {
+    $chk = $conn->query("SHOW COLUMNS FROM sensus_pml LIKE '$_col'");
+    if ($chk && $chk->num_rows === 0)
+        $conn->query("ALTER TABLE sensus_pml ADD COLUMN `$_col` INT DEFAULT 0");
+}
 
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -403,10 +411,12 @@ if (($_GET['action'] ?? '') === 'export') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="data_pml_' . date('Ymd_His') . '.csv"');
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['Email','Nama','Kec_Code','Pending','Approved','Rejected','Revoke','Edited']);
+    fputcsv($out, ['Email','Nama','Kec_Code','Open','Draft','Submitted','Approved','Rejected','Revoke','Edit_PML','Edit_Admin']);
     foreach ($all as $row) {
         fputcsv($out, [$row['email'], $row['nama'], $row['kec_code'],
-            $row['pending'], $row['approved'], $row['rejected'], $row['revoke'], $row['edited']]);
+            $row['open_count'], $row['draft'], $row['submitted'],
+            $row['approved'], $row['rejected'], $row['revoke'],
+            $row['edited_by_pengawas'], $row['edited_by_admin']]);
     }
     fclose($out);
     exit;
@@ -424,18 +434,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email   = $e($_POST['email'] ?? '');
         $nama    = $e($_POST['nama'] ?? '');
         $kec     = $e($_POST['kec_code'] ?? '');
-        $pending  = (int)($_POST['pending'] ?? 0);
-        $approved = (int)($_POST['approved'] ?? 0);
-        $rejected = (int)($_POST['rejected'] ?? 0);
-        $revoke   = (int)($_POST['revoke'] ?? 0);
-        $edited   = (int)($_POST['edited'] ?? 0);
+        $open_count        = (int)($_POST['open_count'] ?? 0);
+        $draft             = (int)($_POST['draft'] ?? 0);
+        $submitted         = (int)($_POST['submitted'] ?? 0);
+        $approved          = (int)($_POST['approved'] ?? 0);
+        $rejected          = (int)($_POST['rejected'] ?? 0);
+        $revoke            = (int)($_POST['revoke'] ?? 0);
+        $edited_by_pengawas = (int)($_POST['edited_by_pengawas'] ?? 0);
+        $edited_by_admin    = (int)($_POST['edited_by_admin'] ?? 0);
 
         if (!$email || !$kec) {
             $redir_msg = 'Email dan Kecamatan wajib diisi.'; $redir_type = 'danger';
         } else {
             $conn->query("INSERT INTO sensus_pml
-                (email, nama, kec_code, pending, approved, rejected, `revoke`, edited)
-                VALUES ('$email','$nama','$kec',$pending,$approved,$rejected,$revoke,$edited)");
+                (email, nama, kec_code, open_count, draft, submitted, approved, rejected, `revoke`, edited_by_pengawas, edited_by_admin)
+                VALUES ('$email','$nama','$kec',$open_count,$draft,$submitted,$approved,$rejected,$revoke,$edited_by_pengawas,$edited_by_admin)");
             $redir_msg = $conn->affected_rows ? 'Data PML berhasil disimpan.' : ('Gagal: ' . $conn->error);
             if (!$conn->affected_rows) $redir_type = 'danger';
         }
@@ -445,17 +458,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email   = $e($_POST['email'] ?? '');
         $nama    = $e($_POST['nama'] ?? '');
         $kec     = $e($_POST['kec_code'] ?? '');
-        $pending  = (int)($_POST['pending'] ?? 0);
-        $approved = (int)($_POST['approved'] ?? 0);
-        $rejected = (int)($_POST['rejected'] ?? 0);
-        $revoke   = (int)($_POST['revoke'] ?? 0);
-        $edited   = (int)($_POST['edited'] ?? 0);
+        $open_count        = (int)($_POST['open_count'] ?? 0);
+        $draft             = (int)($_POST['draft'] ?? 0);
+        $submitted         = (int)($_POST['submitted'] ?? 0);
+        $approved          = (int)($_POST['approved'] ?? 0);
+        $rejected          = (int)($_POST['rejected'] ?? 0);
+        $revoke            = (int)($_POST['revoke'] ?? 0);
+        $edited_by_pengawas = (int)($_POST['edited_by_pengawas'] ?? 0);
+        $edited_by_admin    = (int)($_POST['edited_by_admin'] ?? 0);
 
         if ($id && $email && $kec) {
             $conn->query("UPDATE sensus_pml SET
                 email='$email', nama='$nama', kec_code='$kec',
-                pending=$pending, approved=$approved, rejected=$rejected,
-                `revoke`=$revoke, edited=$edited
+                open_count=$open_count, draft=$draft, submitted=$submitted,
+                approved=$approved, rejected=$rejected,
+                `revoke`=$revoke, edited_by_pengawas=$edited_by_pengawas, edited_by_admin=$edited_by_admin
                 WHERE id=$id");
             $redir_msg = 'Data PML berhasil diperbarui.';
         } else {
@@ -484,29 +501,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->query("TRUNCATE TABLE sensus_pml");
             }
 
-            // Format: Email, Nama, Kec_Code, Pending, Approved, Rejected, Revoke, Edited
+            // Format: Email, Nama, Kec_Code, Open, Draft, Submitted, Approved, Rejected, Revoke, Edit_PML, Edit_Admin
             while (($row = fgetcsv($handle)) !== false) {
-                $row = array_pad($row, 8, 0);
-                [$remail, $rnama, $rkec, $rpend, $rappr, $rrej, $rrev, $redit] = $row;
+                $row = array_pad($row, 11, 0);
+                [$remail, $rnama, $rkec, $ropen, $rdraft, $rsub, $rappr, $rrej, $rrev, $redit_pml, $redit_adm] = $row;
                 $remail = strtolower(trim(trim($remail), '"'));
                 $rnama  = trim(trim($rnama), '"');
                 $rkec   = trim(trim($rkec), '"');
                 if (!$remail || !$rkec) { $skipped++; continue; }
 
-                $em = $conn->real_escape_string($remail);
-                $nm = $conn->real_escape_string($rnama);
-                $kc = $conn->real_escape_string($rkec);
-                $pd = (int)$rpend;
-                $ap = (int)$rappr;
-                $rj = (int)$rrej;
-                $rv = (int)$rrev;
-                $ed = (int)$redit;
+                $em  = $conn->real_escape_string($remail);
+                $nm  = $conn->real_escape_string($rnama);
+                $kc  = $conn->real_escape_string($rkec);
+                $op  = (int)$ropen;
+                $dr  = (int)$rdraft;
+                $sb  = (int)$rsub;
+                $ap  = (int)$rappr;
+                $rj  = (int)$rrej;
+                $rv  = (int)$rrev;
+                $ep  = (int)$redit_pml;
+                $ea  = (int)$redit_adm;
 
                 $r = $conn->query("INSERT INTO sensus_pml
-                    (email, nama, kec_code, pending, approved, rejected, `revoke`, edited)
-                    VALUES ('$em','$nm','$kc',$pd,$ap,$rj,$rv,$ed)
+                    (email, nama, kec_code, open_count, draft, submitted, approved, rejected, `revoke`, edited_by_pengawas, edited_by_admin)
+                    VALUES ('$em','$nm','$kc',$op,$dr,$sb,$ap,$rj,$rv,$ep,$ea)
                     ON DUPLICATE KEY UPDATE
-                    nama='$nm', pending=$pd, approved=$ap, rejected=$rj, `revoke`=$rv, edited=$ed");
+                    nama='$nm', open_count=$op, draft=$dr, submitted=$sb,
+                    approved=$ap, rejected=$rj, `revoke`=$rv,
+                    edited_by_pengawas=$ep, edited_by_admin=$ea");
                 if ($r) $upserted++; else $skipped++;
             }
             fclose($handle);
@@ -537,11 +559,14 @@ $whereSQL = $conds ? 'WHERE ' . implode(' AND ', $conds) : '';
 
 $stats = $conn->query("SELECT
     COUNT(*) AS total,
-    COALESCE(SUM(pending),0) AS total_pending,
+    COALESCE(SUM(open_count),0) AS total_open,
+    COALESCE(SUM(draft),0) AS total_draft,
+    COALESCE(SUM(submitted),0) AS total_submitted,
     COALESCE(SUM(approved),0) AS total_approved,
     COALESCE(SUM(rejected),0) AS total_rejected,
     COALESCE(SUM(`revoke`),0) AS total_revoke,
-    COALESCE(SUM(edited),0) AS total_edited
+    COALESCE(SUM(edited_by_pengawas),0) AS total_edited_by_pengawas,
+    COALESCE(SUM(edited_by_admin),0) AS total_edited_by_admin
 FROM sensus_pml")->fetch_assoc();
 
 $totalRec   = (int)$conn->query("SELECT COUNT(*) c FROM sensus_pml $whereSQL")->fetch_assoc()['c'];
@@ -562,11 +587,12 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
         .section-head { font-weight:700; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin-bottom:14px; }
         .table-hover tbody tr:hover { background:#fff8f0; }
         .act-btn { padding:3px 8px; font-size:.78rem; border-radius:6px; }
-        .badge-pending  { background:#dbeafe; color:#1d4ed8; }
+        .badge-open     { background:#ffedd5; color:#c2410c; }
+        .badge-draft    { background:#dbeafe; color:#1d4ed8; }
+        .badge-sub      { background:#dcfce7; color:#166534; }
         .badge-approved { background:#dcfce7; color:#166534; }
         .badge-rej      { background:#fee2e2; color:#991b1b; }
         .badge-rev      { background:#ffedd5; color:#c2410c; }
-        .badge-edited   { background:#d1fae5; color:#065f46; }
     </style>
 </head>
 <body>
@@ -620,8 +646,8 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                 <div class="col-6 col-xl-3">
                     <div class="card stat-card p-3">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-hourglass-split"></i></div>
-                            <div><div class="fs-2 fw-bold lh-1"><?= number_format((int)$stats['total_pending']) ?></div><div class="text-muted small">Pending</div></div>
+                            <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-folder2-open"></i></div>
+                            <div><div class="fs-2 fw-bold lh-1"><?= number_format((int)$stats['total_open']) ?></div><div class="text-muted small">Open</div></div>
                         </div>
                     </div>
                 </div>
@@ -690,17 +716,20 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                                 <th>Email PML</th>
                                 <th>Nama</th>
                                 <th>Kecamatan</th>
-                                <th class="text-center">Pending</th>
+                                <th class="text-center">Open</th>
+                                <th class="text-center">Draft</th>
+                                <th class="text-center">Submit</th>
                                 <th class="text-center">Approved</th>
                                 <th class="text-center">Rejected</th>
                                 <th class="text-center">Revoke</th>
-                                <th class="text-center">Edited</th>
+                                <th class="text-center">Edit PML</th>
+                                <th class="text-center">Edit Admin</th>
                                 <th class="text-center pe-4" style="width:90px">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php if (empty($records)): ?>
-                            <tr><td colspan="10" class="text-center text-muted py-5">
+                            <tr><td colspan="13" class="text-center text-muted py-5">
                                 Belum ada data. Gunakan tombol <strong>Tambah</strong> untuk menambahkan data PML.
                             </td></tr>
                         <?php else: ?>
@@ -714,11 +743,14 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                                     <span class="badge" style="background:#fff3e0;color:#f79039"><?= htmlspecialchars($resolvedKec) ?></span>
                                     <?= htmlspecialchars($kecNama[$resolvedKec] ?? '') ?>
                                 </td>
-                                <td class="text-center"><span class="badge badge-pending"><?= $r['pending'] ?></span></td>
+                                <td class="text-center"><span class="badge badge-open"><?= $r['open_count'] ?></span></td>
+                                <td class="text-center"><span class="badge badge-draft"><?= $r['draft'] ?></span></td>
+                                <td class="text-center"><span class="badge badge-sub"><?= $r['submitted'] ?></span></td>
                                 <td class="text-center"><span class="badge badge-approved"><?= $r['approved'] ?></span></td>
                                 <td class="text-center"><span class="badge badge-rej"><?= $r['rejected'] ?></span></td>
                                 <td class="text-center"><span class="badge badge-rev"><?= $r['revoke'] ?></span></td>
-                                <td class="text-center"><span class="badge badge-edited"><?= $r['edited'] ?></span></td>
+                                <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46"><?= $r['edited_by_pengawas'] ?></span></td>
+                                <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3"><?= $r['edited_by_admin'] ?></span></td>
                                 <td class="text-center pe-4">
                                     <button class="btn btn-sm btn-outline-primary act-btn me-1"
                                             onclick='openEditModal(<?= json_encode($r) ?>)'>
@@ -797,8 +829,16 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Pending</label>
-                            <input type="number" name="pending" id="formPending" class="form-control" min="0" value="0">
+                            <label class="form-label fw-semibold">Open</label>
+                            <input type="number" name="open_count" id="formOpenCount" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Draft</label>
+                            <input type="number" name="draft" id="formDraft" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Submitted</label>
+                            <input type="number" name="submitted" id="formSubmitted" class="form-control" min="0" value="0">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Approved</label>
@@ -813,8 +853,12 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                             <input type="number" name="revoke" id="formRevoke" class="form-control" min="0" value="0">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Edited</label>
-                            <input type="number" name="edited" id="formEdited" class="form-control" min="0" value="0">
+                            <label class="form-label fw-semibold">Edit PML (Pengawas)</label>
+                            <input type="number" name="edited_by_pengawas" id="formEditedByPengawas" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Edit Admin</label>
+                            <input type="number" name="edited_by_admin" id="formEditedByAdmin" class="form-control" min="0" value="0">
                         </div>
                     </div>
                 </div>
@@ -893,7 +937,7 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                 <div class="modal-body">
                     <div class="alert alert-info py-2 mb-3" style="font-size:.82rem;">
                         <strong>Format kolom CSV (urut):</strong><br>
-                        <code>Email, Nama, Kec_Code, Pending, Approved, Rejected, Revoke, Edited</code>
+                        <code>Email, Nama, Kec_Code, Open, Draft, Submitted, Approved, Rejected, Revoke, Edit_PML, Edit_Admin</code>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
@@ -930,12 +974,15 @@ function openAddModal() {
     document.getElementById('formId').value       = '';
     document.getElementById('formEmail').value    = '';
     document.getElementById('formNama').value     = '';
-    document.getElementById('formKec').value      = '';
-    document.getElementById('formPending').value  = '0';
-    document.getElementById('formApproved').value = '0';
-    document.getElementById('formRejected').value = '0';
-    document.getElementById('formRevoke').value   = '0';
-    document.getElementById('formEdited').value   = '0';
+    document.getElementById('formKec').value               = '';
+    document.getElementById('formOpenCount').value         = '0';
+    document.getElementById('formDraft').value             = '0';
+    document.getElementById('formSubmitted').value         = '0';
+    document.getElementById('formApproved').value          = '0';
+    document.getElementById('formRejected').value          = '0';
+    document.getElementById('formRevoke').value            = '0';
+    document.getElementById('formEditedByPengawas').value  = '0';
+    document.getElementById('formEditedByAdmin').value     = '0';
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-plus-lg me-2"></i>Tambah Data PML';
     document.getElementById('submitBtn').innerHTML  = '<i class="bi bi-save-fill me-1"></i>Simpan';
     new bootstrap.Modal(document.getElementById('dataModal')).show();
@@ -946,12 +993,15 @@ function openEditModal(r) {
     document.getElementById('formId').value       = r.id;
     document.getElementById('formEmail').value    = r.email || '';
     document.getElementById('formNama').value     = r.nama || '';
-    document.getElementById('formKec').value      = r.kec_code || '';
-    document.getElementById('formPending').value  = r.pending || 0;
-    document.getElementById('formApproved').value = r.approved || 0;
-    document.getElementById('formRejected').value = r.rejected || 0;
-    document.getElementById('formRevoke').value   = r.revoke || 0;
-    document.getElementById('formEdited').value   = r.edited || 0;
+    document.getElementById('formKec').value               = r.kec_code || '';
+    document.getElementById('formOpenCount').value         = r.open_count || 0;
+    document.getElementById('formDraft').value             = r.draft || 0;
+    document.getElementById('formSubmitted').value         = r.submitted || 0;
+    document.getElementById('formApproved').value          = r.approved || 0;
+    document.getElementById('formRejected').value          = r.rejected || 0;
+    document.getElementById('formRevoke').value            = r.revoke || 0;
+    document.getElementById('formEditedByPengawas').value  = r.edited_by_pengawas || 0;
+    document.getElementById('formEditedByAdmin').value     = r.edited_by_admin || 0;
     document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil-fill me-2"></i>Edit Data PML';
     document.getElementById('submitBtn').innerHTML  = '<i class="bi bi-save-fill me-1"></i>Perbarui';
     new bootstrap.Modal(document.getElementById('dataModal')).show();
@@ -969,9 +1019,9 @@ function confirmDeleteAll() {
 
 function downloadTemplate() {
     const rows = [
-        ['Email','Nama','Kec_Code','Pending','Approved','Rejected','Revoke','Edited'],
-        ['"contoh@gmail.com"','"Nama PML"','"040"','10','5','2','1','0'],
-        ['"contoh@gmail.com"','"Nama PML"','"050"','8','3','1','0','0'],
+        ['Email','Nama','Kec_Code','Open','Draft','Submitted','Approved','Rejected','Revoke','Edit_PML','Edit_Admin'],
+        ['"contoh@gmail.com"','"Nama PML"','"040"','10','5','3','5','2','1','1','0'],
+        ['"contoh2@gmail.com"','"Nama PML"','"050"','8','3','2','3','1','0','0','1'],
     ];
     const csv  = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});

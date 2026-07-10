@@ -422,30 +422,41 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
     email VARCHAR(150) NOT NULL,
     nama VARCHAR(200) NOT NULL DEFAULT '',
     kec_code VARCHAR(20) NOT NULL DEFAULT '',
-    pending INT DEFAULT 0,
+    open_count INT DEFAULT 0,
+    draft INT DEFAULT 0,
+    submitted INT DEFAULT 0,
     approved INT DEFAULT 0,
     rejected INT DEFAULT 0,
     `revoke` INT DEFAULT 0,
-    edited INT DEFAULT 0,
+    edited_by_pengawas INT DEFAULT 0,
+    edited_by_admin INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_pml_email_kec (email, kec_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 $conn->query("ALTER TABLE sensus_pml MODIFY COLUMN kec_code VARCHAR(20) NOT NULL DEFAULT ''");
+foreach (['open_count','draft','submitted','edited_by_pengawas','edited_by_admin'] as $_col) {
+    $chk = $conn->query("SHOW COLUMNS FROM sensus_pml LIKE '$_col'");
+    if ($chk && $chk->num_rows === 0)
+        $conn->query("ALTER TABLE sensus_pml ADD COLUMN `$_col` INT DEFAULT 0");
+}
 
 $kecWherePML = ($kdkec !== 'all') ? "WHERE kec_code='" . $conn->real_escape_string($kdkec) . "'" : '';
 
 $pmlRows = $conn->query("SELECT
     email, nama,
     GROUP_CONCAT(DISTINCT kec_code ORDER BY kec_code) AS kec_codes,
-    COALESCE(SUM(pending),0)  AS pending,
-    COALESCE(SUM(approved),0) AS approved,
-    COALESCE(SUM(rejected),0) AS rejected,
-    COALESCE(SUM(`revoke`),0) AS `revoke`,
-    COALESCE(SUM(edited),0)   AS edited
+    COALESCE(SUM(open_count),0)          AS open,
+    COALESCE(SUM(draft),0)               AS draft,
+    COALESCE(SUM(submitted),0)           AS submitted,
+    COALESCE(SUM(approved),0)            AS approved,
+    COALESCE(SUM(rejected),0)            AS rejected,
+    COALESCE(SUM(`revoke`),0)            AS `revoke`,
+    COALESCE(SUM(edited_by_pengawas),0)  AS edited_pengawas,
+    COALESCE(SUM(edited_by_admin),0)     AS edited_admin
 FROM sensus_pml $kecWherePML
 GROUP BY email, nama
-ORDER BY approved DESC, pending DESC")->fetch_all(MYSQLI_ASSOC);
+ORDER BY submitted DESC, open DESC")->fetch_all(MYSQLI_ASSOC);
 
 $kecNamaPML = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
@@ -580,22 +591,26 @@ $emailKec = [
 
 $tabel_pml = [];
 foreach ($pmlRows as $r) {
-    $pNum = (int)$r['approved'] + (int)$r['rejected'] + (int)$r['revoke'] + (int)$r['edited'];
-    $pDen = $pNum + (int)$r['pending'];
+    $pNum = (int)$r['submitted'] + (int)$r['approved'] + (int)$r['revoke']
+          + (int)$r['rejected'] + (int)$r['edited_pengawas'] + (int)$r['edited_admin'];
+    $pDen = $pNum + (int)$r['open'] + (int)$r['draft'];
     $prog = $pDen > 0 ? round($pNum / $pDen * 100, 2) : 0;
     $resolvedKec = $emailKec[strtolower($r['email'])] ?? null;
     $kecCodes    = $resolvedKec ? [$resolvedKec] : array_map('trim', explode(',', $r['kec_codes'] ?? ''));
     $kecNames    = array_filter(array_map(fn($k) => $kecNamaPML[$k] ?? $k, $kecCodes));
     $tabel_pml[] = [
-        'nama'      => $emailNama[strtolower($r['email'])] ?? ($r['nama'] ?: $r['email']),
-        'kecamatan' => implode(', ', $kecNames),
-        'pending'   => (int)$r['pending'],
-        'approved'  => (int)$r['approved'],
-        'rejected'  => (int)$r['rejected'],
-        'revoke'    => (int)$r['revoke'],
-        'edited'    => (int)$r['edited'],
-        'total'     => $pDen,
-        'prog'      => $prog,
+        'nama'            => $emailNama[strtolower($r['email'])] ?? ($r['nama'] ?: $r['email']),
+        'kecamatan'       => implode(', ', $kecNames),
+        'open'            => (int)$r['open'],
+        'draft'           => (int)$r['draft'],
+        'submitted'       => (int)$r['submitted'],
+        'approved'        => (int)$r['approved'],
+        'rejected'        => (int)$r['rejected'],
+        'revoke'          => (int)$r['revoke'],
+        'edited_pengawas' => (int)$r['edited_pengawas'],
+        'edited_admin'    => (int)$r['edited_admin'],
+        'total'           => $pDen,
+        'prog'            => $prog,
     ];
 }
 

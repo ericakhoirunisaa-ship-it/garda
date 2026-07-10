@@ -600,16 +600,19 @@
                   <th style="width:36px">#</th>
                   <th>Nama PML</th>
                   <th>Kecamatan</th>
-                  <th class="text-center">Pending</th>
-                  <th class="text-center">Approved</th>
-                  <th class="text-center">Rejected</th>
+                  <th class="text-center">Open</th>
+                  <th class="text-center">Draft</th>
+                  <th class="text-center">Submit</th>
+                  <th class="text-center">Reject</th>
+                  <th class="text-center">Approve</th>
+                  <th class="text-center">Edit PML</th>
+                  <th class="text-center">Edit Admin</th>
                   <th class="text-center">Revoke</th>
-                  <th class="text-center">Edited</th>
                   <th style="min-width:150px">Progress</th>
                 </tr>
               </thead>
               <tbody id="bodyTopPML">
-                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="13" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -641,17 +644,20 @@
                   <th>#</th>
                   <th class="sort-th" onclick="sortPML('nama')">Nama PML<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortPML('kecamatan')">Kecamatan<span class="sort-icon"></span></th>
-                  <th class="text-center sort-th" onclick="sortPML('pending')">Pending<span class="sort-icon"></span></th>
-                  <th class="text-center sort-th" onclick="sortPML('approved')">Approved<span class="sort-icon"></span></th>
-                  <th class="text-center sort-th" onclick="sortPML('rejected')">Rejected<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('open')">Open<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('draft')">Draft<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('submitted')">Submit<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('rejected')">Reject<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('approved')">Approve<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('edited_pengawas')">Edit PML<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('edited_admin')">Edit Admin<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPML('revoke')">Revoke<span class="sort-icon"></span></th>
-                  <th class="text-center sort-th" onclick="sortPML('edited')">Edited<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPML('total')">Total<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortPML('prog')" style="min-width:150px">Progress<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyPML">
-                <tr><td colspan="10" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="14" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1143,9 +1149,9 @@
     }
 
     function calcProgPML(p) {
-      // Progress PML = (approved + rejected + revoke + edited) / (pending + approved + rejected + revoke + edited)
-      const num = (p.approved || 0) + (p.rejected || 0) + (p.revoke || 0) + (p.edited || 0);
-      const den = num + (p.pending || 0);
+      const num = (p.submitted||0) + (p.approved||0) + (p.revoke||0) + (p.rejected||0)
+                + (p.edited_pengawas||0) + (p.edited_admin||0);
+      const den = num + (p.open||0) + (p.draft||0);
       return den > 0 ? (num / den * 100) : 0;
     }
 
@@ -1166,11 +1172,14 @@
           <td class="text-center fw-bold" style="color:${color}">${medal}</td>
           <td class="fw-semibold">${p.nama}</td>
           <td class="text-muted small">${p.kecamatan || '—'}</td>
-          <td class="text-center"><span class="badge badge-open">${(p.pending || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-app">${(p.approved || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-rej">${(p.rejected || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-rev">${(p.revoke || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-open">${(p.open||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-draft">${(p.draft||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-sub">${(p.submitted||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${(p.rejected||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited_pengawas||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(p.edited_admin||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="progress flex-grow-1">
@@ -1205,12 +1214,15 @@
           <td class="text-muted small">${i + 1}</td>
           <td class="fw-semibold">${p.nama}</td>
           <td class="text-muted small">${p.kecamatan || '—'}</td>
-          <td class="text-center"><span class="badge badge-open">${(p.pending || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-app">${(p.approved || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-rej">${(p.rejected || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge badge-rev">${(p.revoke || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited || 0).toLocaleString('id-ID')}</span></td>
-          <td class="text-center fw-bold text-muted">${(p.total || 0).toLocaleString('id-ID')}</td>
+          <td class="text-center"><span class="badge badge-open">${(p.open||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-draft">${(p.draft||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-sub">${(p.submitted||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${(p.rejected||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-app">${(p.approved||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited_pengawas||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(p.edited_admin||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center fw-bold text-muted">${(p.total||0).toLocaleString('id-ID')}</td>
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="progress flex-grow-1">
