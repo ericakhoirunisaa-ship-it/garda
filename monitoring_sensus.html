@@ -705,8 +705,9 @@
       if (data.error) { showError('Server: ' + data.error); return; }
 
       const s = data.stats;
-      const total = s.open + s.draft + s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
-      const num   = s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
+      const num   = s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0)
+                  + (s.edited_pengawas || 0) + (s.edited_admin || 0);
+      const total = num + s.open + s.draft;
       const pct   = total > 0 ? (num / total * 100).toFixed(2) : '0.00';
 
       // Update stat cards
@@ -740,7 +741,8 @@
       const today     = new Date(); today.setHours(0,0,0,0);
       const hariKe    = Math.max(1, Math.floor((today - startDate) / 86400000) + 1);
       const targetKab = TOTAL_PETUGAS_KAB * TARGET_PER_HARI * hariKe;
-      const realisasiKab = s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0);
+      const realisasiKab = s.submitted + s.rejected + (s.approved || 0) + (s.revoke || 0)
+                         + (s.edited_pengawas || 0) + (s.edited_admin || 0);
       const pctKab    = targetKab > 0 ? Math.min(100, (realisasiKab / targetKab * 100)) : 0;
       const pctKabStr = pctKab.toFixed(2) + '%';
       const pctColor  = pctKab >= 100 ? '#10b981' : pctKab >= 70 ? '#f79039' : '#ef4444';
@@ -776,8 +778,8 @@
     function calcProgPetugas(p) {
       // Rumus: (submit+approve+revoke+reject+edit_pengawas+edit_admin) /
       //        (submit+approve+revoke+reject+open+draft+edit_pengawas+edit_admin)
-      // p.approved dari API sudah = approved + edited_pengawas + edited_admin
-      const num = p.submitted + (p.approved||0) + (p.revoke||0) + p.rejected;
+      const num = p.submitted + (p.approved||0) + (p.revoke||0) + p.rejected
+                + (p.edited_pengawas||0) + (p.edited_admin||0);
       const den = num + p.open + p.draft;
       return den > 0 ? (num / den * 100) : 0;
     }
@@ -874,8 +876,9 @@
         edited_admin: acc.edited_admin + (k.edited_admin||0),
         revoke: acc.revoke + (k.revoke||0)
       }), { sls:0, open:0, draft:0, submitted:0, rejected:0, approved:0, edited_pengawas:0, edited_admin:0, revoke:0 });
-      const tNum = tot.submitted + tot.rejected + tot.approved + tot.revoke;
-      const tDen = tot.open + tot.draft + tot.submitted + tot.rejected + tot.approved + tot.revoke;
+      const tNum = tot.submitted + tot.rejected + tot.approved + tot.revoke
+                 + tot.edited_pengawas + tot.edited_admin;
+      const tDen = tNum + tot.open + tot.draft;
       const tPct = tDen > 0 ? (tNum/tDen*100).toFixed(2) : '0.00';
       document.getElementById('footKec').innerHTML = `<tr>
         <td><strong>TOTAL</strong></td>

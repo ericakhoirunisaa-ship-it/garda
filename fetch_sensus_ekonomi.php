@@ -346,11 +346,12 @@ ORDER BY kec_code")->fetch_all(MYSQLI_ASSOC);
 
 $tabel_kec = [];
 foreach ($kecRows as $k) {
-    $approvedCombined = (int)$k['approved'] + (int)$k['edited_pengawas'] + (int)$k['edited_admin'];
-    $tot  = (int)$k['open'] + (int)$k['draft'] + (int)$k['submitted']
-          + (int)$k['rejected'] + $approvedCombined + (int)$k['revoke'];
-    $num  = (int)$k['submitted'] + (int)$k['rejected'] + $approvedCombined + (int)$k['revoke'];
-    $prog = $tot > 0 ? round($num / $tot * 100, 2) : 0;
+    $kNum = (int)$k['submitted'] + (int)$k['approved']
+          + (int)$k['edited_pengawas'] + (int)$k['edited_admin']
+          + (int)$k['rejected'] + (int)$k['revoke'];
+    $kDen = $kNum + (int)$k['open'] + (int)$k['draft'];
+    $prog = $kDen > 0 ? round($kNum / $kDen * 100, 2) : 0;
+    $tot  = $kDen;
     $tabel_kec[] = [
         'kec_code'        => $k['kec_code'],
         'nama'            => $kecNama[$k['kec_code']] ?? 'Kec. ' . $k['kec_code'],
@@ -358,7 +359,7 @@ foreach ($kecRows as $k) {
         'draft'           => (int)$k['draft'],
         'submitted'       => (int)$k['submitted'],
         'rejected'        => (int)$k['rejected'],
-        'approved'        => $approvedCombined,
+        'approved'        => (int)$k['approved'],
         'edited_pengawas' => (int)$k['edited_pengawas'],
         'edited_admin'    => (int)$k['edited_admin'],
         'revoke'          => (int)$k['revoke'],
@@ -387,11 +388,12 @@ ORDER BY submitted DESC, open DESC")->fetch_all(MYSQLI_ASSOC);
 
 $tabel_petugas = [];
 foreach ($petRows as $p) {
-    $approvedCombined = (int)$p['approved'] + (int)$p['edited_pengawas'] + (int)$p['edited_admin'];
-    $tot  = (int)$p['open'] + (int)$p['draft'] + (int)$p['submitted']
-          + (int)$p['rejected'] + $approvedCombined + (int)$p['revoke'];
-    $pNum = (int)$p['submitted'] + (int)$p['rejected'] + $approvedCombined + (int)$p['revoke'];
-    $prog = $tot > 0 ? round($pNum / $tot * 100, 2) : 0;
+    $pNum = (int)$p['submitted'] + (int)$p['approved']
+          + (int)$p['edited_pengawas'] + (int)$p['edited_admin']
+          + (int)$p['rejected'] + (int)$p['revoke'];
+    $pDen = $pNum + (int)$p['open'] + (int)$p['draft'];
+    $prog = $pDen > 0 ? round($pNum / $pDen * 100, 2) : 0;
+    $tot  = $pDen;
     $kecNames = array_map(
         fn($k) => $kecNama[trim($k)] ?? trim($k),
         explode(',', $p['kec_codes'] ?? '')
@@ -403,7 +405,7 @@ foreach ($petRows as $p) {
         'draft'           => (int)$p['draft'],
         'submitted'       => (int)$p['submitted'],
         'rejected'        => (int)$p['rejected'],
-        'approved'        => $approvedCombined,
+        'approved'        => (int)$p['approved'],
         'edited_pengawas' => (int)$p['edited_pengawas'],
         'edited_admin'    => (int)$p['edited_admin'],
         'revoke'          => (int)$p['revoke'],
@@ -424,14 +426,13 @@ if ($luRow && ($luData = $luRow->fetch_assoc())) {
     $lastUpdate = $dt->format('d') . ' ' . $bulan[(int)$dt->format('n')] . ' ' . $dt->format('Y H:i') . ' WITA';
 }
 
-$approvedCombinedStats = (int)$s['total_approved'] + (int)$s['total_edited_pengawas'] + (int)$s['total_edited_admin'];
 echo json_encode([
     'stats' => [
         'open'            => (int)$s['total_open'],
         'draft'           => (int)$s['total_draft'],
         'submitted'       => (int)$s['total_submitted'],
         'rejected'        => (int)$s['total_rejected'],
-        'approved'        => $approvedCombinedStats,
+        'approved'        => (int)$s['total_approved'],
         'edited_pengawas' => (int)$s['total_edited_pengawas'],
         'edited_admin'    => (int)$s['total_edited_admin'],
         'revoke'          => (int)$s['total_revoke'],
