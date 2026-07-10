@@ -591,9 +591,10 @@ $emailKec = [
 
 $tabel_pml = [];
 foreach ($pmlRows as $r) {
-    $pNum = (int)$r['submitted'] + (int)$r['approved'] + (int)$r['revoke']
-          + (int)$r['rejected'] + (int)$r['edited_pengawas'] + (int)$r['edited_admin'];
-    $pDen = $pNum + (int)$r['open'] + (int)$r['draft'];
+    $pNum = (int)$r['approved'] + (int)$r['edited_pengawas'] + (int)$r['edited_admin'];
+    $pDen = (int)$r['open'] + (int)$r['draft'] + (int)$r['submitted'] + (int)$r['rejected']
+          + (int)$r['approved'] + (int)$r['edited_pengawas'] + (int)$r['edited_admin']
+          + (int)$r['revoke'];
     $prog = $pDen > 0 ? round($pNum / $pDen * 100, 2) : 0;
     $resolvedKec = $emailKec[strtolower($r['email'])] ?? null;
     $kecCodes    = $resolvedKec ? [$resolvedKec] : array_map('trim', explode(',', $r['kec_codes'] ?? ''));

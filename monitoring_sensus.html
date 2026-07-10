@@ -1147,9 +1147,9 @@
     }
 
     function calcProgPML(p) {
-      const num = (p.submitted||0) + (p.approved||0) + (p.revoke||0) + (p.rejected||0)
-                + (p.edited_pengawas||0) + (p.edited_admin||0);
-      const den = num + (p.open||0) + (p.draft||0);
+      const num = (p.approved||0) + (p.edited_pengawas||0) + (p.edited_admin||0);
+      const den = (p.open||0) + (p.draft||0) + (p.submitted||0) + (p.rejected||0)
+                + (p.approved||0) + (p.edited_pengawas||0) + (p.edited_admin||0) + (p.revoke||0);
       return den > 0 ? (num / den * 100) : 0;
     }
 
