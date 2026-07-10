@@ -424,7 +424,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
     pending INT DEFAULT 0,
     approved INT DEFAULT 0,
     rejected INT DEFAULT 0,
-    revoke INT DEFAULT 0,
+    `revoke` INT DEFAULT 0,
     edited INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,

@@ -11,7 +11,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
     pending INT DEFAULT 0,
     approved INT DEFAULT 0,
     rejected INT DEFAULT 0,
-    revoke INT DEFAULT 0,
+    `revoke` INT DEFAULT 0,
     edited INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $redir_msg = 'Email dan Kecamatan wajib diisi.'; $redir_type = 'danger';
         } else {
             $conn->query("INSERT INTO sensus_pml
-                (email, nama, kec_code, pending, approved, rejected, revoke, edited)
+                (email, nama, kec_code, pending, approved, rejected, `revoke`, edited)
                 VALUES ('$email','$nama','$kec',$pending,$approved,$rejected,$revoke,$edited)");
             $redir_msg = $conn->affected_rows ? 'Data PML berhasil disimpan.' : ('Gagal: ' . $conn->error);
             if (!$conn->affected_rows) $redir_type = 'danger';
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn->query("UPDATE sensus_pml SET
                 email='$email', nama='$nama', kec_code='$kec',
                 pending=$pending, approved=$approved, rejected=$rejected,
-                revoke=$revoke, edited=$edited
+                `revoke`=$revoke, edited=$edited
                 WHERE id=$id");
             $redir_msg = 'Data PML berhasil diperbarui.';
         } else {
@@ -112,7 +112,7 @@ $stats = $conn->query("SELECT
     COALESCE(SUM(pending),0) AS total_pending,
     COALESCE(SUM(approved),0) AS total_approved,
     COALESCE(SUM(rejected),0) AS total_rejected,
-    COALESCE(SUM(revoke),0) AS total_revoke,
+    COALESCE(SUM(`revoke`),0) AS total_revoke,
     COALESCE(SUM(edited),0) AS total_edited
 FROM sensus_pml")->fetch_assoc();
 
