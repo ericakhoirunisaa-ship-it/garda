@@ -26,6 +26,21 @@ $kecNama = [
     '060' => 'Tolitoli Utara', '061' => 'Dako Pemean',
 ];
 
+// ── Export CSV ────────────────────────────────────────────────────────────────
+if (($_GET['action'] ?? '') === 'export') {
+    $all = $conn->query("SELECT * FROM sensus_pml ORDER BY kec_code, nama, email")->fetch_all(MYSQLI_ASSOC);
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="data_pml_' . date('Ymd_His') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['Email','Nama','Kec_Code','Pending','Approved','Rejected','Revoke','Edited']);
+    foreach ($all as $row) {
+        fputcsv($out, [$row['email'], $row['nama'], $row['kec_code'],
+            $row['pending'], $row['approved'], $row['rejected'], $row['revoke'], $row['edited']]);
+    }
+    fclose($out);
+    exit;
+}
+
 // ── POST handlers ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -86,6 +101,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif ($action === 'delete_all') {
         $conn->query("TRUNCATE TABLE sensus_pml");
         $redir_msg = 'Semua data PML berhasil dihapus.';
+    }
+    elseif ($action === 'import_csv') {
+        if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
+            $handle     = fopen($_FILES['csv_file']['tmp_name'], 'r');
+            $header     = fgetcsv($handle);
+            $upserted   = 0; $skipped = 0;
+            $clearFirst = ($_POST['overwrite'] ?? '0') === '1';
+
+            if ($clearFirst) {
+                $conn->query("TRUNCATE TABLE sensus_pml");
+            }
+
+            // Format: Email, Nama, Kec_Code, Pending, Approved, Rejected, Revoke, Edited
+            while (($row = fgetcsv($handle)) !== false) {
+                $row = array_pad($row, 8, 0);
+                [$remail, $rnama, $rkec, $rpend, $rappr, $rrej, $rrev, $redit] = $row;
+                $remail = strtolower(trim(trim($remail), '"'));
+                $rnama  = trim(trim($rnama), '"');
+                $rkec   = trim(trim($rkec), '"');
+                if (!$remail || !$rkec) { $skipped++; continue; }
+
+                $em = $conn->real_escape_string($remail);
+                $nm = $conn->real_escape_string($rnama);
+                $kc = $conn->real_escape_string($rkec);
+                $pd = (int)$rpend;
+                $ap = (int)$rappr;
+                $rj = (int)$rrej;
+                $rv = (int)$rrev;
+                $ed = (int)$redit;
+
+                $r = $conn->query("INSERT INTO sensus_pml
+                    (email, nama, kec_code, pending, approved, rejected, `revoke`, edited)
+                    VALUES ('$em','$nm','$kc',$pd,$ap,$rj,$rv,$ed)
+                    ON DUPLICATE KEY UPDATE
+                    nama='$nm', pending=$pd, approved=$ap, rejected=$rj, `revoke`=$rv, edited=$ed");
+                if ($r) $upserted++; else $skipped++;
+            }
+            fclose($handle);
+            $redir_msg = "Import selesai: $upserted baris diproses (insert/update)" . ($skipped ? ", $skipped dilewati (email/kec kosong)" : '') . '.';
+        } else {
+            $redir_msg = 'Gagal membaca file CSV.'; $redir_type = 'danger';
+        }
     }
 
     $qs = http_build_query(['msg' => $redir_msg, 'msg_type' => $redir_type,
@@ -232,6 +289,12 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                         <button class="btn btn-sm text-white" style="background:#f79039" onclick="openAddModal()">
                             <i class="bi bi-plus-lg me-1"></i>Tambah
                         </button>
+                        <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#importModal">
+                            <i class="bi bi-upload me-1"></i>Import CSV
+                        </button>
+                        <a href="?action=export" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download me-1"></i>Export CSV
+                        </a>
                         <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAll()">
                             <i class="bi bi-trash3-fill me-1"></i>Hapus Semua
                         </button>
@@ -445,6 +508,49 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
     </div>
 </div>
 
+<!-- ── Modal Import CSV ─────────────────────────────────────────────────────── -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="import_csv">
+                <div class="modal-header" style="background:#f79039; color:#fff;">
+                    <h5 class="modal-title"><i class="bi bi-upload me-2"></i>Import CSV Data PML</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info py-2 mb-3" style="font-size:.82rem;">
+                        <strong>Format kolom CSV (urut):</strong><br>
+                        <code>Email, Nama, Kec_Code, Pending, Approved, Rejected, Revoke, Edited</code>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pilih File CSV <span class="text-danger">*</span></label>
+                        <input type="file" name="csv_file" class="form-control" accept=".csv,text/csv" required>
+                    </div>
+                    <div class="mb-0">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="overwrite" value="1" id="chkOverwrite">
+                            <label class="form-check-label small" for="chkOverwrite">
+                                <strong>Reset — hapus semua data lama sebelum import</strong><br>
+                                <span class="text-muted">Jika <strong>tidak</strong> dicentang (default): data existing di-update, baris baru di-insert (aman untuk update berkala). Jika dicentang: semua data dihapus dulu lalu seluruh baris dari file dimasukkan.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-outline-success btn-sm me-auto" onclick="downloadTemplate()">
+                        <i class="bi bi-download me-1"></i>Template
+                    </button>
+                    <button type="submit" class="btn btn-success fw-semibold">
+                        <i class="bi bi-upload me-1"></i>Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
 function openAddModal() {
@@ -487,6 +593,20 @@ function confirmDelete(id, email) {
 
 function confirmDeleteAll() {
     new bootstrap.Modal(document.getElementById('deleteAllModal')).show();
+}
+
+function downloadTemplate() {
+    const rows = [
+        ['Email','Nama','Kec_Code','Pending','Approved','Rejected','Revoke','Edited'],
+        ['"contoh@gmail.com"','"Nama PML"','"040"','10','5','2','1','0'],
+        ['"contoh@gmail.com"','"Nama PML"','"050"','8','3','1','0','0'],
+    ];
+    const csv  = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'template_pml.csv';
+    a.click();
 }
 </script>
 </body>
