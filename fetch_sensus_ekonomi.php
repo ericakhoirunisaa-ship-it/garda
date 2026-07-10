@@ -464,7 +464,7 @@ foreach ($pmlRows as $r) {
         explode(',', $r['kec_codes'] ?? '')
     );
     $tabel_pml[] = [
-        'nama'      => $r['nama'] ?: $r['email'],
+        'nama'      => $emailNama[strtolower($r['email'])] ?? ($r['nama'] ?: $r['email']),
         'kecamatan' => implode(', ', array_filter($kecNames)),
         'pending'   => (int)$r['pending'],
         'approved'  => (int)$r['approved'],
