@@ -608,11 +608,10 @@
                   <th class="text-center">Edit PML</th>
                   <th class="text-center">Edit Admin</th>
                   <th class="text-center">Revoke</th>
-                  <th style="min-width:150px">Progress</th>
                 </tr>
               </thead>
               <tbody id="bodyTopPML">
-                <tr><td colspan="13" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="12" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -653,11 +652,10 @@
                   <th class="text-center sort-th" onclick="sortPML('edited_admin')">Edit Admin<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPML('revoke')">Revoke<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPML('total')">Total<span class="sort-icon"></span></th>
-                  <th class="sort-th" onclick="sortPML('prog')" style="min-width:150px">Progress<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyPML">
-                <tr><td colspan="14" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="13" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1180,14 +1178,6 @@
           <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited_pengawas||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(p.edited_admin||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="progress flex-grow-1">
-                <div class="progress-bar" style="width:${prog.toFixed(1)}%; background:${color}"></div>
-              </div>
-              <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
-            </div>
-          </td>
         </tr>`;
       }).join('');
     }
@@ -1195,7 +1185,7 @@
     function renderPML(list) {
       if (!list.length) {
         document.getElementById('bodyPML').innerHTML =
-          '<tr><td colspan="10" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="13" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('countPML').textContent = '';
         return;
       }
@@ -1208,8 +1198,6 @@
         });
       }
       document.getElementById('bodyPML').innerHTML = withProg.map((p, i) => {
-        const prog  = p.prog;
-        const color = prog >= 70 ? '#10b981' : prog >= 40 ? '#f79039' : '#94a3b8';
         return `<tr>
           <td class="text-muted small">${i + 1}</td>
           <td class="fw-semibold">${p.nama}</td>
@@ -1223,14 +1211,6 @@
           <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${(p.edited_admin||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center"><span class="badge badge-rev">${(p.revoke||0).toLocaleString('id-ID')}</span></td>
           <td class="text-center fw-bold text-muted">${(p.total||0).toLocaleString('id-ID')}</td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="progress flex-grow-1">
-                <div class="progress-bar" style="width:${prog.toFixed(1)}%; background:${color}"></div>
-              </div>
-              <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
-            </div>
-          </td>
         </tr>`;
       }).join('');
       document.getElementById('countPML').textContent =
