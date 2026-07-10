@@ -496,10 +496,10 @@
           </div>
         </div>
 
-        <!-- ── Top N Capaian Petugas ──────────────────────────── -->
+        <!-- ── Top N Capaian PPL ──────────────────────────── -->
         <div class="glass-card" data-aos="fade-up" data-aos-delay="265">
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <h6 class="m-0"><i class="bi bi-trophy-fill me-2" style="color:#f59e0b"></i>Top Capaian Petugas</h6>
+            <h6 class="m-0"><i class="bi bi-trophy-fill me-2" style="color:#f59e0b"></i>Top Capaian PPL</h6>
             <div class="d-flex gap-1 align-items-center">
               <span class="text-muted small me-1">Tampilkan:</span>
               <button class="btn-topn" data-n="5"  onclick="setTopN(5)">5</button>
@@ -514,7 +514,7 @@
               <thead>
                 <tr>
                   <th style="width:36px">#</th>
-                  <th>Petugas</th>
+                  <th>PPL</th>
                   <th>Kecamatan</th>
                   <th class="text-center">Submitted</th>
                   <th class="text-center">Rejected</th>
@@ -533,10 +533,10 @@
           </div>
         </div>
 
-        <!-- ── Tabel Per Petugas ───────────────────────────────── -->
+        <!-- ── Tabel Per PPL ───────────────────────────────── -->
         <div class="glass-card" data-aos="fade-up" data-aos-delay="280">
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <h6 class="m-0"><i class="bi bi-person-lines-fill me-2" style="color:var(--accent-color)"></i>Detail per Petugas</h6>
+            <h6 class="m-0"><i class="bi bi-person-lines-fill me-2" style="color:var(--accent-color)"></i>Detail per PPL</h6>
             <div class="d-flex gap-2 flex-wrap align-items-center">
               <div class="input-group" style="max-width:260px;">
                 <span class="input-group-text bg-white" style="border-radius:10px 0 0 10px; border:2px solid #e2e8f0; border-right:none;">
@@ -557,7 +557,7 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th class="sort-th" onclick="sortPetugas('nama')">Petugas<span class="sort-icon"></span></th>
+                  <th class="sort-th" onclick="sortPetugas('nama')">PPL<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortPetugas('kecamatan')">Kecamatan<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('sls')">SLS<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('open')">Open<span class="sort-icon"></span></th>
@@ -578,6 +578,84 @@
             </table>
           </div>
           <div class="text-muted small mt-2" id="countPetugas"></div>
+        </div>
+
+        <!-- ── Top N Capaian PML ──────────────────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="295">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h6 class="m-0"><i class="bi bi-trophy-fill me-2" style="color:#7c3aed"></i>Top Capaian PML</h6>
+            <div class="d-flex gap-1 align-items-center">
+              <span class="text-muted small me-1">Tampilkan:</span>
+              <button class="btn-topn" data-pml-n="5"  onclick="setTopNPML(5)">5</button>
+              <button class="btn-topn active" data-pml-n="10" onclick="setTopNPML(10)">10</button>
+              <button class="btn-topn" data-pml-n="20" onclick="setTopNPML(20)">20</button>
+              <button class="btn-topn" data-pml-n="30" onclick="setTopNPML(30)">30</button>
+              <button class="btn-topn" data-pml-n="50" onclick="setTopNPML(50)">50</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table dashboard-table">
+              <thead>
+                <tr>
+                  <th style="width:36px">#</th>
+                  <th>Nama PML</th>
+                  <th>Kecamatan</th>
+                  <th class="text-center">Pending</th>
+                  <th class="text-center">Approved</th>
+                  <th class="text-center">Rejected</th>
+                  <th class="text-center">Revoke</th>
+                  <th class="text-center">Edited</th>
+                  <th style="min-width:150px">Progress</th>
+                </tr>
+              </thead>
+              <tbody id="bodyTopPML">
+                <tr><td colspan="9" class="text-center text-muted py-4">Memuat data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── Tabel Per PML ───────────────────────────────── -->
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="310">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h6 class="m-0"><i class="bi bi-person-check-fill me-2" style="color:#7c3aed"></i>Detail per PML</h6>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+              <div class="input-group" style="max-width:260px;">
+                <span class="input-group-text bg-white" style="border-radius:10px 0 0 10px; border:2px solid #e2e8f0; border-right:none;">
+                  <i class="bi bi-search" style="color:#94a3b8"></i>
+                </span>
+                <input type="text" id="searchPML" class="form-control"
+                       placeholder="Cari PML…"
+                       oninput="filterPML()"
+                       style="border:2px solid #e2e8f0; border-left:none; border-radius:0 10px 10px 0; font-size:.88rem;">
+              </div>
+              <button onclick="exportExcel('tablePML')" class="btn btn-sm btn-export" style="border-color:#7c3aed; color:#7c3aed;">
+                <i class="bi bi-file-earmark-excel me-1"></i>Ekspor
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive" style="max-height:420px; overflow-y:auto;">
+            <table id="tablePML" class="table dashboard-table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="sort-th" onclick="sortPML('nama')">Nama PML<span class="sort-icon"></span></th>
+                  <th class="sort-th" onclick="sortPML('kecamatan')">Kecamatan<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('pending')">Pending<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('approved')">Approved<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('rejected')">Rejected<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('revoke')">Revoke<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('edited')">Edited<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPML('total')">Total<span class="sort-icon"></span></th>
+                  <th class="sort-th" onclick="sortPML('prog')" style="min-width:150px">Progress<span class="sort-icon"></span></th>
+                </tr>
+              </thead>
+              <tbody id="bodyPML">
+                <tr><td colspan="10" class="text-center text-muted py-4">Memuat data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-muted small mt-2" id="countPML"></div>
         </div>
 
       </div>
@@ -681,9 +759,12 @@
 
     let barChart, pieChart, stackedChart;
     let allPetugas = [], allKec = [];
+    let allPML = [];
     let topN = 10;
+    let topNPML = 10;
     let kecSort = { col: null, dir: 'desc' };
     let petugasSort = { col: null, dir: 'desc' };
+    let pmlSort = { col: null, dir: 'desc' };
 
     async function fetchData() {
       const kdkec = document.getElementById('filterKecamatan').value;
@@ -765,6 +846,10 @@
       allPetugas = data.tabel_petugas || [];
       renderTopPetugas(allPetugas);
       renderPetugas(allPetugas);
+
+      allPML = data.tabel_pml || [];
+      renderTopPML(allPML);
+      renderPML(allPML);
 
       // Charts
       renderCharts(data);
@@ -1048,6 +1133,115 @@
           plugins: { legend: { position: 'top', labels: { boxWidth: 13 } } },
         }
       });
+    }
+
+    function setTopNPML(n) {
+      topNPML = n;
+      document.querySelectorAll('[data-pml-n]').forEach(b =>
+        b.classList.toggle('active', parseInt(b.dataset.pmlN) === n));
+      renderTopPML(allPML);
+    }
+
+    function calcProgPML(p) {
+      // Progress PML = (approved + rejected + revoke + edited) / (pending + approved + rejected + revoke + edited)
+      const num = (p.approved || 0) + (p.rejected || 0) + (p.revoke || 0) + (p.edited || 0);
+      const den = num + (p.pending || 0);
+      return den > 0 ? (num / den * 100) : 0;
+    }
+
+    function renderTopPML(list) {
+      const body = document.getElementById('bodyTopPML');
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        return;
+      }
+      const ranked = list.map(p => ({ ...p, prog: calcProgPML(p) }))
+                         .sort((a, b) => b.prog - a.prog)
+                         .slice(0, topNPML);
+      body.innerHTML = ranked.map((p, i) => {
+        const prog  = p.prog;
+        const color = prog >= 70 ? '#10b981' : prog >= 40 ? '#f79039' : '#94a3b8';
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        return `<tr>
+          <td class="text-center fw-bold" style="color:${color}">${medal}</td>
+          <td class="fw-semibold">${p.nama}</td>
+          <td class="text-muted small">${p.kecamatan || '—'}</td>
+          <td class="text-center"><span class="badge badge-open">${(p.pending || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-app">${(p.approved || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${(p.rejected || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(p.revoke || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited || 0).toLocaleString('id-ID')}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1">
+                <div class="progress-bar" style="width:${prog.toFixed(1)}%; background:${color}"></div>
+              </div>
+              <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderPML(list) {
+      if (!list.length) {
+        document.getElementById('bodyPML').innerHTML =
+          '<tr><td colspan="10" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        document.getElementById('countPML').textContent = '';
+        return;
+      }
+      const withProg = list.map(p => ({ ...p, prog: calcProgPML(p) }));
+      if (pmlSort.col) {
+        withProg.sort((a, b) => {
+          const v = pmlSort.dir === 'asc' ? 1 : -1;
+          const av = a[pmlSort.col] ?? 0, bv = b[pmlSort.col] ?? 0;
+          return (av > bv ? 1 : av < bv ? -1 : 0) * v;
+        });
+      }
+      document.getElementById('bodyPML').innerHTML = withProg.map((p, i) => {
+        const prog  = p.prog;
+        const color = prog >= 70 ? '#10b981' : prog >= 40 ? '#f79039' : '#94a3b8';
+        return `<tr>
+          <td class="text-muted small">${i + 1}</td>
+          <td class="fw-semibold">${p.nama}</td>
+          <td class="text-muted small">${p.kecamatan || '—'}</td>
+          <td class="text-center"><span class="badge badge-open">${(p.pending || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-app">${(p.approved || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rej">${(p.rejected || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge badge-rev">${(p.revoke || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center"><span class="badge" style="background:#d1fae5;color:#065f46">${(p.edited || 0).toLocaleString('id-ID')}</span></td>
+          <td class="text-center fw-bold text-muted">${(p.total || 0).toLocaleString('id-ID')}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1">
+                <div class="progress-bar" style="width:${prog.toFixed(1)}%; background:${color}"></div>
+              </div>
+              <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+      document.getElementById('countPML').textContent =
+        `Menampilkan ${list.length} dari ${allPML.length} PML`;
+    }
+
+    function sortPML(col) {
+      if (pmlSort.col === col) pmlSort.dir = pmlSort.dir === 'asc' ? 'desc' : 'asc';
+      else { pmlSort.col = col; pmlSort.dir = 'desc'; }
+      document.querySelectorAll('#tablePML .sort-th').forEach(th => {
+        th.classList.remove('asc', 'desc');
+        if (th.getAttribute('onclick') === `sortPML('${col}')`)
+          th.classList.add(pmlSort.dir);
+      });
+      filterPML();
+    }
+
+    function filterPML() {
+      const q = document.getElementById('searchPML').value.trim().toLowerCase();
+      let list = allPML;
+      if (q) list = list.filter(p =>
+        p.nama.toLowerCase().includes(q) || (p.kecamatan || '').toLowerCase().includes(q));
+      renderPML(list);
     }
 
     function showError(msg) {

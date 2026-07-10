@@ -415,6 +415,66 @@ foreach ($petRows as $p) {
     ];
 }
 
+// Buat tabel sensus_pml jika belum ada
+$conn->query("CREATE TABLE IF NOT EXISTS sensus_pml (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) NOT NULL,
+    nama VARCHAR(200) NOT NULL DEFAULT '',
+    kec_code VARCHAR(5) NOT NULL DEFAULT '',
+    pending INT DEFAULT 0,
+    approved INT DEFAULT 0,
+    rejected INT DEFAULT 0,
+    revoke INT DEFAULT 0,
+    edited INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_pml_email_kec (email, kec_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+$kecWherePML = ($kdkec !== 'all') ? "WHERE kec_code='" . $conn->real_escape_string($kdkec) . "'" : '';
+
+$pmlRows = $conn->query("SELECT
+    email, nama,
+    GROUP_CONCAT(DISTINCT kec_code ORDER BY kec_code) AS kec_codes,
+    COALESCE(SUM(pending),0)  AS pending,
+    COALESCE(SUM(approved),0) AS approved,
+    COALESCE(SUM(rejected),0) AS rejected,
+    COALESCE(SUM(`revoke`),0) AS revoke,
+    COALESCE(SUM(edited),0)   AS edited
+FROM sensus_pml $kecWherePML
+GROUP BY email, nama
+ORDER BY approved DESC, pending DESC")->fetch_all(MYSQLI_ASSOC);
+
+$kecNamaPML = [
+    '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
+    '030' => 'Dondo',          '031' => 'Ogodeide',
+    '032' => 'Basidondo',      '040' => 'Baolan',
+    '041' => 'Lampasio',       '050' => 'Galang',
+    '060' => 'Tolitoli Utara', '061' => 'Dako Pemean',
+];
+
+$tabel_pml = [];
+foreach ($pmlRows as $r) {
+    $pNum = (int)$r['approved'] + (int)$r['rejected'] + (int)$r['revoke'] + (int)$r['edited'];
+    $pDen = $pNum + (int)$r['pending'];
+    $prog = $pDen > 0 ? round($pNum / $pDen * 100, 2) : 0;
+    $kecNames = array_map(
+        fn($k) => $kecNamaPML[trim($k)] ?? trim($k),
+        explode(',', $r['kec_codes'] ?? '')
+    );
+    $tabel_pml[] = [
+        'nama'      => $r['nama'] ?: $r['email'],
+        'kecamatan' => implode(', ', array_filter($kecNames)),
+        'pending'   => (int)$r['pending'],
+        'approved'  => (int)$r['approved'],
+        'rejected'  => (int)$r['rejected'],
+        'revoke'    => (int)$r['revoke'],
+        'edited'    => (int)$r['edited'],
+        'total'     => $pDen,
+        'prog'      => $prog,
+    ];
+}
+
 // Last update — baca dari tabel meta yang dicatat saat import CSV
 $conn->query("CREATE TABLE IF NOT EXISTS sensus_meta (k VARCHAR(50) PRIMARY KEY, v TEXT) ENGINE=InnoDB");
 $luRow = $conn->query("SELECT v FROM sensus_meta WHERE k='last_import' LIMIT 1");
@@ -441,5 +501,6 @@ echo json_encode([
     ],
     'tabel_kec'     => $tabel_kec,
     'tabel_petugas' => $tabel_petugas,
+    'tabel_pml'     => $tabel_pml,
     'last_update'   => $lastUpdate,
 ], JSON_UNESCAPED_UNICODE);

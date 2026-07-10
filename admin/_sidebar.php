@@ -1,7 +1,7 @@
 <?php
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-$monitoringPages = ['monitoring_sensus_ekonomi.php','data_sensus_ekonomi.php','monitoring_pencacahan.php'];
+$monitoringPages = ['monitoring_sensus_ekonomi.php','data_sensus_ekonomi.php','monitoring_pencacahan.php','data_pml_sensus.php'];
 $ujianPages      = ['ujian.php','ujian_soal.php','ujian_hasil.php','ujian_peserta.php'];
 $wawancaraPages  = ['index.php','form_wawancara.php','monitoring.php','rekap.php',
                     'penilaian_akhir.php','import_nilai_kompetensi.php','export_penilaian_akhir.php'];
@@ -60,6 +60,11 @@ $groupAkun       = in_array($currentPage, $akunPages);
                    class="nav-sub-item <?= $currentPage === 'data_sensus_ekonomi.php' ? 'active' : '' ?>">
                     <i class="bi bi-database-fill-gear"></i>
                     <span>Data Sensus Ekonomi</span>
+                </a>
+                <a href="data_pml_sensus.php"
+                   class="nav-sub-item <?= $currentPage === 'data_pml_sensus.php' ? 'active' : '' ?>">
+                    <i class="bi bi-person-check-fill"></i>
+                    <span>Data PML</span>
                 </a>
                 <?php endif; ?>
             </div>
