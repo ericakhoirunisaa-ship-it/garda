@@ -756,11 +756,12 @@ foreach ($kecNama as $kc => $nm) {
                                         <th class="text-center">Edited<br><small style="font-weight:400;font-size:.72rem;">Admin Kab</small></th>
                                         <th class="text-center">Total</th>
                                         <th style="min-width:100px">Progress</th>
+                                        <th class="text-center">% Approve</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php if (empty($perPetugas)): ?>
-                                    <tr><td colspan="17" class="text-center text-muted py-4">Belum ada data. <a href="data_sensus_ekonomi.php">Import data?</a></td></tr>
+                                    <tr><td colspan="18" class="text-center text-muted py-4">Belum ada data. <a href="data_sensus_ekonomi.php">Import data?</a></td></tr>
                                 <?php else: ?>
                                 <?php foreach ($perPetugas as $i => $p): ?>
                                     <?php
@@ -775,7 +776,10 @@ foreach ($kecNama as $kc => $nm) {
                                     $pPct = $pDenominator > 0
                                         ? number_format($pNumerator / $pDenominator * 100, 1)
                                         : '0.0';
-                                    $pBarColor = (float)$pPct >= 100 ? '#4ade80' : ((float)$pPct >= 70 ? '#facc15' : '#f87171');
+                                    $pBarColor  = (float)$pPct >= 100 ? '#4ade80' : ((float)$pPct >= 70 ? '#facc15' : '#f87171');
+                                    $pctApprove = $pDenominator > 0
+                                        ? number_format(($p['total_approved'] + $p['total_edited_pengawas'] + $p['total_edited_admin']) / $pDenominator * 100, 1)
+                                        : '0.0';
                                     ?>
                                     <tr<?= $rowStyle ?>>
                                         <td class="ps-4 text-muted small"><?= $i + 1 ?></td>
@@ -802,6 +806,7 @@ foreach ($kecNama as $kc => $nm) {
                                                 <span style="font-size:.7rem; min-width:34px; text-align:right; color:<?= $pBarColor ?>"><?= $pPct ?>%</span>
                                             </div>
                                         </td>
+                                        <td class="text-center fw-semibold" style="font-size:.8rem; color:#5b21b6"><?= $pctApprove ?>%</td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <?php endif; ?>
@@ -828,11 +833,12 @@ foreach ($kecNama as $kc => $nm) {
                                         <th class="text-center">Edit Pengawas</th>
                                         <th class="text-center">Edit Admin Kab</th>
                                         <th class="text-center">Progress</th>
+                                        <th class="text-center">% Approve</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php if (empty($perKec)): ?>
-                                    <tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>
+                                    <tr><td colspan="13" class="text-center text-muted py-4">Belum ada data.</td></tr>
                                 <?php else: ?>
                                 <?php foreach ($perKec as $kec): ?>
                                     <?php
@@ -845,6 +851,9 @@ foreach ($kecNama as $kc => $nm) {
                                     $pct = $kDenominator > 0
                                         ? number_format($kNumerator / $kDenominator * 100, 2)
                                         : '0.00';
+                                    $kPctApprove = $kDenominator > 0
+                                        ? number_format($kApprovedCombined / $kDenominator * 100, 1)
+                                        : '0.0';
                                     $nama = $kecNama[$kec['kec_code']] ?? 'Kec. ' . $kec['kec_code'];
                                     ?>
                                     <tr>
@@ -871,6 +880,7 @@ foreach ($kecNama as $kc => $nm) {
                                                 <small class="text-muted" style="white-space:nowrap"><?= $pct ?>%</small>
                                             </div>
                                         </td>
+                                        <td class="text-center fw-semibold" style="font-size:.8rem; color:#5b21b6"><?= $kPctApprove ?>%</td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <?php endif; ?>

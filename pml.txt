@@ -1,0 +1,182 @@
+(async () => {
+
+    // Ambil XSRF Token
+    const token = decodeURIComponent(
+        document.cookie
+            .split("; ")
+            .find(x => x.startsWith("XSRF-TOKEN="))
+            .split("=")[1]
+    );
+
+    const rows = [];
+
+    // Payload Pengawas
+    const payload = {
+        surveyPeriodId: "fd68e454-ba45-4b85-8205-f3bf777ded24",
+        surveyRoleId: "93bcf446-c4c1-4462-8ed0-4b0f7ae89e52", // Pengawas
+        size: 10,
+        page: 0,
+        search: "",
+        target: "TARGET_ONLY",
+        region: {
+            region1Id: null,
+            region2Id: null,
+            region3Id: null,
+            region4Id: null,
+            region5Id: null,
+            region6Id: null,
+            region7Id: null,
+            region8Id: null,
+            region9Id: null,
+            region10Id: null
+        },
+        regionSummaryLevel: 6
+    };
+
+    const endpoint =
+        "https://fasih-sm.bps.go.id/app/api/analytic/api/v2/assignment/report-progress-by-responsibility";
+
+    // Request pertama untuk mengetahui jumlah halaman
+    const firstRes = await fetch(endpoint, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": token
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const firstJson = await firstRes.json();
+
+    const totalElements = firstJson.data.totalElements;
+    const totalPages = Math.ceil(totalElements / payload.size);
+
+    console.log("Total Pengawas :", totalElements);
+    console.log("Total Page :", totalPages);
+
+    // Ambil seluruh halaman
+    for (let page = 0; page < totalPages; page++) {
+
+        payload.page = page;
+
+        const res = await fetch(endpoint, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": token
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+
+        for (const user of json.data.content || []) {
+
+            for (const region of user.regionSummary || []) {
+
+                const row = {
+                    Email: user.email || "",
+                    Nama: user.name || "",
+                    SLS_Code: region.regionCode || "",
+
+                    OPEN: 0,
+                    DRAFT: 0,
+                    SUBMITTED_BY_PENCACAH: 0,
+                    APPROVED_BY_PENGAWAS: 0,
+                    REJECTED_BY_PENGAWAS: 0,
+                    REVOKED_BY_PENGAWAS: 0,
+                    EDITED_BY_ADMIN_KABUPATEN: 0,
+                    EDITED_BY_PENGAWAS: 0
+                };
+
+                for (const status of region.statusBreakdown || []) {
+
+                    switch (status.status) {
+
+                        case "OPEN":
+                            row.OPEN = status.count;
+                            break;
+
+                        case "DRAFT":
+                            row.DRAFT = status.count;
+                            break;
+
+                        case "SUBMITTED BY Pencacah":
+                            row.SUBMITTED_BY_PENCACAH = status.count;
+                            break;
+
+                        case "APPROVED BY Pengawas":
+                            row.APPROVED_BY_PENGAWAS = status.count;
+                            break;
+
+                        case "REJECTED BY Pengawas":
+                            row.REJECTED_BY_PENGAWAS = status.count;
+                            break;
+
+                        case "REVOKED BY Pengawas":
+                            row.REVOKED_BY_PENGAWAS = status.count;
+                            break;
+
+                        case "EDITED BY Admin Kabupaten":
+                            row.EDITED_BY_ADMIN_KABUPATEN = status.count;
+                            break;
+
+                        case "EDITED BY Pengawas":
+                            row.EDITED_BY_PENGAWAS = status.count;
+                            break;
+                    }
+                }
+
+                rows.push(row);
+            }
+        }
+
+        console.log(`Page ${page + 1}/${totalPages} selesai`);
+    }
+
+    // Header CSV
+    const headers = [
+        "Email",
+        "Nama",
+        "SLS_Code",
+        "OPEN",
+        "DRAFT",
+        "SUBMITTED_BY_PENCACAH",
+        "APPROVED_BY_PENGAWAS",
+        "REJECTED_BY_PENGAWAS",
+        "REVOKED_BY_PENGAWAS",
+        "EDITED_BY_ADMIN_KABUPATEN",
+        "EDITED_BY_PENGAWAS"
+    ];
+
+    // Konversi ke CSV
+    const csv = [
+        headers.join(","),
+        ...rows.map(row =>
+            headers.map(h => `"${row[h] ?? 0}"`).join(",")
+        )
+    ].join("\n");
+
+    // Download CSV
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "fasih_progress_pengawas.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    console.log("====================================");
+    console.log("Export Pengawas selesai.");
+    console.log("Total Row :", rows.length);
+
+})();
