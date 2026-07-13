@@ -486,10 +486,11 @@
                   <th class="text-center sort-th" onclick="sortKec('edited_admin')">Edit Admin Kab<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortKec('revoke')">Revoke<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortKec('prog')" style="min-width:140px">Progress<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortKec('pct_approve')" style="min-width:90px">% Approve<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyKec">
-                <tr><td colspan="11" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="12" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
               <tfoot id="footKec"></tfoot>
             </table>
@@ -524,10 +525,11 @@
                   <th class="text-center">Revoke</th>
                   <th class="text-center">Total</th>
                   <th style="min-width:150px">Progress</th>
+                  <th class="text-center" style="min-width:90px">% Approve</th>
                 </tr>
               </thead>
               <tbody id="bodyTopPetugas">
-                <tr><td colspan="11" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="12" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -570,10 +572,11 @@
                   <th class="text-center sort-th" onclick="sortPetugas('revoke')">Revoke<span class="sort-icon"></span></th>
                   <th class="text-center sort-th" onclick="sortPetugas('total')">Total<span class="sort-icon"></span></th>
                   <th class="sort-th" onclick="sortPetugas('prog')" style="min-width:150px">Progress<span class="sort-icon"></span></th>
+                  <th class="text-center sort-th" onclick="sortPetugas('pct_approve')" style="min-width:90px">% Approve<span class="sort-icon"></span></th>
                 </tr>
               </thead>
               <tbody id="bodyPetugas">
-                <tr><td colspan="14" class="text-center text-muted py-4">Memuat data…</td></tr>
+                <tr><td colspan="15" class="text-center text-muted py-4">Memuat data…</td></tr>
               </tbody>
             </table>
           </div>
@@ -880,7 +883,7 @@
     function renderTopPetugas(list) {
       const body = document.getElementById('bodyTopPetugas');
       if (!list.length) {
-        body.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+        body.innerHTML = '<tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         return;
       }
       const ranked = list.map(p => {
@@ -891,6 +894,11 @@
         const prog  = p.prog;
         const color = prog >= 70 ? '#10b981' : prog >= 40 ? '#f79039' : '#94a3b8';
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        const den = p.submitted + (p.approved||0) + (p.revoke||0) + p.rejected
+                  + (p.edited_pengawas||0) + (p.edited_admin||0) + p.open + p.draft;
+        const pctApp = den > 0
+          ? (((p.approved||0) + (p.edited_pengawas||0) + (p.edited_admin||0)) / den * 100).toFixed(1)
+          : '0.0';
         return `<tr>
           <td class="text-center fw-bold" style="color:${color}">${medal}</td>
           <td class="fw-semibold">${p.nama}</td>
@@ -910,6 +918,7 @@
               <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
             </div>
           </td>
+          <td class="text-center fw-semibold" style="color:#5b21b6">${pctApp}%</td>
         </tr>`;
       }).join('');
     }
@@ -928,7 +937,7 @@
     function renderKec(list) {
       if (!list.length) {
         document.getElementById('bodyKec').innerHTML =
-          '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="12" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('footKec').innerHTML = '';
         return;
       }
@@ -939,7 +948,13 @@
           return (a[kecSort.col] > b[kecSort.col] ? 1 : -1) * v;
         });
       }
-      document.getElementById('bodyKec').innerHTML = sorted.map(k => `
+      document.getElementById('bodyKec').innerHTML = sorted.map(k => {
+        const kDen = k.open + k.draft + k.submitted + k.rejected
+                   + (k.approved||0) + (k.edited_pengawas||0) + (k.edited_admin||0) + (k.revoke||0);
+        const kPctApp = kDen > 0
+          ? (((k.approved||0) + (k.edited_pengawas||0) + (k.edited_admin||0)) / kDen * 100).toFixed(1)
+          : '0.0';
+        return `
         <tr>
           <td class="fw-semibold">${k.nama}</td>
           <td class="text-center"><span class="badge" style="background:#e0e7ff;color:#3730a3">${k.sls}</span></td>
@@ -959,8 +974,9 @@
               <span class="small fw-bold" style="min-width:46px; color:#f79039">${k.prog}%</span>
             </div>
           </td>
-        </tr>
-      `).join('');
+          <td class="text-center fw-semibold" style="color:#5b21b6">${kPctApp}%</td>
+        </tr>`;
+      }).join('');
 
       // Baris TOTAL
       const tot = list.reduce((acc, k) => ({
@@ -975,6 +991,9 @@
                  + tot.edited_pengawas + tot.edited_admin;
       const tDen = tNum + tot.open + tot.draft;
       const tPct = tDen > 0 ? (tNum/tDen*100).toFixed(2) : '0.00';
+      const tPctApp = tDen > 0
+        ? ((tot.approved + tot.edited_pengawas + tot.edited_admin) / tDen * 100).toFixed(1)
+        : '0.0';
       document.getElementById('footKec').innerHTML = `<tr>
         <td><strong>TOTAL</strong></td>
         <td class="text-center"><strong>${tot.sls.toLocaleString('id-ID')}</strong></td>
@@ -987,18 +1006,24 @@
         <td class="text-center"><strong>${tot.edited_admin.toLocaleString('id-ID')}</strong></td>
         <td class="text-center"><strong>${tot.revoke.toLocaleString('id-ID')}</strong></td>
         <td><span class="small fw-bold" style="color:#f79039">${tPct}%</span></td>
+        <td class="text-center"><strong style="color:#5b21b6">${tPctApp}%</strong></td>
       </tr>`;
     }
 
     function renderPetugas(list) {
       if (!list.length) {
         document.getElementById('bodyPetugas').innerHTML =
-          '<tr><td colspan="14" class="text-center text-muted py-4">Belum ada data.</td></tr>';
+          '<tr><td colspan="15" class="text-center text-muted py-4">Belum ada data.</td></tr>';
         document.getElementById('countPetugas').textContent = '';
         return;
       }
       const withProg = list.map(p => {
-        return { ...p, prog: calcProgPetugas(p) };
+        const den = p.submitted + (p.approved||0) + (p.revoke||0) + p.rejected
+                  + (p.edited_pengawas||0) + (p.edited_admin||0) + p.open + p.draft;
+        const pct_approve = den > 0
+          ? (((p.approved||0) + (p.edited_pengawas||0) + (p.edited_admin||0)) / den * 100)
+          : 0;
+        return { ...p, prog: calcProgPetugas(p), pct_approve };
       });
       if (petugasSort.col) {
         withProg.sort((a, b) => {
@@ -1032,6 +1057,7 @@
               <span class="small fw-bold" style="min-width:46px; color:${color}">${prog.toFixed(2)}%</span>
             </div>
           </td>
+          <td class="text-center fw-semibold" style="color:#5b21b6">${p.pct_approve.toFixed(1)}%</td>
         </tr>`;
       }).join('');
       document.getElementById('countPetugas').textContent =
