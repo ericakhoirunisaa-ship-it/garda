@@ -15,6 +15,7 @@ register_shutdown_function(function() {
     }
 });
 
+mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @mysqli_connect('43.128.105.129', 'root', 'Djt04k91On5HRE8ZyNVxha7JUF6m3bW2', 'db_semanis', 30444);
 if (!$conn) {
     ob_end_clean();
@@ -113,7 +114,6 @@ $emailNama = [
     'wulandarisb981@gmail.com'        => 'Wulandari S. Butudoka',
     'nanadjapara10@gmail.com'         => 'Nurhasanah',
     'raramutiara353@gmail.com'        => 'ANDI MUTIARA ISTIQHAMARANI',
-    'iyasdwi996@gmail.com'            => 'Dwi wahyono',
     'fitriyawatitadore@gmail.com'     => 'FITRIYAWATI NH HANS TADORE',
     'astuti7061992@gmail.com'         => 'Tri astuti',
     'deliyhana2022@gmail.com'         => 'SRI DELY',
@@ -490,7 +490,7 @@ $emailKec = [
     'indahade247@gmail.com' => '040', 'ahmaadtlz17@gmail.com' => '040',
     'fitriyantimarhalil@gmail.com' => '040', 'umijarnawi@gmail.com' => '040',
     'wulandarisb981@gmail.com' => '040', 'nanadjapara10@gmail.com' => '040',
-    'raramutiara353@gmail.com' => '040', 'iyasdwi996@gmail.com' => '040',
+    'raramutiara353@gmail.com' => '040',
     'fitriyawatitadore@gmail.com' => '040', 'astuti7061992@gmail.com' => '040',
     'deliyhana2022@gmail.com' => '040', 'mohfajrin219@gmail.com' => '040',
     'maulana022007@gmail.com' => '040', 'rosnirauf@gmail.com' => '040',

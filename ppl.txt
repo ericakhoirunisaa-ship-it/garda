@@ -1,6 +1,20 @@
 (async () => {
 
-    // Ambil XSRF Token
+    // ==========================
+    // KONFIGURASI
+    // ==========================
+    const DELAY_MIN = 1000; // 1 detik
+    const DELAY_MAX = 2000; // 2 detik
+    const MAX_RETRY = 5;
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    const randomDelay = () =>
+        Math.floor(Math.random() * (DELAY_MAX - DELAY_MIN + 1)) + DELAY_MIN;
+
+    // ==========================
+    // XSRF TOKEN
+    // ==========================
     const token = decodeURIComponent(
         document.cookie
             .split("; ")
@@ -8,9 +22,9 @@
             .split("=")[1]
     );
 
-    const rows = [];
+    const endpoint =
+        "https://fasih-sm.bps.go.id/app/api/analytic/api/v2/assignment/report-progress-by-responsibility";
 
-    // Payload
     const payload = {
         surveyPeriodId: "fd68e454-ba45-4b85-8205-f3bf777ded24",
         surveyRoleId: "6d7d919a-45e5-4779-bb87-2905b49fd31a",
@@ -33,53 +47,106 @@
         regionSummaryLevel: 6
     };
 
-    const endpoint =
-        "https://fasih-sm.bps.go.id/app/api/analytic/api/v2/assignment/report-progress-by-responsibility";
+    const headers = {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": token
+    };
 
-    // Request pertama untuk mengetahui total data
-    const firstRes = await fetch(endpoint, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": token
-        },
-        body: JSON.stringify(payload)
-    });
+    const rows = [];
 
-    const firstJson = await firstRes.json();
-
-    const totalElements = firstJson.data.totalElements;
-    const totalPages = Math.ceil(totalElements / payload.size);
-
-    console.log("Total User :", totalElements);
-    console.log("Total Page :", totalPages);
-
-    // Loop seluruh halaman
-    for (let page = 0; page < totalPages; page++) {
+    // ==========================
+    // FETCH DENGAN RETRY
+    // ==========================
+    async function fetchRetry(page) {
 
         payload.page = page;
 
-        const res = await fetch(endpoint, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": token
-            },
-            body: JSON.stringify(payload)
-        });
+        for (let retry = 1; retry <= MAX_RETRY; retry++) {
 
-        const json = await res.json();
+            try {
 
-        for (const user of json.data.content || []) {
+                const res = await fetch(endpoint, {
+                    method: "POST",
+                    credentials: "include",
+                    headers,
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.status === 429) {
+
+                    const wait = retry * 5000;
+
+                    console.warn(
+                        `Page ${page + 1} kena 429. Retry ${retry}/${MAX_RETRY} (${wait / 1000}s)`
+                    );
+
+                    await sleep(wait);
+
+                    continue;
+                }
+
+                if (!res.ok) {
+
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const json = await res.json();
+
+                return json;
+
+            } catch (err) {
+
+                console.warn(
+                    `Page ${page + 1} gagal (${err.message}) Retry ${retry}/${MAX_RETRY}`
+                );
+
+                await sleep(retry * 3000);
+            }
+        }
+
+        console.error(`Page ${page + 1} dilewati.`);
+        return null;
+    }
+
+    // ==========================
+    // REQUEST PERTAMA
+    // ==========================
+    const first = await fetchRetry(0);
+
+    if (!first?.data) {
+
+        console.error("Tidak bisa mengambil data.");
+        return;
+    }
+
+    const totalElements = first.data.totalElements;
+    const totalPages = Math.ceil(totalElements / payload.size);
+
+    console.log("==================================");
+    console.log("Total User :", totalElements);
+    console.log("Total Page :", totalPages);
+    console.log("==================================");
+
+    // ==========================
+    // LOOP HALAMAN
+    // ==========================
+    for (let page = 0; page < totalPages; page++) {
+
+        const json = page === 0 ? first : await fetchRetry(page);
+
+        if (!json?.data?.content) {
+
+            console.warn(`Page ${page + 1} kosong.`);
+            continue;
+        }
+
+        for (const user of json.data.content) {
 
             for (const region of user.regionSummary || []) {
 
                 const row = {
                     Email: user.email || "",
                     SLS_Code: region.regionCode || "",
-
                     OPEN: 0,
                     DRAFT: 0,
                     SUBMITTED_BY_PENCACAH: 0,
@@ -132,11 +199,15 @@
             }
         }
 
-        console.log(`Selesai Page ${page + 1} / ${totalPages}`);
+        console.log(`✅ Page ${page + 1}/${totalPages}`);
+
+        await sleep(randomDelay());
     }
 
-    // Header CSV
-    const headers = [
+    // ==========================
+    // EXPORT CSV
+    // ==========================
+    const csvHeaders = [
         "Email",
         "SLS_Code",
         "OPEN",
@@ -149,15 +220,13 @@
         "EDITED_BY_PENGAWAS"
     ];
 
-    // Konversi ke CSV
     const csv = [
-        headers.join(","),
-        ...rows.map(row =>
-            headers.map(h => `"${row[h] ?? 0}"`).join(",")
+        csvHeaders.join(","),
+        ...rows.map(r =>
+            csvHeaders.map(h => `"${r[h] ?? ""}"`).join(",")
         )
     ].join("\n");
 
-    // Download CSV
     const blob = new Blob([csv], {
         type: "text/csv;charset=utf-8;"
     });
@@ -169,12 +238,13 @@
     a.download = "fasih_progress_all_status.csv";
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    a.remove();
 
     URL.revokeObjectURL(url);
 
     console.log("==================================");
-    console.log("Export selesai!");
+    console.log("EXPORT SELESAI");
     console.log("Total Row :", rows.length);
+    console.log("==================================");
 
 })();

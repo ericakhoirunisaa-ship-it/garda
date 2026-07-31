@@ -86,7 +86,6 @@ $emailData = [
     'wulandarisb981@gmail.com'        => ['nama'=>'Wulandari S. Butudoka','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'NALU'],
     'nanadjapara10@gmail.com'         => ['nama'=>'Nurhasanah','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'NALU'],
     'raramutiara353@gmail.com'        => ['nama'=>'ANDI MUTIARA ISTIQHAMARANI','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'SIDOARJO'],
-    'iyasdwi996@gmail.com'            => ['nama'=>'Dwi wahyono','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'NALU'],
     'fitriyawatitadore@gmail.com'     => ['nama'=>'FITRIYAWATI NH HANS TADORE','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'SIDOARJO'],
     'astuti7061992@gmail.com'         => ['nama'=>'Tri astuti','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'BUNTUNA'],
     'deliyhana2022@gmail.com'         => ['nama'=>'SRI DELY','kec_code'=>'040','kecamatan'=>'BAOLAN','desa'=>'TUWELEY'],
