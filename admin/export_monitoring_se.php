@@ -3,79 +3,8 @@ require_once 'config.php';
 requireLogin();
 require_once __DIR__ . '/se_petugas.php';
 
-/* ── Baca desa map dari LK Excel (ZipArchive + SimpleXML) ── */
-function buildDesaMap($xlsxPath) {
-    $map = [];
-    if (!file_exists($xlsxPath)) return $map;
-    $zip = new ZipArchive();
-    if ($zip->open($xlsxPath) !== true) return $map;
-
-    // Shared strings
-    $ss = [];
-    $ssXml = $zip->getFromName('xl/sharedStrings.xml');
-    if ($ssXml) {
-        $xml = simplexml_load_string($ssXml);
-        foreach ($xml->si as $si) {
-            $text = '';
-            if (isset($si->t)) $text = (string)$si->t;
-            else foreach ($si->r as $r) $text .= (string)$r->t;
-            $ss[] = $text;
-        }
-    }
-
-    $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
-    $zip->close();
-    if (!$sheetXml) return $map;
-
-    // Column letter → 0-based index
-    $colIdx = function($ref) {
-        preg_match('/^([A-Z]+)/i', $ref, $m);
-        if (empty($m)) return -1;
-        $col = strtoupper($m[1]); $n = 0;
-        for ($i = 0; $i < strlen($col); $i++) $n = $n * 26 + (ord($col[$i]) - 64);
-        return $n - 1;
-    };
-    $cellVal = function($cell) use ($ss) {
-        $type = (string)$cell['t']; $val = (string)$cell->v;
-        return ($type === 's') ? ($ss[(int)$val] ?? $val) : $val;
-    };
-
-    $xml = simplexml_load_string($sheetXml);
-    $kdkecCol = -1; $kddesaCol = -1; $nmdesaCol = -1;
-    $isHeader = true;
-
-    foreach ($xml->sheetData->row as $row) {
-        if ($isHeader) {
-            foreach ($row->c as $cell) {
-                $ci = $colIdx((string)$cell['r']);
-                $h  = strtolower(trim($cellVal($cell)));
-                if ($h === 'kdkec')  $kdkecCol  = $ci;
-                if ($h === 'kddesa') $kddesaCol = $ci;
-                if ($h === 'nmdesa') $nmdesaCol = $ci;
-            }
-            $isHeader = false;
-            continue;
-        }
-        if ($kddesaCol < 0 || $nmdesaCol < 0) continue;
-
-        $rowData = [];
-        foreach ($row->c as $cell) {
-            $rowData[$colIdx((string)$cell['r'])] = $cellVal($cell);
-        }
-
-        $kdkec  = str_pad((string)($rowData[$kdkecCol]  ?? ''), 3, '0', STR_PAD_LEFT);
-        $kddesa = str_pad((string)($rowData[$kddesaCol] ?? ''), 3, '0', STR_PAD_LEFT);
-        $nmdesa = $rowData[$nmdesaCol] ?? '';
-        if ($kddesa !== '000' && $nmdesa !== '') {
-            $key = $kdkec . $kddesa;
-            if (!isset($map[$key])) $map[$key] = $nmdesa;
-        }
-    }
-    return $map;
-}
-
-$xlsxPath = dirname(__DIR__) . '/LK Hasil Pengolahan Muatan_Kab 7206_result.xlsx';
-$desaMap  = buildDesaMap($xlsxPath);
+/* ── Desa map (pre-generated dari LK Hasil Pengolahan Muatan_Kab 7206_result.xlsx) ── */
+require_once __DIR__ . '/se_desa_map.php';
 
 /* ── Pengawas per kecamatan dari sensus_pml ── */
 $pengawasPerKec = [];
