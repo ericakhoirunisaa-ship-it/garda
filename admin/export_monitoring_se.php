@@ -6,19 +6,15 @@ require_once __DIR__ . '/se_petugas.php';
 /* ── Desa map (pre-generated dari LK Hasil Pengolahan Muatan_Kab 7206_result.xlsx) ── */
 require_once __DIR__ . '/se_desa_map.php';
 
-/* ── Pengawas per kecamatan dari sensus_pml ── */
-$pengawasPerKec = [];
-$pmlRows = $conn->query("SELECT nama, email, kec_code FROM sensus_pml ORDER BY kec_code, nama")->fetch_all(MYSQLI_ASSOC);
-foreach ($pmlRows as $r) {
-    $kc   = $r['kec_code'];
-    $nama = trim($r['nama']) ?: $r['email'];
-    if ($nama) $pengawasPerKec[$kc][] = $nama;
+/* ── Pengawas per SLS dari sensus_sls_pengawas ── */
+$pengawasPerSls = [];
+$pmlRows = $conn->query("SELECT sls_code, pml_nama, pml_email FROM sensus_sls_pengawas");
+if ($pmlRows) {
+    while ($r = $pmlRows->fetch_assoc()) {
+        $pengawasPerSls[$r['sls_code']] = trim($r['pml_nama']) ?: $r['pml_email'];
+    }
 }
-$getPengawas = function($kec_code) use ($pengawasPerKec) {
-    return isset($pengawasPerKec[$kec_code])
-        ? implode('; ', $pengawasPerKec[$kec_code])
-        : '';
-};
+$getPengawas = fn($sls_code) => $pengawasPerSls[$sls_code] ?? '';
 
 /* ── Filter kecamatan (dari query string) ── */
 $kecFilter = trim($_GET['kec'] ?? 'all');
@@ -153,7 +149,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $nmDesa     = $desaMap[$r['desa_key']] ?? '';
     $nmKec      = $kecNama[$kec_code] ?? $kec_code;
     $nmPetugas  = $getNama($r['email']);
-    $nmPengawas = $getPengawas($kec_code);
+    $nmPengawas = $getPengawas($r['sls_code']);
 ?>
    <Row>
     <?= xcn($i + 1) ?>

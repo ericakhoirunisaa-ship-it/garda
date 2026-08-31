@@ -27,6 +27,13 @@ foreach (['open_count','draft','submitted','edited_by_pengawas','edited_by_admin
         $conn->query("ALTER TABLE sensus_pml ADD COLUMN `$_col` INT DEFAULT 0");
 }
 
+$conn->query("CREATE TABLE IF NOT EXISTS sensus_sls_pengawas (
+    sls_code VARCHAR(20) NOT NULL,
+    pml_email VARCHAR(150) NOT NULL DEFAULT '',
+    pml_nama  VARCHAR(200) NOT NULL DEFAULT '',
+    PRIMARY KEY (sls_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
 $kecNama = [
     '010' => 'Dampal Selatan', '020' => 'Dampal Utara',
     '030' => 'Dondo',          '031' => 'Ogodeide',
@@ -498,6 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($clearFirst) {
                 $conn->query("TRUNCATE TABLE sensus_pml");
+                $conn->query("TRUNCATE TABLE sensus_sls_pengawas");
             }
 
             // Format: Email, Nama, SLS_Code, OPEN, DRAFT, SUBMITTED_BY_PENCACAH,
@@ -505,7 +513,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             //         EDITED_BY_ADMIN_KABUPATEN, EDITED_BY_PENGAWAS
             // kec_code = $emailKec lookup, fallback 3 digit pertama SLS_Code
             // Baris di-aggregate (SUM) per email+kec_code sebelum upsert
-            $grouped = [];
+            $grouped    = [];
+            $slsMapping = []; // sls_code => [email, nama]
             while (($row = fgetcsv($handle)) !== false) {
                 $row    = array_pad($row, 11, 0);
                 [$remail, $rnama, $rsls, $ropen, $rdraft, $rsub, $rappr, $rrej, $rrev, $rea, $rep] = $row;
@@ -515,6 +524,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$remail) { $skipped++; continue; }
                 $rkec = $emailKec[strtolower($remail)] ?? substr($rsls, 0, 3);
                 if (!$rkec) { $skipped++; continue; }
+
+                // Simpan mapping sls_code → PML
+                if ($rsls) $slsMapping[$rsls] = ['email' => $remail, 'nama' => $rnama];
+
                 $key = $remail . '|' . $rkec;
                 if (!isset($grouped[$key])) {
                     $grouped[$key] = ['email'=>$remail,'nama'=>$rnama,'kec'=>$rkec,
@@ -530,6 +543,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $grouped[$key]['ep'] += (int)$rep;   // EDITED_BY_PENGAWAS
             }
             fclose($handle);
+
+            // Simpan mapping sls_code → pengawas
+            foreach ($slsMapping as $sls => $pml) {
+                $es = $conn->real_escape_string($sls);
+                $ep = $conn->real_escape_string($pml['email']);
+                $np = $conn->real_escape_string($pml['nama']);
+                $conn->query("INSERT INTO sensus_sls_pengawas (sls_code, pml_email, pml_nama)
+                    VALUES ('$es','$ep','$np')
+                    ON DUPLICATE KEY UPDATE pml_email='$ep', pml_nama='$np'");
+            }
+
             foreach ($grouped as $g) {
                 $em = $conn->real_escape_string($g['email']);
                 $nm = $conn->real_escape_string($g['nama']);
@@ -544,7 +568,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     edited_by_pengawas=$ep, edited_by_admin=$ea");
                 if ($r) $upserted++; else $skipped++;
             }
-            $redir_msg = "Import selesai: $upserted baris diproses (insert/update)" . ($skipped ? ", $skipped dilewati (email/kec kosong)" : '') . '.';
+            $redir_msg = "Import selesai: $upserted baris diproses (insert/update), " . count($slsMapping) . " SLS pengawas dipetakan" . ($skipped ? ", $skipped dilewati" : '') . '.';
         } else {
             $redir_msg = 'Gagal membaca file CSV.'; $redir_type = 'danger';
         }
