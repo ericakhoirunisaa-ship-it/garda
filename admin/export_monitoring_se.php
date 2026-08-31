@@ -7,6 +7,13 @@ require_once __DIR__ . '/se_petugas.php';
 require_once __DIR__ . '/se_desa_map.php';
 
 /* ── Pengawas per SLS dari sensus_sls_pengawas ── */
+$conn->query("CREATE TABLE IF NOT EXISTS sensus_sls_pengawas (
+    sls_code  VARCHAR(20)  NOT NULL,
+    pml_email VARCHAR(150) NOT NULL DEFAULT '',
+    pml_nama  VARCHAR(200) NOT NULL DEFAULT '',
+    PRIMARY KEY (sls_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
 $pengawasPerSls = [];
 $pmlRows = $conn->query("SELECT sls_code, pml_nama, pml_email FROM sensus_sls_pengawas");
 if ($pmlRows) {
