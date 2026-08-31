@@ -428,6 +428,112 @@ if (($_GET['action'] ?? '') === 'export') {
     exit;
 }
 
+// ── Export Excel ──────────────────────────────────────────────────────────────
+if (($_GET['action'] ?? '') === 'export_excel') {
+    $kecXls  = $conn->real_escape_string($_GET['kec'] ?? '');
+    $where   = $kecXls ? "WHERE kec_code='$kecXls'" : '';
+    $all     = $conn->query("SELECT * FROM sensus_pml $where ORDER BY kec_code, nama, email")->fetch_all(MYSQLI_ASSOC);
+
+    $kecLabel = $kecXls ? ('_Kec' . $kecXls) : '';
+    header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+    header('Content-Disposition: attachment; filename="Data_PML_SE2026' . $kecLabel . '_' . date('Ymd_His') . '.xls"');
+    header('Cache-Control: max-age=0');
+
+    function xc_pml($val, $sid = 'data') {
+        $v = htmlspecialchars((string)($val ?? ''), ENT_XML1, 'UTF-8');
+        return "<Cell ss:StyleID=\"{$sid}\"><Data ss:Type=\"String\">{$v}</Data></Cell>\n";
+    }
+    function xcn_pml($val, $sid = 'num') {
+        return "<Cell ss:StyleID=\"{$sid}\"><Data ss:Type=\"Number\">" . (int)$val . "</Data></Cell>\n";
+    }
+
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    echo '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:x="urn:schemas-microsoft-com:office:excel">
+ <Styles>
+  <Style ss:ID="hdr">
+   <Font ss:Bold="1" ss:Color="#FFFFFF" ss:Size="9"/>
+   <Interior ss:Color="#f79039" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+  </Style>
+  <Style ss:ID="data">
+   <Font ss:Size="9"/>
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#e2e8f0"/></Borders>
+  </Style>
+  <Style ss:ID="num">
+   <Font ss:Size="9"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Top"/>
+   <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#e2e8f0"/></Borders>
+  </Style>
+  <Style ss:ID="title"><Font ss:Bold="1" ss:Size="12"/></Style>
+  <Style ss:ID="sub"><Font ss:Italic="1" ss:Size="9" ss:Color="#6b7280"/></Style>
+ </Styles>
+ <Worksheet ss:Name="Data PML SE2026">
+  <Table>
+   <Column ss:Width="28"/>
+   <Column ss:Width="150"/>
+   <Column ss:Width="130"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="42"/>
+   <Column ss:Width="42"/>
+   <Column ss:Width="52"/>
+   <Column ss:Width="52"/>
+   <Column ss:Width="52"/>
+   <Column ss:Width="48"/>
+   <Column ss:Width="55"/>
+   <Column ss:Width="55"/>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="title"><Data ss:Type="String">Data PML Sensus Ekonomi 2026' .
+        ($kecXls ? ' — Kecamatan ' . htmlspecialchars($kecNama[$kecXls] ?? $kecXls) : '') .
+    '</Data></Cell>
+   </Row>
+   <Row ss:Height="14">
+    <Cell ss:StyleID="sub"><Data ss:Type="String">Dicetak: ' . date('d M Y H:i') . ' WIB  |  Total: ' . count($all) . ' PML</Data></Cell>
+   </Row>
+   <Row/>
+   <Row ss:Height="28">
+    ' . xc_pml('#', 'hdr') .
+    xc_pml('Email PML', 'hdr') .
+    xc_pml('Nama PML', 'hdr') .
+    xc_pml('Kecamatan', 'hdr') .
+    xc_pml('Open', 'hdr') .
+    xc_pml('Draft', 'hdr') .
+    xc_pml('Submit', 'hdr') .
+    xc_pml('Approved', 'hdr') .
+    xc_pml('Rejected', 'hdr') .
+    xc_pml('Revoke', 'hdr') .
+    xc_pml('Edit PML', 'hdr') .
+    xc_pml('Edit Admin', 'hdr') . '
+   </Row>';
+
+    foreach ($all as $i => $row) {
+        $resolvedKec = $emailKec[strtolower($row['email'])] ?? $row['kec_code'];
+        $nmKec = ($kecNama[$resolvedKec] ?? $resolvedKec) . ' (' . $resolvedKec . ')';
+        $nmPML = $getNamaPML($row['email'], $row['nama']);
+        echo '   <Row>
+    ' . xcn_pml($i + 1) .
+        xc_pml($row['email']) .
+        xc_pml($nmPML) .
+        xc_pml($nmKec) .
+        xcn_pml($row['open_count']) .
+        xcn_pml($row['draft']) .
+        xcn_pml($row['submitted']) .
+        xcn_pml($row['approved']) .
+        xcn_pml($row['rejected']) .
+        xcn_pml($row['revoke']) .
+        xcn_pml($row['edited_by_pengawas']) .
+        xcn_pml($row['edited_by_admin']) . '
+   </Row>' . "\n";
+    }
+
+    echo '  </Table>
+ </Worksheet>
+</Workbook>';
+    exit;
+}
+
 // ── POST handlers ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -727,6 +833,9 @@ $records    = $conn->query("SELECT * FROM sensus_pml $whereSQL ORDER BY kec_code
                         </button>
                         <a href="?action=export" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-download me-1"></i>Export CSV
+                        </a>
+                        <a href="?action=export_excel&kec=<?= htmlspecialchars($filterKec) ?>" class="btn btn-sm btn-success">
+                            <i class="bi bi-file-earmark-excel me-1"></i>Unduh Excel
                         </a>
                         <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAll()">
                             <i class="bi bi-trash3-fill me-1"></i>Hapus Semua
